@@ -21,30 +21,22 @@ class TrondheimSpider(scrapy.Spider):
     def parse(self, response):
         # Only store HTML responses, not other attachments.
         if isinstance(response, HtmlResponse):
-            # Parse the raw HTML using BeautifulSoup.
-            soup = BeautifulSoup(response.body)
+            # Find all paragraphs in the response.
+            paragraphs = response.css('p')
 
-            # Remove elements which are not rendered in the browser.
-            for script in soup(['script', 'style']): script.extract()
-            
-            # Extract the raw text from the document/
-            text = soup.get_text()
-
-            # Strip extra spaces around all lines.
-            lines = (line.strip() for line in text.splitlines())
-
-            # Remove blank lines.
-            text = '\n'.join(line for line in lines if line)
-
-            # Yield the data we store for this page.
-            yield {
-                'url': response.url,
-                'text': text,
-            }
+            for paragraph in paragraphs:
+                # Return the paragraph contents and the link
+                # the paragraph was retrieved from.
+                yield {
+                    'url': response.url,
+                    'contents': paragraph.extract(),
+                }
 
             # Follow all links from allowed domains.
             for next_page in LinkExtractor().extract_links(response):
                 for allowed_path in self.allowed_paths:
+                    # Only follow the link if it is in the list
+                    # of allowed paths.
                     if allowed_path in next_page.url:
                         yield response.follow(next_page, self.parse)
                         break
