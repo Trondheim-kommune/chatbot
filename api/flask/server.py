@@ -1,7 +1,18 @@
 import json
 from flask import *
+import dialogflow_v2beta1
+import os
 
 app = Flask(__name__)
+
+# This dictionary contains a mapping from synonyms to entity_type in order to match training phrases with
+# entities.
+entities = {}
+# A simple flag if you have already loaded the entities or not.
+entities_loaded = False
+
+PROJECT_ID = os.getenv("PROJECT_ID")
+print(PROJECT_ID)
 
 
 @app.route("/flask", methods=["POST"])
@@ -38,3 +49,85 @@ def get_fulfillmentText(raw_query_text, intent, entities, def_fulfil_text):
     print(entities)
     print(def_fulfil_text)
     return "Works"
+
+
+@app.route("/create_intent", methods=["POST"])
+def create_intent():
+    json_input_data = json.loads(request.data)
+    try:
+        intent_name = json_input_data["intent_name"]
+    except KeyError:
+        return "Could not find intent_name"
+
+    try:
+        training_phrases = json_input_data["training_phrases"]
+    except KeyError:
+        training_phrases = []
+
+    intent = {
+        "display_name": intent_name,
+        "webhook_state": True,
+        "training_phrases": [],
+        "parameters": []
+    }
+
+    client = dialogflow_v2beta1.IntentsClient()
+    parent = client.project_agent_path(PROJECT_ID)
+    parameters = []
+    for training_phrase in training_phrases:
+        parts = []
+
+        for word in training_phrase.split():
+            try:
+                # This is when we find an entity matching this specific word in the training phrase.
+                # Then we need to add entity type to the word and add the parameter to the intent.
+                entity_type = entities[word]
+                parts.append({"text": word + " ", "entity_type": "@" + entity_type,
+                              "alias": entity_type})
+
+                parameters.append({"display_name": entity_type,
+                                   "entity_type_display_name": "@" + entity_type,
+                                   "value": "$" + entity_type
+                                   })
+
+            except KeyError:
+                # All the non-matching words.
+                parts.append({"text": word + " "})
+
+        intent["training_phrases"].append({"parts": parts, "type": "EXAMPLE"})
+
+    intent["parameters"] = parameters
+
+    response = client.create_intent(parent, intent)
+    try:
+        # Return the newly created intent ID.
+        return response.name
+    except:
+        return "Could not get intent ID, failed to insert intent."
+
+
+# This method is used for fetching every entity and caching it.
+def get_entities():
+    global entities_loaded
+
+    if entities_loaded:
+        # No reason to do this more than once. So if we have already loaded them just return now.
+        return
+
+    global entities
+    client = dialogflow_v2beta1.EntityTypesClient()
+    parent = client.project_agent_path(PROJECT_ID)
+
+    # For every entity_type element
+    for element in client.list_entity_types(parent):
+        entity_type = element.display_name
+        for entity in element.entities:
+            # Get every synonym.
+            for synonym in entity.synonyms:
+                # Insert them into the big dictionary.
+                entities[synonym] = entity_type
+
+    entities_loaded = True
+
+
+get_entities()
