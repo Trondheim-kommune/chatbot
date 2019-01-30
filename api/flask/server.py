@@ -110,11 +110,8 @@ def create_intent():
 def get_entities():
     global entities_loaded
 
-    if entities_loaded:
-        # No reason to do this more than once. So if we have already loaded them just return now.
-        return
-
     global entities
+    entities = {}
     client = dialogflow_v2beta1.EntityTypesClient()
     parent = client.project_agent_path(PROJECT_ID)
 
@@ -128,6 +125,35 @@ def get_entities():
                 entities[synonym] = entity_type
 
     entities_loaded = True
+
+
+def batch_create_intents():
+    # TODO https://cloud.google.com/dialogflow-enterprise/docs/reference/rest/v2beta1/projects.agent.intents/batchUpdate
+    pass
+
+
+# Creates entites and adds them into the global entities dictionary.
+@app.route("/batch_create_entities", methods=["POST"])
+def batch_create_entities():
+    json_input_data = json.loads(request.data)
+
+    client = dialogflow_v2beta1.EntityTypesClient()
+    parent = client.project_agent_path(PROJECT_ID)
+
+    entity_types = json_input_data["data"]
+    # A simple counter for how many entity types we have inserted.
+    counter = 0
+
+    for entity_type in entity_types:
+        entity_type_out = {"display_name": entity_type["entity_type_name"], "kind": "KIND_MAP",
+                           "entities": entity_type["entities"]}
+        response = client.create_entity_type(parent, entity_type_out)
+        counter += 1
+
+    # After we have inserted all the new entities we get_entities() again.
+    # TODO: it would be more efficient to add to the dictionary whilst uploading new entities.
+    get_entities()
+    return "Added " + str(counter) + " new entity types."
 
 
 get_entities()
