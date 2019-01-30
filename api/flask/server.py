@@ -51,19 +51,9 @@ def get_fulfillmentText(raw_query_text, intent, entities, def_fulfil_text):
     return "Works"
 
 
-@app.route("/create_intent", methods=["POST"])
-def create_intent():
-    json_input_data = json.loads(request.data)
-    try:
-        intent_name = json_input_data["intent_name"]
-    except KeyError:
-        return "Could not find intent_name"
-
-    try:
-        training_phrases = json_input_data["training_phrases"]
-    except KeyError:
-        training_phrases = []
-
+# This method take in a name and training phrases and creates the intent object and maps intents to entities
+# if it finds a match.
+def create_intent_object(intent_name, training_phrases):
     intent = {
         "display_name": intent_name,
         "webhook_state": True,
@@ -71,8 +61,6 @@ def create_intent():
         "parameters": []
     }
 
-    client = dialogflow_v2beta1.IntentsClient()
-    parent = client.project_agent_path(PROJECT_ID)
     parameters = []
     for training_phrase in training_phrases:
         parts = []
@@ -97,8 +85,28 @@ def create_intent():
         intent["training_phrases"].append({"parts": parts, "type": "EXAMPLE"})
 
     intent["parameters"] = parameters
+    return intent
 
+
+@app.route("/create_intent", methods=["POST"])
+def create_intent():
+    json_input_data = json.loads(request.data)
+    try:
+        intent_name = json_input_data["intent_name"]
+    except KeyError:
+        return "Could not find intent_name"
+
+    try:
+        training_phrases = json_input_data["training_phrases"]
+    except KeyError:
+        training_phrases = []
+
+    client = dialogflow_v2beta1.IntentsClient()
+    parent = client.project_agent_path(PROJECT_ID)
+
+    intent = create_intent_object(intent_name, training_phrases)
     response = client.create_intent(parent, intent)
+
     try:
         # Return the newly created intent ID.
         return response.name
@@ -127,9 +135,28 @@ def get_entities():
     entities_loaded = True
 
 
+# This is used to insert multiple intents at the same time, much more efficient than runner the
+# create_intent multiple times.
+@app.route("/batch_create_intents", methods=["POST"])
 def batch_create_intents():
-    # TODO https://cloud.google.com/dialogflow-enterprise/docs/reference/rest/v2beta1/projects.agent.intents/batchUpdate
-    pass
+    json_input_data = json.loads(request.data)
+    intents = json_input_data["data"]
+    intents_out = []
+
+    # A simple counter for how many intents we have inserted.
+    counter = 0
+
+    for intent in intents:
+        current_intent = create_intent_object(intent["intent_name"], intent["training_phrases"])
+        intents_out.append(current_intent)
+        counter += 1
+
+    client = dialogflow_v2beta1.IntentsClient()
+    parent = client.project_agent_path(PROJECT_ID)
+
+    response = client.batch_update_intents(parent, "no", intent_batch_inline={"intents": intents_out})
+
+    return counter
 
 
 # Creates entites and adds them into the global entities dictionary.
