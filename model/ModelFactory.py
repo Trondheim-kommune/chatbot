@@ -25,23 +25,32 @@ class ModelFactory:
     def set_database(self, ip, db_name, username, password, port=27017):
         """ Sets up conncetion to given database"""
         client = pymongo.MongoClient("mongodb://{}:{}@{}:{}/{}"
-                                        .format(username, password, ip, port, db_name)
+                                        .format(username, password, 
+                                                ip, port, db_name)
                                     )
         self.database = client[db_name]
     
     # TODO: some validation on response to make sure everything is posted
     def post_document(self, data, collection):
         """ Posts JSON data to colletion in db """
-        col = self.database[collection]
+        col = self.get_collection(collection)
         data = json_util.loads(data)
         response = col.insert_one(data)
 
+    def get_document(self, query, collection):
+        """ Takes a dictionary and checks if all fields in dictionary matches
+        the same fields in a document. If so, returns the document """
+        col = self.get_collection(collection)
+        return col.find_one({ "$and": [ query ] })
 
-if __name__ == "__main__":
-    fact = ModelFactory.get_instance()
-    db = fact.set_database("agent25.tinusf.com", "test_db", 
-            str(os.getenv('DB_USER')), str(os.getenv('DB_PWD')))
+    def update_document(self, query, data, collection):
+        """ Updates the document specified in query with the new data """
+        col = self.get_collection(collection)
+        data = json_util.loads(data)
+        col.find_one_and_update({ "$and": [ query ] }, { "$set": data })
+        
+    def get_collection(self, collection):
+        return self.database[collection]
 
-    with open('schema/example_data.json') as f:
-        data =  f.read()
-    fact.post_document(data, "site")
+    def get_database(self):
+        return self.database
