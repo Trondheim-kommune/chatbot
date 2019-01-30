@@ -3,13 +3,15 @@ from scrapy.linkextractors import LinkExtractor
 from scrapy.http import HtmlResponse
 from bs4 import BeautifulSoup
 from anytree import RenderTree, NodeMixin
+from anytree.exporter import DictExporter
 
+# Global ID counter for nodes.
 tree_node_id = 0
 
 class TreeElement(NodeMixin):
     def __init__(self, tag, text, parent=None):
+        """Tree node which stores information about an HTML element."""
         global tree_node_id
-        self.name = tag
         self.tag = tag
         self.text = text
         self.parent = parent
@@ -34,71 +36,69 @@ class TrondheimSpider(scrapy.Spider):
     def parse(self, response):
         # Only store HTML responses, not other attachments.
         if isinstance(response, HtmlResponse):
-            # Find all paragraphs in the response.
-            paragraphs = response.css('p')
-
-            for paragraph in paragraphs:
-                # Return the paragraph contents and the link
-                # the paragraph was retrieved from.
-                yield {
-                    'url': response.url,
-                    'contents': paragraph.extract(),
-                }
-
             elements = response.css('h1, h2, h3, h4, h5, h6, p')
 
-            # Root element
-            root = TreeElement("root", "root", None)
-            # Current position, parent, in hierachy
+            # Root element of the tree.
+            root = TreeElement('root', 'root', None)
+
+            # Current position in the tree.
             current_position = root
 
             for elem in elements:
-                elem_text = BeautifulSoup(elem.extract()).text
-                elem_tag = list(BeautifulSoup(elem.extract(), "html.parser").children)[0].name
+                # Parse the element using BeautifulSoup.
+                soup = BeautifulSoup(elem.extract(), 'html.parser')
 
-                # Find parent for element
+                current_text = soup.text
+
+                current_tag = list(soup.children)[0].name
+
+                # The parent which will be used for the current element.
                 parent = None
 
-                # p is always a child of current posistion
-                if elem_tag == "p":
-                    TreeElement(elem_tag, elem_text, current_position)
+                # Paragraphs are always a children, they cannot contain any headers.
+                if current_tag == 'p':
+                    # Add the paragraph to the tree.
+                    TreeElement(current_tag, current_text, current_position)
                 else:
-                    # If element has same level in hierachy
-                    if elem_tag == current_position.tag:
+                    # If this header is at the same level in the hierarchy.
+                    if current_tag == current_position.tag:
                         parent = current_position.parent
-                    elif current_position.tag != "root" and int((elem_tag[1])) > (int(current_position.tag[1])):
-                        # If we have found child of currentposition
+                    elif current_position.tag != 'root' and int((current_tag[1])) > (int(current_position.tag[1])):
+                        # If we have found a child of the current position.
                         parent = current_position
 
                     else:
-                        # search for appropriate parent
-                        temp_parent = current_position
+                        # Search for the appropriate parent.
+                        search_position = current_position
+                        
                         while True:
-                            # if we find root
-                            if temp_parent == root:
+                            # If we reach the root element.
+                            if search_position == root:
                                 parent = root
                                 break
 
-                            # if we have found the same level in hierarchy
-                            if int(temp_parent.tag[1]) == int(elem_tag[1]):
-                                parent = temp_parent.parent
-                                break
-                                # Set parent according to header hierarchy
-                            elif int(temp_parent.tag[1]) < int(elem_tag[1]):
-                                parent = temp_parent
+                            # If we have found the same level in hierarchy.
+                            if int(search_position.tag[1]) == int(current_tag[1]):
+                                parent = search_position.parent
                                 break
 
+                            # Set parent according to header hierarchy.
+                            elif int(search_position.tag[1]) < int(current_tag[1]):
+                                parent = search_position
+                                break
 
                             # Update current parent when searching
-                            temp_parent = temp_parent.parent
+                            search_position = search_position.parent
 
-                    # Create element
-                    current_position = TreeElement(elem_tag, elem_text, parent)
+                    # Create the new tree node.
+                    current_position = TreeElement(current_tag, current_text, parent)
 
-            # Printing nodetree
-            for pre, fill, node in RenderTree(root):
-                print("%s%s" % (pre, node.text))
+            exporter = DictExporter()
 
+            yield {
+                'url': response.url,
+                'tree': exporter.export(root)
+            }
 
             # Follow all links from allowed domains.
             for next_page in LinkExtractor().extract_links(response):
