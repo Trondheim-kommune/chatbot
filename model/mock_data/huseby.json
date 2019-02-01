@@ -1,0 +1,533 @@
+{
+  "url": "https://trondheim.kommune.no/tema/kultur-og-fritid/lokaler/husebybadet/",
+  "tree": {
+    "tag": "root",
+    "text": "root",
+    "id": 28568,
+    "children": [
+      {
+        "tag": "h1",
+        "text": "Svømmehall - Husebybadet",
+        "id": 28569,
+        "children": [
+          {
+            "tag": "h2",
+            "text": "Innhold",
+            "id": 28570
+          },
+          {
+            "tag": "h2",
+            "text": "Ordinære åpningstider",
+            "id": 28571,
+            "children": [
+              {
+                "tag": "p",
+                "text": "Mandag, onsdag, fredag: 15.00–20.00Tirsdag, torsdag: 15.00–17.30 og 19.30–22.30Lørdag, søndag: 10.00–16.00",
+                "id": 28572
+              },
+              {
+                "tag": "p",
+                "text": "Badetiden er minimum 30 min, og du kan bade så lenge du vil. Stengetiden angir når badegjestene må opp av bassenget. ",
+                "id": 28573
+              },
+              {
+                "tag": "h3",
+                "text": "Morgenbading",
+                "id": 28574,
+                "children": [
+                  {
+                    "tag": "p",
+                    "text": "Alle hverdager: 06.30-08.30",
+                    "id": 28575
+                  }
+                ]
+              },
+              {
+                "tag": "h3",
+                "text": "Trimsvømming for voksen",
+                "id": 28576,
+                "children": [
+                  {
+                    "tag": "p",
+                    "text": "Alle hverdager: 14.00-15.00",
+                    "id": 28577
+                  },
+                  {
+                    "tag": "p",
+                    "text": "Kr 60",
+                    "id": 28578
+                  }
+                ]
+              },
+              {
+                "tag": "h3",
+                "text": "Vanngym",
+                "id": 28579,
+                "children": [
+                  {
+                    "tag": "p",
+                    "text": "Tirsdag, torsdag: 14.00–15.00",
+                    "id": 28580
+                  }
+                ]
+              },
+              {
+                "tag": "h3",
+                "text": "Babysvømming",
+                "id": 28581,
+                "children": [
+                  {
+                    "tag": "p",
+                    "text": "Mandag, onsdag, fredag: 14.00–15.00Her er det drop-in timer med instruktør i vannet. Foresatte må ta kontakt med instruktøren hvis de ønsker hjelp. Babyene kan starte fra de er seks til åtte uker gamle. Temperaturen i vannet er 33 grader.",
+                    "id": 28582
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "tag": "h2",
+            "text": "Billettpriser",
+            "id": 28583,
+            "children": [
+			  {
+				"tag": "p",
+				"text": "Enkeltbillett: 105,-Trimsvømming*: 60,-Klippekort med 12 klipp: 920,-Årskort: 3135,-Halvårskort: 2060,-",
+				"id": 28585
+			  },
+              {
+                "tag": "h3",
+                "text": "Voksne",
+                "id": 28584,
+                "children": [
+                  {
+                    "tag": "p",
+                    "text": "Enkeltbillett: 105,-Trimsvømming*: 60,-Klippekort med 12 klipp: 920,-Årskort: 3135,-Halvårskort: 2060,-",
+                    "id": 28585
+                  },
+                  {
+                    "tag": "p",
+                    "text": "*Svømming når det foregår tilrettelagt aktivitet i deler av badet.",
+                    "id": 28586
+                  }
+                ]
+              },
+              {
+                "tag": "h3",
+                "text": "Barn (0-16) og honnør",
+                "id": 28587,
+                "children": [
+                  {
+                    "tag": "p",
+                    "text": "Enkeltbillett barn 0-2 år: GratisEnkeltbillett barn 3-16 år: 60,-                                                 ",
+                    "id": 28588
+                  },
+                  {
+                    "tag": "p",
+                    "text": "Enkeltbillett honnør: 60,-",
+                    "id": 28589
+                  },
+                  {
+                    "tag": "p",
+                    "text": "Klippekort med 12 klipp: 450,-Årskort: 1750,-",
+                    "id": 28590
+                  }
+                ]
+              },
+              {
+                "tag": "h3",
+                "text": "Studenter (fra 17 år med gyldig studiebevis)",
+                "id": 28591,
+                "children": [
+                  {
+                    "tag": "p",
+                    "text": "Enkeltbillett: 75,-Klippekort med 12 klipp: 595,-Årskort: 2380,-",
+                    "id": 28592
+                  }
+                ]
+              },
+              {
+                "tag": "h3",
+                "text": "Familie (maks 2 voksne og 3 barn)",
+                "id": 28593,
+                "children": [
+                  {
+                    "tag": "p",
+                    "text": "Enkeltbillett: 200,-Klippekort med 10 klipp: 1575,-",
+                    "id": 28594
+                  }
+                ]
+              },
+              {
+                "tag": "h3",
+                "text": "Cup/turnering",
+                "id": 28595,
+                "children": [
+                  {
+                    "tag": "p",
+                    "text": "Deltakere med bevis: 45,-",
+                    "id": 28596
+                  }
+                ]
+              },
+              {
+                "tag": "h3",
+                "text": "Diverse",
+                "id": 28597,
+                "children": [
+                  {
+                    "tag": "p",
+                    "text": "Badetøy (utlån per gang): 75,-",
+                    "id": 28598
+                  },
+                  {
+                    "tag": "p",
+                    "text": "Vi selger også badebleier, håndkle og diverse svømmeutstyr. ",
+                    "id": 28599
+                  },
+                  {
+                    "tag": "p",
+                    "text": "Medlemmer i Actic treningssenter kan benytte Husebybadet i badets åpningstider. Svømming når det foregår tilrettelagt aktivitet i deler av badet.",
+                    "id": 28600
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "tag": "h2",
+            "text": "Leie av Husebybadet",
+            "id": 28601,
+            "children": [
+              {
+                "tag": "p",
+                "text": "Du kan leie Husebybadet til bursdager og andre arrangementer, på lørdager og søndager mellom 16.00 og 20.00.",
+                "id": 28602
+              },
+              {
+                "tag": "p",
+                "text": "Har du spørsmål eller ønsker å avtale leie, ta kontakt på telefon 95263688 (betjenes i åpningstid).",
+                "id": 28603
+              },
+              {
+                "tag": "p",
+                "text": "Priser",
+                "id": 28604
+              },
+              {
+                "tag": "p",
+                "text": "Pris for leie er kr 1605,- per time. Du kan også leie foajéen for et tillegg på kr 205,-",
+                "id": 28605
+              },
+              {
+                "tag": "p",
+                "text": "Betaling av leie gjøres ved ankomst.",
+                "id": 28606
+              },
+              {
+                "tag": "p",
+                "text": "Badevakt",
+                "id": 28607
+              },
+              {
+                "tag": "p",
+                "text": "Ved leie i helgene stiller Husebybadet med en badevakt. Du som er leietaker må i tillegg stille med minimum én vakt over 18 år per 15 barn.",
+                "id": 28608
+              }
+            ]
+          },
+          {
+            "tag": "h2",
+            "text": "Svømmekurs",
+            "id": 28609,
+            "children": [
+              {
+                "tag": "p",
+                "text": "Svømmekurs (Vestbyen IL)",
+                "id": 28610
+              }
+            ]
+          },
+          {
+            "tag": "h2",
+            "text": "Fasiliteter",
+            "id": 28611,
+            "children": [
+              {
+                "tag": "p",
+                "text": "Husebybadet er åpent for alle, men har egne tider for blant annet trimsvømming, vanngym og babysvømming. Se under åpningstider for når disse aktivitetene foregår. Har du spørsmål om aldersgrenser for når du kan bade alene, ta kontakt på telefon 95263688.",
+                "id": 28612
+              },
+              {
+                "tag": "p",
+                "text": "Fasiliteter i Husebybadet",
+                "id": 28613
+              },
+              {
+                "tag": "p",
+                "text": "I Husebybadet finner du også Actic treningssenter. Actic-medlemmer kan bruke Husebybadet i åpningstiden.",
+                "id": 28614
+              }
+            ]
+          },
+          {
+            "tag": "h2",
+            "text": "Swim Tag",
+            "id": 28615,
+            "children": [
+              {
+                "tag": "p",
+                "text": "Vil du vite hvor langt du har svømt eller hvor fort det gikk? Med SwimTag blir alt du gjør i bassenget registrert.",
+                "id": 28616
+              },
+              {
+                "tag": "p",
+                "text": "Rundt bassenget i Husebybadet er det plassert en rekke sensorer.",
+                "id": 28617
+              },
+              {
+                "tag": "p",
+                "text": "Med et SwimTag-armbånd, vil du kunne registrere hvor langt du har svømt, hvor fort du svømte, hvor lange pauser du har tatt, hvilken stilart du benyttet og hvor mange og lange tak du har tatt. Du kan også få vite ditt estimerte kaloriforbruk.",
+                "id": 28618
+              },
+              {
+                "tag": "p",
+                "text": "Etter endt treningsøkt er informasjonen lett tilgjengelig i din egen brukerprofil, enkelt presentert med fargekodede grafer og oversiktlig grafikk. Du kan også velge å knytte din brukerprofil opp mot sosiale medier som Facebook og Twitter, og dele sin trening og fremgang med venner.",
+                "id": 28619
+              },
+              {
+                "tag": "p",
+                "text": "SwimTag er også et godt redskap for å gi barn og unge motivasjon til å lære seg å svømme. Det finnes ulike nivåer av treningsprogrammer integrert. Armbåndet koster ingenting.",
+                "id": 28620
+              }
+            ]
+          },
+          {
+            "tag": "h2",
+            "text": "Andre kommunale svømmehaller",
+            "id": 28621,
+            "children": [
+              {
+                "tag": "p",
+                "text": "Du kan også booke tid i andre kommunale svømmehaller via denne siden.",
+                "id": 28622
+              }
+            ]
+          },
+          {
+            "tag": "h2",
+            "text": "Kontakt oss",
+            "id": 28623,
+            "children": [
+              {
+                "tag": "p",
+                "text": "Adresse: Saupstadringen 13, 7078 TRONDHEIM",
+                "id": 28624
+              },
+              {
+                "tag": "p",
+                "text": "Telefon: 95263688 (betjenes i Husebybadets åpningstid)",
+                "id": 28625
+              },
+              {
+                "tag": "p",
+                "text": "Følg Husebybadet på Facebook",
+                "id": 28626
+              },
+              {
+                "tag": "p",
+                "text": "E-post: bydrift.postmottak@trondheim.kommune.no",
+                "id": 28627
+              },
+              {
+                "tag": "p",
+                "text": "Sist oppdatert: 21.01.2019 ",
+                "id": 28628
+              },
+              {
+                "tag": "h3",
+                "text": "Fant du det du lette etter?",
+                "id": 28629,
+                "children": [
+                  {
+                    "tag": "p",
+                    "text": "Hva forsøkte du å finne?",
+                    "id": 28630
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "tag": "h2",
+            "text": "Kontaktinfo",
+            "id": 28631,
+            "children": [
+              {
+                "tag": "p",
+                "text": "Kontakt kommunen",
+                "id": 28632
+              },
+              {
+                "tag": "p",
+                "text": "Søk etter ansatt",
+                "id": 28633
+              },
+              {
+                "tag": "p",
+                "text": "Kontakt Trondheim bydrift",
+                "id": 28634
+              },
+              {
+                "tag": "p",
+                "text": "Personvern",
+                "id": 28635
+              }
+            ]
+          },
+          {
+            "tag": "h2",
+            "text": "Aktuelt",
+            "id": 28636,
+            "children": [
+              {
+                "tag": "p",
+                "text": "Ledige stillinger",
+                "id": 28637
+              },
+              {
+                "tag": "p",
+                "text": "Kunngjøringer av planer",
+                "id": 28638
+              },
+              {
+                "tag": "p",
+                "text": "Nyheter",
+                "id": 28639
+              },
+              {
+                "tag": "p",
+                "text": "Postliste",
+                "id": 28640
+              },
+              {
+                "tag": "p",
+                "text": "Innsyn",
+                "id": 28641
+              },
+              {
+                "tag": "p",
+                "text": "Kurs og konferanser",
+                "id": 28642
+              },
+              {
+                "tag": "p",
+                "text": "Bystyrevideoer",
+                "id": 28643
+              },
+              {
+                "tag": "p",
+                "text": "Vigsel - gifte seg borgerlig",
+                "id": 28644
+              }
+            ]
+          },
+          {
+            "tag": "h2",
+            "text": "Organisasjon",
+            "id": 28645,
+            "children": [
+              {
+                "tag": "p",
+                "text": "Strategisk ledelse",
+                "id": 28646
+              },
+              {
+                "tag": "p",
+                "text": "Organisasjonen",
+                "id": 28647
+              },
+              {
+                "tag": "p",
+                "text": "Virksomheter og foretak",
+                "id": 28648
+              },
+              {
+                "tag": "p",
+                "text": "Miljøpakkens nettsted",
+                "id": 28649
+              },
+              {
+                "tag": "p",
+                "text": "Trondheim2030.no",
+                "id": 28650
+              },
+              {
+                "tag": "p",
+                "text": "Trondheim bys nettsted",
+                "id": 28651
+              },
+              {
+                "tag": "p",
+                "text": " ",
+                "id": 28652
+              },
+              {
+                "tag": "p",
+                "text": " ",
+                "id": 28653
+              },
+              {
+                "tag": "p",
+                "text": " ",
+                "id": 28654
+              }
+            ]
+          },
+          {
+            "tag": "h2",
+            "text": "Snarveier",
+            "id": 28655,
+            "children": [
+              {
+                "tag": "p",
+                "text": "English",
+                "id": 28656
+              },
+              {
+                "tag": "p",
+                "text": "Kart",
+                "id": 28657
+              },
+              {
+                "tag": "p",
+                "text": "Priser, avgifter og gebyr",
+                "id": 28658
+              },
+              {
+                "tag": "p",
+                "text": "Skjema fra A til Å",
+                "id": 28659
+              },
+              {
+                "tag": "p",
+                "text": "Åpningstider",
+                "id": 28660
+              },
+              {
+                "tag": "p",
+                "text": "Finn din bydel",
+                "id": 28661
+              },
+              {
+                "tag": "p",
+                "text": "Finn din skole",
+                "id": 28662
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
