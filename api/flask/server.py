@@ -125,7 +125,7 @@ def create_intent_post():
     except:
         return "Could not get intent ID, failed to insert intent."
 
-
+      
 def create_intent(intent_name, training_phrases):
     """
     This method creates only a single intent.
@@ -138,8 +138,8 @@ def create_intent(intent_name, training_phrases):
 
     intent = create_intent_object(intent_name, training_phrases)
     return client.create_intent(parent, intent)
-
-
+  
+  
 def get_entities():
     """This method is used for fetching every entity and caching it."""
     global entities_loaded
