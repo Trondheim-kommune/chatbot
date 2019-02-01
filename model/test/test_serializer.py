@@ -7,10 +7,10 @@ import json
 
 def test_serialize_data():
     # Test that data is serialized correctly
-    ser = Serializer("mock_data/test_data.json")
+    ser = Serializer("model/test/test_data/test_data.json")
     ser.serialize_data()
     test_data = ser.get_model()
-    with open("mock_data/test_data_serialized.json", "r") as f:
+    with open("model/test/test_data/test_data_serialized.json", "r") as f:
         serialized_data = json.load(f)
 
     assert test_data["url"] == serialized_data["url"]
