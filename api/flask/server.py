@@ -12,7 +12,6 @@ entities = {}
 entities_loaded = False
 
 PROJECT_ID = os.getenv("PROJECT_ID")
-print(PROJECT_ID)
 
 
 @app.route("/", methods=["GET"])
@@ -20,9 +19,11 @@ def test():
     return "Success."
 
 
-@app.route("/flask", methods=["POST"])
+@app.route("/v1/webhook", methods=["POST"])
 def get_response():
-    # Read the data sent using POST.
+    """
+    Read the data sent using POST.
+    """
     json_input_data = json.loads(request.data)
     try:
         raw_query_text = json_input_data["queryResult"]["queryText"]
@@ -49,6 +50,9 @@ def get_response():
 
 
 def get_fulfillmentText(raw_query_text, intent, entities, def_fulfil_text):
+    """
+    TODO: Write this method once we have mongoDB in place.
+    """
     print(raw_query_text)
     print(intent)
     print(entities)
@@ -56,9 +60,12 @@ def get_fulfillmentText(raw_query_text, intent, entities, def_fulfil_text):
     return "Works"
 
 
-# This method take in a name and training phrases and creates the intent object and maps intents to entities
-# if it finds a match. (Also a variable match_entity if you do not wish to match with entities you can turn it off.
 def create_intent_object(intent_name, training_phrases, match_entity=True):
+    """
+    This method take in a name and training phrases and creates the intent object and maps intents to entities
+    if it finds a match. (Also a variable match_entity if you do not wish to match with entities you can turn it off.
+
+    """
     intent = {
         "display_name": intent_name,
         "webhook_state": True,
@@ -97,8 +104,11 @@ def create_intent_object(intent_name, training_phrases, match_entity=True):
     return intent
 
 
-@app.route("/create_intent", methods=["POST"])
+@app.route("/v1/create_intent", methods=["POST"])
 def create_intent():
+    """
+    This method creates only a single intent.
+    """
     json_input_data = json.loads(request.data)
     try:
         intent_name = json_input_data["intent_name"]
@@ -123,8 +133,8 @@ def create_intent():
         return "Could not get intent ID, failed to insert intent."
 
 
-# This method is used for fetching every entity and caching it.
 def get_entities():
+    """This method is used for fetching every entity and caching it."""
     global entities_loaded
 
     global entities
@@ -144,10 +154,10 @@ def get_entities():
     entities_loaded = True
 
 
-# This is used to insert multiple intents at the same time, much more efficient than runner the
-# create_intent multiple times.
-@app.route("/batch_create_intents", methods=["POST"])
+@app.route("/v1/batch_create_intents", methods=["POST"])
 def batch_create_intents():
+    """This is used to insert multiple intents at the same time, much more efficient than running the
+    create_intent multiple times. """
     json_input_data = json.loads(request.data)
     intents = json_input_data["data"]
     intents_out = []
@@ -169,9 +179,11 @@ def batch_create_intents():
     return "Successfully inserted " + str(counter) + " intents."
 
 
-# Creates entites and adds them into the global entities dictionary.
-@app.route("/batch_create_entities", methods=["POST"])
+@app.route("/v1/batch_create_entities", methods=["POST"])
 def batch_create_entities():
+    """
+    Creates entites and adds them into the global entities dictionary.
+    """
     json_input_data = json.loads(request.data)
 
     client = dialogflow_v2beta1.EntityTypesClient()
@@ -194,9 +206,11 @@ def batch_create_entities():
     return json.dumps({"data": ID_list})
 
 
-# In order to delete multiple entities at a time.
-@app.route("/batch_delete_entities", methods=["POST"])
+@app.route("/v1/batch_delete_entities", methods=["POST"])
 def batch_delete_entities():
+    """
+    In order to delete multiple entities at a time.
+    """
     json_input_data = json.loads(request.data)
 
     client = dialogflow_v2beta1.EntityTypesClient()

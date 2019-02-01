@@ -103,14 +103,14 @@ def test_add_and_remove_entities(app):
         ]
     }
 
-    response = app.test_client().post('/batch_create_entities', data=json.dumps(input_dict))
+    response = app.test_client().post('/v1/batch_create_entities', data=json.dumps(input_dict))
     assert response.status_code == 200
     response_json = json.loads(response.data.decode())
     # Make sure you got 2 IDs back.
     assert 2 == len(response_json["data"])
 
     # Now we want to delete the 2 new entities.
-    response_2 = app.test_client().post('/batch_delete_entities', data=json.dumps({"data": response_json["data"]}))
+    response_2 = app.test_client().post('/v1/batch_delete_entities', data=json.dumps({"data": response_json["data"]}))
     assert response_2.status_code == 200
 
 
@@ -137,6 +137,6 @@ def test_add_intents(app):
             }
         ]
     }
-    response = app.test_client().post('/batch_create_intents', data=json.dumps(input_dict))
+    response = app.test_client().post('/v1/batch_create_intents', data=json.dumps(input_dict))
     assert response.status_code == 200
     assert b'Success' in response.data
