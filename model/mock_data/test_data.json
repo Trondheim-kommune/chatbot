@@ -1,0 +1,27 @@
+{
+    "url": "https://ntnu.no",
+    "tree": {
+        "tag": "root",
+        "text": "root",
+        "id": 1,
+        "children": [
+            {
+                "tag": "h2",
+                "text": "emner",
+                "id": 2
+            },
+            {
+                "tag": "h3",
+                "text": "mange bra emner",
+                "id": 3,
+                "children": [
+                    {
+                        "tag": "p",
+                        "text": "Informatikk prosjektarbeid 2 er et kjempe bra emne!",
+                        "id": 2
+                    }
+                ]
+            }
+        ]
+    }
+}
