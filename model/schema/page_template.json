@@ -1,0 +1,17 @@
+{
+	"title": "string",
+	"description": "string",
+	"url": "string",
+	"last_modified": "datetime",
+	"header_meta_keywords": ["string"],
+	"keywords": ["string"],
+	"contents":
+		[
+			{ 
+				"title": "string",
+				"keywords": [ {"keyword": "string", "confidence": "number"} ],
+				"text": ["string"]
+			}
+		],
+	"indexed": "boolean"
+}
