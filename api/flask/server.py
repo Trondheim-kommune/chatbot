@@ -15,6 +15,11 @@ PROJECT_ID = os.getenv("PROJECT_ID")
 print(PROJECT_ID)
 
 
+@app.route("/", methods=["GET"])
+def test():
+    return "Success."
+
+
 @app.route("/flask", methods=["POST"])
 def get_response():
     # Read the data sent using POST.
@@ -52,8 +57,8 @@ def get_fulfillmentText(raw_query_text, intent, entities, def_fulfil_text):
 
 
 # This method take in a name and training phrases and creates the intent object and maps intents to entities
-# if it finds a match.
-def create_intent_object(intent_name, training_phrases):
+# if it finds a match. (Also a variable match_entity if you do not wish to match with entities you can turn it off.
+def create_intent_object(intent_name, training_phrases, match_entity=True):
     intent = {
         "display_name": intent_name,
         "webhook_state": True,
@@ -67,6 +72,10 @@ def create_intent_object(intent_name, training_phrases):
 
         for word in training_phrase.split():
             try:
+                if not match_entity:
+                    # If you don't want to match with entities just append regular and continue to the next one.
+                    parts.append({"text": word + " "})
+                    continue
                 # This is when we find an entity matching this specific word in the training phrase.
                 # Then we need to add entity type to the word and add the parameter to the intent.
                 entity_type = entities[word]
@@ -155,8 +164,9 @@ def batch_create_intents():
     parent = client.project_agent_path(PROJECT_ID)
 
     response = client.batch_update_intents(parent, "no", intent_batch_inline={"intents": intents_out})
-
-    return counter
+    # Since reponse is an operation/ future object we don't really have anything to return here. So just a simple
+    # counter, so atleast we know how many intents we created.
+    return "Successfully inserted " + str(counter) + " intents."
 
 
 # Creates entites and adds them into the global entities dictionary.
@@ -168,19 +178,42 @@ def batch_create_entities():
     parent = client.project_agent_path(PROJECT_ID)
 
     entity_types = json_input_data["data"]
-    # A simple counter for how many entity types we have inserted.
-    counter = 0
+
+    # A list of the newly created entities ID's.
+    ID_list = []
 
     for entity_type in entity_types:
         entity_type_out = {"display_name": entity_type["entity_type_name"], "kind": "KIND_MAP",
                            "entities": entity_type["entities"]}
         response = client.create_entity_type(parent, entity_type_out)
-        counter += 1
-
+        ID_list.append(response.name.split("/")[-1])
     # After we have inserted all the new entities we get_entities() again.
     # TODO: it would be more efficient to add to the dictionary whilst uploading new entities.
     get_entities()
-    return "Added " + str(counter) + " new entity types."
+
+    return json.dumps({"data": ID_list})
+
+
+# In order to delete multiple entities at a time.
+@app.route("/batch_delete_entities", methods=["POST"])
+def batch_delete_entities():
+    json_input_data = json.loads(request.data)
+
+    client = dialogflow_v2beta1.EntityTypesClient()
+    parent = client.project_agent_path(PROJECT_ID)
+
+    entity_ids = json_input_data["data"]
+    entity_ids_fixed_path = []
+
+    # This may seems weird and it seems like it would not be necessary but there is a bug with the api and
+    # therefore we have to append the beginning of the path to every entity_id in order to get this to work.
+    for entity_id in entity_ids:
+        entity_ids_fixed_path.append(parent + "/entityTypes/" + entity_id)
+
+    response = client.batch_delete_entity_types(parent, entity_ids_fixed_path)
+
+    # Since reponse is an operation/ future object we don't really have anything to return here.
+    return "Success"
 
 
 get_entities()
