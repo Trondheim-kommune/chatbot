@@ -12,7 +12,6 @@ entities = {}
 entities_loaded = False
 
 PROJECT_ID = os.getenv("PROJECT_ID")
-print(PROJECT_ID)
 
 
 @app.route("/", methods=["GET"])
@@ -20,9 +19,11 @@ def test():
     return "Success."
 
 
-@app.route("/flask", methods=["POST"])
+@app.route("/v1/webhook", methods=["POST"])
 def get_response():
-    # Read the data sent using POST.
+    """
+    Read the data sent using POST.
+    """
     json_input_data = json.loads(request.data)
     try:
         raw_query_text = json_input_data["queryResult"]["queryText"]
@@ -45,10 +46,13 @@ def get_response():
         default_fulfillment_text = None
 
     return json.dumps(
-        {"fulfillmentText": get_fulfillmentText(raw_query_text, intent, entities, default_fulfillment_text)})
+        {"fulfillmentText": get_fulfillment_text(raw_query_text, intent, entities, default_fulfillment_text)})
 
 
-def get_fulfillmentText(raw_query_text, intent, entities, def_fulfil_text):
+def get_fulfillment_text(raw_query_text, intent, entities, def_fulfil_text):
+    """
+    TODO: Write this method once we have mongoDB in place.
+    """
     print(raw_query_text)
     print(intent)
     print(entities)
@@ -56,9 +60,12 @@ def get_fulfillmentText(raw_query_text, intent, entities, def_fulfil_text):
     return "Works"
 
 
-# This method take in a name and training phrases and creates the intent object and maps intents to entities
-# if it finds a match. (Also a variable match_entity if you do not wish to match with entities you can turn it off.
 def create_intent_object(intent_name, training_phrases, match_entity=True):
+    """
+    This method take in a name and training phrases and creates the intent object and maps intents to entities
+    if it finds a match. (Also a variable match_entity if you do not wish to match with entities you can turn it off.
+
+    """
     intent = {
         "display_name": intent_name,
         "webhook_state": True,
@@ -97,8 +104,8 @@ def create_intent_object(intent_name, training_phrases, match_entity=True):
     return intent
 
 
-@app.route("/create_intent", methods=["POST"])
-def create_intent():
+@app.route("/v1/create_intent", methods=["POST"])
+def create_intent_post():
     json_input_data = json.loads(request.data)
     try:
         intent_name = json_input_data["intent_name"]
@@ -110,11 +117,7 @@ def create_intent():
     except KeyError:
         training_phrases = []
 
-    client = dialogflow_v2beta1.IntentsClient()
-    parent = client.project_agent_path(PROJECT_ID)
-
-    intent = create_intent_object(intent_name, training_phrases)
-    response = client.create_intent(parent, intent)
+    response = create_intent(intent_name, training_phrases)
 
     try:
         # Return the newly created intent ID.
@@ -123,8 +126,22 @@ def create_intent():
         return "Could not get intent ID, failed to insert intent."
 
 
-# This method is used for fetching every entity and caching it.
+def create_intent(intent_name, training_phrases):
+    """
+    This method creates only a single intent.
+    :param intent_name: A simple string.
+    :param training_phrases: A list containing multiple training_phrases.
+    :return: the newly created intent.
+    """
+    client = dialogflow_v2beta1.IntentsClient()
+    parent = client.project_agent_path(PROJECT_ID)
+
+    intent = create_intent_object(intent_name, training_phrases)
+    return client.create_intent(parent, intent)
+
+
 def get_entities():
+    """This method is used for fetching every entity and caching it."""
     global entities_loaded
 
     global entities
@@ -144,12 +161,25 @@ def get_entities():
     entities_loaded = True
 
 
-# This is used to insert multiple intents at the same time, much more efficient than runner the
-# create_intent multiple times.
-@app.route("/batch_create_intents", methods=["POST"])
-def batch_create_intents():
+@app.route("/v1/batch_create_intents", methods=["POST"])
+def batch_create_intents_post():
     json_input_data = json.loads(request.data)
     intents = json_input_data["data"]
+
+    counter = batch_create_intents(intents)
+
+    # Since reponse is an operation/ future object we don't really have anything to return here. So just a simple
+    # counter, so atleast we know how many intents we created.
+    return "Successfully inserted " + str(counter) + " intents."
+
+
+def batch_create_intents(intents):
+    """
+    This is used to insert multiple intents at the same time, much more efficient than running the
+    create_intent multiple times.
+    :param intents: A list of intents you want to create.
+    :return: a simple int of
+    """
     intents_out = []
 
     # A simple counter for how many intents we have inserted.
@@ -163,21 +193,27 @@ def batch_create_intents():
     client = dialogflow_v2beta1.IntentsClient()
     parent = client.project_agent_path(PROJECT_ID)
 
-    response = client.batch_update_intents(parent, "no", intent_batch_inline={"intents": intents_out})
-    # Since reponse is an operation/ future object we don't really have anything to return here. So just a simple
-    # counter, so atleast we know how many intents we created.
-    return "Successfully inserted " + str(counter) + " intents."
+    client.batch_update_intents(parent, "no", intent_batch_inline={"intents": intents_out})
+    return counter
 
 
-# Creates entites and adds them into the global entities dictionary.
-@app.route("/batch_create_entities", methods=["POST"])
-def batch_create_entities():
+@app.route("/v1/batch_create_entities", methods=["POST"])
+def batch_create_entities_post():
     json_input_data = json.loads(request.data)
+    entity_types = json_input_data["data"]
 
+    ID_list = batch_create_entities(entity_types)
+    return json.dumps({"data": ID_list})
+
+
+def batch_create_entities(entity_types):
+    """
+    Creates entites and adds them into the global entities dictionary.
+    :param entity_types: A list of entity types.
+    :return: a list of the entity ID's created.
+    """
     client = dialogflow_v2beta1.EntityTypesClient()
     parent = client.project_agent_path(PROJECT_ID)
-
-    entity_types = json_input_data["data"]
 
     # A list of the newly created entities ID's.
     ID_list = []
@@ -191,18 +227,28 @@ def batch_create_entities():
     # TODO: it would be more efficient to add to the dictionary whilst uploading new entities.
     get_entities()
 
-    return json.dumps({"data": ID_list})
+    return ID_list
 
 
-# In order to delete multiple entities at a time.
-@app.route("/batch_delete_entities", methods=["POST"])
-def batch_delete_entities():
+@app.route("/v1/batch_delete_entities", methods=["POST"])
+def batch_delete_entities_post():
     json_input_data = json.loads(request.data)
+    entity_ids = json_input_data["data"]
+    batch_delete_entities(entity_ids)
 
+    # Since reponse is an operation/ future object we don't really have anything to return here.
+    return "Success"
+
+
+def batch_delete_entities(entity_ids):
+    """
+    In order to delete multiple entities at a time.
+    :param entity_ids:
+    :return: response which is an operation/ future object.
+    """
     client = dialogflow_v2beta1.EntityTypesClient()
     parent = client.project_agent_path(PROJECT_ID)
 
-    entity_ids = json_input_data["data"]
     entity_ids_fixed_path = []
 
     # This may seems weird and it seems like it would not be necessary but there is a bug with the api and
@@ -210,10 +256,7 @@ def batch_delete_entities():
     for entity_id in entity_ids:
         entity_ids_fixed_path.append(parent + "/entityTypes/" + entity_id)
 
-    response = client.batch_delete_entity_types(parent, entity_ids_fixed_path)
-
-    # Since reponse is an operation/ future object we don't really have anything to return here.
-    return "Success"
+    return client.batch_delete_entity_types(parent, entity_ids_fixed_path)
 
 
 get_entities()
