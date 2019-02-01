@@ -1,0 +1,233 @@
+import json
+from flask import *
+import dialogflow_v2beta1
+import os
+
+app = Flask(__name__)
+
+# This dictionary contains a mapping from synonyms to entity_type in order to match training phrases with
+# entities.
+entities = {}
+# A simple flag if you have already loaded the entities or not.
+entities_loaded = False
+
+PROJECT_ID = os.getenv("PROJECT_ID")
+
+
+@app.route("/", methods=["GET"])
+def test():
+    return "Success."
+
+
+@app.route("/v1/webhook", methods=["POST"])
+def get_response():
+    """
+    Read the data sent using POST.
+    """
+    json_input_data = json.loads(request.data)
+    try:
+        raw_query_text = json_input_data["queryResult"]["queryText"]
+    except KeyError:
+        raw_query_text = None
+
+    try:
+        intent = json_input_data["queryResult"]["intent"]["displayName"]
+    except KeyError:
+        intent = None
+
+    try:
+        entities = list(json_input_data["queryResult"]["parameters"].keys())
+    except KeyError:
+        entities = []
+
+    try:
+        default_fulfillment_text = json_input_data["queryResult"]["fulfillmentMessages"][0]["text"]["text"][0]
+    except KeyError:
+        default_fulfillment_text = None
+
+    return json.dumps(
+        {"fulfillmentText": get_fulfillmentText(raw_query_text, intent, entities, default_fulfillment_text)})
+
+
+def get_fulfillmentText(raw_query_text, intent, entities, def_fulfil_text):
+    """
+    TODO: Write this method once we have mongoDB in place.
+    """
+    print(raw_query_text)
+    print(intent)
+    print(entities)
+    print(def_fulfil_text)
+    return "Works"
+
+
+def create_intent_object(intent_name, training_phrases, match_entity=True):
+    """
+    This method take in a name and training phrases and creates the intent object and maps intents to entities
+    if it finds a match. (Also a variable match_entity if you do not wish to match with entities you can turn it off.
+
+    """
+    intent = {
+        "display_name": intent_name,
+        "webhook_state": True,
+        "training_phrases": [],
+        "parameters": []
+    }
+
+    parameters = []
+    for training_phrase in training_phrases:
+        parts = []
+
+        for word in training_phrase.split():
+            try:
+                if not match_entity:
+                    # If you don't want to match with entities just append regular and continue to the next one.
+                    parts.append({"text": word + " "})
+                    continue
+                # This is when we find an entity matching this specific word in the training phrase.
+                # Then we need to add entity type to the word and add the parameter to the intent.
+                entity_type = entities[word]
+                parts.append({"text": word + " ", "entity_type": "@" + entity_type,
+                              "alias": entity_type})
+
+                parameters.append({"display_name": entity_type,
+                                   "entity_type_display_name": "@" + entity_type,
+                                   "value": "$" + entity_type
+                                   })
+
+            except KeyError:
+                # All the non-matching words.
+                parts.append({"text": word + " "})
+
+        intent["training_phrases"].append({"parts": parts, "type": "EXAMPLE"})
+
+    intent["parameters"] = parameters
+    return intent
+
+
+@app.route("/v1/create_intent", methods=["POST"])
+def create_intent():
+    """
+    This method creates only a single intent.
+    """
+    json_input_data = json.loads(request.data)
+    try:
+        intent_name = json_input_data["intent_name"]
+    except KeyError:
+        return "Could not find intent_name"
+
+    try:
+        training_phrases = json_input_data["training_phrases"]
+    except KeyError:
+        training_phrases = []
+
+    client = dialogflow_v2beta1.IntentsClient()
+    parent = client.project_agent_path(PROJECT_ID)
+
+    intent = create_intent_object(intent_name, training_phrases)
+    response = client.create_intent(parent, intent)
+
+    try:
+        # Return the newly created intent ID.
+        return response.name
+    except:
+        return "Could not get intent ID, failed to insert intent."
+
+
+def get_entities():
+    """This method is used for fetching every entity and caching it."""
+    global entities_loaded
+
+    global entities
+    entities = {}
+    client = dialogflow_v2beta1.EntityTypesClient()
+    parent = client.project_agent_path(PROJECT_ID)
+
+    # For every entity_type element
+    for element in client.list_entity_types(parent):
+        entity_type = element.display_name
+        for entity in element.entities:
+            # Get every synonym.
+            for synonym in entity.synonyms:
+                # Insert them into the big dictionary.
+                entities[synonym] = entity_type
+
+    entities_loaded = True
+
+
+@app.route("/v1/batch_create_intents", methods=["POST"])
+def batch_create_intents():
+    """This is used to insert multiple intents at the same time, much more efficient than running the
+    create_intent multiple times. """
+    json_input_data = json.loads(request.data)
+    intents = json_input_data["data"]
+    intents_out = []
+
+    # A simple counter for how many intents we have inserted.
+    counter = 0
+
+    for intent in intents:
+        current_intent = create_intent_object(intent["intent_name"], intent["training_phrases"])
+        intents_out.append(current_intent)
+        counter += 1
+
+    client = dialogflow_v2beta1.IntentsClient()
+    parent = client.project_agent_path(PROJECT_ID)
+
+    response = client.batch_update_intents(parent, "no", intent_batch_inline={"intents": intents_out})
+    # Since reponse is an operation/ future object we don't really have anything to return here. So just a simple
+    # counter, so atleast we know how many intents we created.
+    return "Successfully inserted " + str(counter) + " intents."
+
+
+@app.route("/v1/batch_create_entities", methods=["POST"])
+def batch_create_entities():
+    """
+    Creates entites and adds them into the global entities dictionary.
+    """
+    json_input_data = json.loads(request.data)
+
+    client = dialogflow_v2beta1.EntityTypesClient()
+    parent = client.project_agent_path(PROJECT_ID)
+
+    entity_types = json_input_data["data"]
+
+    # A list of the newly created entities ID's.
+    ID_list = []
+
+    for entity_type in entity_types:
+        entity_type_out = {"display_name": entity_type["entity_type_name"], "kind": "KIND_MAP",
+                           "entities": entity_type["entities"]}
+        response = client.create_entity_type(parent, entity_type_out)
+        ID_list.append(response.name.split("/")[-1])
+    # After we have inserted all the new entities we get_entities() again.
+    # TODO: it would be more efficient to add to the dictionary whilst uploading new entities.
+    get_entities()
+
+    return json.dumps({"data": ID_list})
+
+
+@app.route("/v1/batch_delete_entities", methods=["POST"])
+def batch_delete_entities():
+    """
+    In order to delete multiple entities at a time.
+    """
+    json_input_data = json.loads(request.data)
+
+    client = dialogflow_v2beta1.EntityTypesClient()
+    parent = client.project_agent_path(PROJECT_ID)
+
+    entity_ids = json_input_data["data"]
+    entity_ids_fixed_path = []
+
+    # This may seems weird and it seems like it would not be necessary but there is a bug with the api and
+    # therefore we have to append the beginning of the path to every entity_id in order to get this to work.
+    for entity_id in entity_ids:
+        entity_ids_fixed_path.append(parent + "/entityTypes/" + entity_id)
+
+    response = client.batch_delete_entity_types(parent, entity_ids_fixed_path)
+
+    # Since reponse is an operation/ future object we don't really have anything to return here.
+    return "Success"
+
+
+get_entities()
