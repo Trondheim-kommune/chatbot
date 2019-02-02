@@ -7,7 +7,6 @@ from anytree.exporter import JsonExporter
 
 tree_node_id = 0
 
-
 class TreeElement(NodeMixin):
     def __init__(self, tag, text, parent=None):
         global tree_node_id
@@ -23,9 +22,11 @@ class TreeElement(NodeMixin):
 # TODO: Create tablesupport - remember to check for <thead>
 # TODO: Fix unicode character
 # TODO: fix support for newlines etc.
-# TODO: title
 # TODO: create support for multiple meta tags
-# TODO: <strong><p></p></strong> needs to be child of header
+# TODO: <p><strong></strong></p> needs to be a header
+# TODO: SKill mellom dropdown og link
+# TODO: CREATE A HIERARCHY FOR WHO SHOULD BE PARENT
+# TODO: COnsider creating the hierarchy in different file
 
 class TrondheimSpider(scrapy.Spider):
     # Name of the spider. This is the name to use from the Scrapy CLI.
@@ -44,19 +45,21 @@ class TrondheimSpider(scrapy.Spider):
 
     # Parses the latest response.
     def parse(self, response):
-        # Constants
-        TITLE_TAG_ = "title"
-        HEADER_TAGS_ = ["h1", "h2", "h3", "h4", "h5", "h6"]
         META_TAG_ = "meta"
-        STRONG_TAG_ = "strong"
         ANCHOR_TAG_ = "a"
-        PARAGRAPH_TAG_ = "p"
+        STRONG_TAG_ = 'strong'
 
-        # Adding all tags
-        # all_tags = [TITLE_TAG_, META_TAG_, STRONG_TAG_, ANCHOR_TAG_, PARAGRAPH_TAG_]
-        all_tags = [TITLE_TAG_, META_TAG_, ANCHOR_TAG_, PARAGRAPH_TAG_]
-        for h in HEADER_TAGS_:
-            all_tags.append(h)
+        hierarchy = dict()
+        hierarchy['title'] = {'level': 0, 'attributes': []}
+        hierarchy['h1'] = {'level': 1, 'attributes': []}
+        hierarchy['h2'] = {'level': 2, 'attributes': []}
+        hierarchy['h3'] = {'level': 3, 'attributes': []}
+        hierarchy['h4'] = {'level': 4, 'attributes': []}
+        hierarchy['h5'] = {'level': 5, 'attributes': []}
+        hierarchy['h6'] = {'level': 6, 'attributes': []}
+        hierarchy['a'] = {'level': 7, 'attributes': []}
+        hierarchy['strong'] = {'level': 8, 'attributes': []}
+        hierarchy['p'] = {'level': 9, 'attributes': []}
 
         # Only store HTML responses, not other attachments.
         if isinstance(response, HtmlResponse):
@@ -71,9 +74,11 @@ class TrondheimSpider(scrapy.Spider):
                     'contents': paragraph.extract(),
                 }
 
+            # printing tags for debugging
             tag_strings = ""
-            for tag in all_tags:
-                tag_strings += ", " + tag
+
+            for key in hierarchy.keys():
+                tag_strings += ", " + key
             tag_strings = tag_strings[2:]
             print("============= TAGS INCLUDED ===============", tag_strings)
             elements = response.css(tag_strings)
@@ -81,10 +86,10 @@ class TrondheimSpider(scrapy.Spider):
             # Root element
             root = TreeElement("title", "title not existing", None)
 
-            # Parent for meta tags
+            # Parent for meta tagsNone
             meta_parent = TreeElement("meta_parent", "meta information", parent=root)
 
-            # Current position, parent, in hierachy
+            # Current position, parent, in hierarchy
             current_parent = root
 
             for elem in elements:
@@ -92,77 +97,83 @@ class TrondheimSpider(scrapy.Spider):
                 elem_text = soup.text
                 elem_tag = list(soup.children)[0].name
 
-                # When found title
-                if elem_tag == TITLE_TAG_:
+                # When found title/root element
+                if elem_tag == "title":
                     root = TreeElement(elem_tag, elem_text, None)
                     # It is necessary to update the new meta_parent
                     meta_parent = TreeElement("meta_parent", "meta information", parent=root)
                     current_parent = root
                     continue
 
-                # Find parent for element
+                # Parent for current element
                 parent = None
 
-                # p is always a child of current posistion
-                if elem_tag == PARAGRAPH_TAG_:
-                    # All paragraphs must be child of parent
-                    TreeElement(elem_tag, elem_text, current_parent)
-                    continue
-                elif elem_tag == META_TAG_:
+                # Keep track of paragraph tag to be able to switch position with strong tags
+                previous_paragraph = None
+
+                # Save keywords from meta tags.
+                if elem_tag == META_TAG_:
                     meta_content = soup.find('meta', attrs={"name": "keywords"})
 
                     if meta_content:
                         TreeElement(elem_tag, meta_content['content'], meta_parent)
                     continue
-                else:
-                    # If element has same level in hierachy
-                    if elem_tag == current_parent.tag:
-                        parent = current_parent.parent
-                        # If the tag is a header we can go for header hierarchy
-                    elif elem_tag in HEADER_TAGS_ and current_parent.tag in HEADER_TAGS_ \
-                            and int((elem_tag[1])) > (int(current_parent.tag[1])):
-                        # If we have found child of current parent
-                        parent = current_parent
-                    else:
-                        # search for appropriate parent
-                        temp_parent = current_parent
-                        while True:
-                            # if we find root
-                            if temp_parent == root:
-                                parent = root
-                                break
 
-                            # If we are checking two headers
-                            if temp_parent.tag in HEADER_TAGS_ and elem_tag in HEADER_TAGS_:
-                                # if we have found the same level in hierarchy
-                                if (int(temp_parent.tag[1])) == int(elem_tag[1]):
-                                    parent = temp_parent.parent
-                                    break
-                                    # Set parent according to header hierarchy
-                                elif int(temp_parent.tag[1]) < int(elem_tag[1]):
+                # Remove anchors in navbar. Useless info to map.
+                if elem_tag == ANCHOR_TAG_ and current_parent == root:
+                    continue
+                else:
+                    # search for appropriate parent
+                    temp_parent = current_parent
+                    while True:
+                        #print("====== THIS IS CURRENT  TEMP PARENT", temp_parent.tag)
+
+                        # if we find root
+                        if temp_parent == root:
+                            parent = root
+                            break
+
+                        # Same type of element have same level of hierarchy
+                        # TODO: Consider adding support for defining level based on different classes
+                        if temp_parent.tag == elem_tag:
+                            parent = temp_parent.parent
+                            break
+                        else:
+                            elem_in_hierarchy = hierarchy[elem_tag]
+                            temp_parent_in_hierarchy = hierarchy[temp_parent.tag]
+                            if temp_parent_in_hierarchy:
+                                # If both tags in hierarchy check hierarchy level
+                                if elem_in_hierarchy:
+                                    if elem_in_hierarchy['level'] > temp_parent_in_hierarchy['level']:
+                                        parent = temp_parent
+                                        break
+                                    elif elem_in_hierarchy['level'] == temp_parent_in_hierarchy['level']:
+                                        # If elements are in same level in hierarchy
+                                        parent = temp_parent.parent
+                                        break
+                                else:
+                                    # Element where hierarchy is not defined
                                     parent = temp_parent
                                     break
-                            # if we have an anchor tag.
-                            elif elem_tag == ANCHOR_TAG_:
-                                parent = temp_parent
-                                break
-                            elif elem_tag == STRONG_TAG_:
-                                parent = temp_parent
-                                break
 
-                            # Update current parent when searching
-                            temp_parent = temp_parent.parent
+                        # Update current parent when searching
+                        temp_parent = temp_parent.parent
 
-                    # Remove anchors in navbar. Useless info to map.
-                    if elem_tag != ANCHOR_TAG_ or parent != root:
-                        # Create element
-                        current_parent = TreeElement(elem_tag, elem_text, parent)
+                # Handle switching parent between strong and paragraph tag
+                if elem_tag == STRONG_TAG_ and previous_paragraph:
+                    print("strong is made ===================")
+                    # strong
+                    current_parent = TreeElement(elem_tag, elem_text, previous_paragraph.parent)
+                    previous_paragraph.parent = current_parent
+                else:
+                    # Create element
+                    current_parent = TreeElement(elem_tag, elem_text, parent)
 
             # Printing nodetree
             for pre, fill, node in RenderTree(root):
                 print("%s%s" % (pre, node.tag + " " + node.text))
 
-            exporter = JsonExporter(indent=2, sort_keys=True)
+            # exporter = JsonExporter(indent=2, sort_keys=True)
             # print(exporter.export(root))
 
             # Follow all links from allowed domains.
