@@ -17,16 +17,13 @@ class TreeElement(NodeMixin):
         self.id = tree_node_id
         tree_node_id += 1
 
-
-# TODO: Create support for anchor-tag <a>
 # TODO: Create tablesupport - remember to check for <thead>
 # TODO: Fix unicode character
 # TODO: fix support for newlines etc.
-# TODO: create support for multiple meta tags
-# TODO: <p><strong></strong></p> needs to be a header
 # TODO: SKill mellom dropdown og link
-# TODO: CREATE A HIERARCHY FOR WHO SHOULD BE PARENT
 # TODO: COnsider creating the hierarchy in different file
+# TODO: Consider creating a better way to map new entities in hierarchy. Maybe some sort of interface?
+# PROBLEM: <p> that comes before a strong tag is consideres only a p tag and has not the hierarchy level required
 
 class TrondheimSpider(scrapy.Spider):
     # Name of the spider. This is the name to use from the Scrapy CLI.
@@ -57,9 +54,10 @@ class TrondheimSpider(scrapy.Spider):
         hierarchy['h4'] = {'level': 4, 'attributes': []}
         hierarchy['h5'] = {'level': 5, 'attributes': []}
         hierarchy['h6'] = {'level': 6, 'attributes': []}
-        hierarchy['a'] = {'level': 7, 'attributes': []}
-        hierarchy['strong'] = {'level': 8, 'attributes': []}
-        hierarchy['p'] = {'level': 9, 'attributes': []}
+        # TODO: CONSIDER DROPPING STRONG
+        hierarchy['strong'] = {'level': 7, 'attributes': []}
+        hierarchy['p'] = {'level': 8, 'attributes': []}
+        hierarchy['a'] = {'level': 9, 'attributes': [{"class": "arie"}]}
 
         # Only store HTML responses, not other attachments.
         if isinstance(response, HtmlResponse):
@@ -126,8 +124,6 @@ class TrondheimSpider(scrapy.Spider):
                     # search for appropriate parent
                     temp_parent = current_parent
                     while True:
-                        #print("====== THIS IS CURRENT  TEMP PARENT", temp_parent.tag)
-
                         # if we find root
                         if temp_parent == root:
                             parent = root
@@ -161,7 +157,6 @@ class TrondheimSpider(scrapy.Spider):
 
                 # Handle switching parent between strong and paragraph tag
                 if elem_tag == STRONG_TAG_ and previous_paragraph:
-                    print("strong is made ===================")
                     # strong
                     current_parent = TreeElement(elem_tag, elem_text, previous_paragraph.parent)
                     previous_paragraph.parent = current_parent
