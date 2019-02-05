@@ -21,9 +21,10 @@ class TreeElement(NodeMixin):
 # TODO: Fix unicode character
 # TODO: fix support for newlines etc.
 # TODO: SKill mellom dropdown og link
-# TODO: COnsider creating the hierarchy in different file
 # TODO: Consider creating a better way to map new entities in hierarchy. Maybe some sort of interface?
 # PROBLEM: <p> that comes before a strong tag is consideres only a p tag and has not the hierarchy level required
+
+
 
 class TrondheimSpider(scrapy.Spider):
     # Name of the spider. This is the name to use from the Scrapy CLI.
@@ -40,52 +41,40 @@ class TrondheimSpider(scrapy.Spider):
         'https://trondheim.kommune.no/tema/kultur-og-fritid/lokaler/husebybadet'
     ]
 
+    def get_hierarchy(self):
+        """Returns a hierarchy of the nodes on the different pages."""
+        return {
+            'title': { 'level': 0, 'attributes': [] },
+            'h1': { 'level': 1, 'attributes': [] },
+            'h2': { 'level': 2, 'attributes': [] },
+            'h3': { 'level': 3, 'attributes': [] },
+            'h4': { 'level': 4, 'attributes': [] },
+            'h5': { 'level': 5, 'attributes': [] },
+            'h6': { 'level': 2, 'attributes': [] },
+            'strong': { 'level': 7, 'attributes': [] },
+            'p': { 'level': 8, 'attributes': [] },
+            'a': { 'level': 9, 'attributes': [{ 'class': 'arie' }] },
+        }
+        
     # Parses the latest response.
     def parse(self, response):
-        META_TAG_ = "meta"
-        ANCHOR_TAG_ = "a"
+        META_TAG_ = 'meta'
+        ANCHOR_TAG_ = 'a'
         STRONG_TAG_ = 'strong'
 
-        hierarchy = dict()
-        hierarchy['title'] = {'level': 0, 'attributes': []}
-        hierarchy['h1'] = {'level': 1, 'attributes': []}
-        hierarchy['h2'] = {'level': 2, 'attributes': []}
-        hierarchy['h3'] = {'level': 3, 'attributes': []}
-        hierarchy['h4'] = {'level': 4, 'attributes': []}
-        hierarchy['h5'] = {'level': 5, 'attributes': []}
-        hierarchy['h6'] = {'level': 6, 'attributes': []}
-        # TODO: CONSIDER DROPPING STRONG
-        hierarchy['strong'] = {'level': 7, 'attributes': []}
-        hierarchy['p'] = {'level': 8, 'attributes': []}
-        hierarchy['a'] = {'level': 9, 'attributes': [{"class": "arie"}]}
+        hierarchy = self.get_hierarchy()
 
         # Only store HTML responses, not other attachments.
         if isinstance(response, HtmlResponse):
-            # Find all paragraphs in the response.
-            paragraphs = response.css('p')
+            tag_strings = ','.join(hierarchy.keys())
 
-            for paragraph in paragraphs:
-                # Return the paragraph contents and the link
-                # the paragraph was retrieved from.
-                yield {
-                    'url': response.url,
-                    'contents': paragraph.extract(),
-                }
-
-            # printing tags for debugging
-            tag_strings = ""
-
-            for key in hierarchy.keys():
-                tag_strings += ", " + key
-            tag_strings = tag_strings[2:]
-            print("============= TAGS INCLUDED ===============", tag_strings)
             elements = response.css(tag_strings)
 
             # Root element
-            root = TreeElement("title", "title not existing", None)
+            root = TreeElement('title', 'title not existing', None)
 
             # Parent for meta tagsNone
-            meta_parent = TreeElement("meta_parent", "meta information", parent=root)
+            meta_parent = TreeElement('meta_parent', 'meta information', parent=root)
 
             # Current position, parent, in hierarchy
             current_parent = root
@@ -122,54 +111,53 @@ class TrondheimSpider(scrapy.Spider):
                     continue
                 else:
                     # search for appropriate parent
-                    temp_parent = current_parent
+                    search_parent = current_parent
                     while True:
                         # if we find root
-                        if temp_parent == root:
+                        if search_parent == root:
                             parent = root
                             break
 
                         # Same type of element have same level of hierarchy
                         # TODO: Consider adding support for defining level based on different classes
-                        if temp_parent.tag == elem_tag:
-                            parent = temp_parent.parent
+                        if search_parent.tag == elem_tag:
+                            parent = search_parent.parent
                             break
                         else:
                             elem_in_hierarchy = hierarchy[elem_tag]
-                            temp_parent_in_hierarchy = hierarchy[temp_parent.tag]
-                            if temp_parent_in_hierarchy:
+                            search_parent_in_hierarchy = hierarchy[search_parent.tag]
+                            if search_parent_in_hierarchy:
                                 # If both tags in hierarchy check hierarchy level
                                 if elem_in_hierarchy:
-                                    if elem_in_hierarchy['level'] > temp_parent_in_hierarchy['level']:
-                                        parent = temp_parent
+                                    if elem_in_hierarchy['level'] > search_parent_in_hierarchy['level']:
+                                        parent = search_parent
                                         break
-                                    elif elem_in_hierarchy['level'] == temp_parent_in_hierarchy['level']:
+                                    elif elem_in_hierarchy['level'] == search_parent_in_hierarchy['level']:
                                         # If elements are in same level in hierarchy
-                                        parent = temp_parent.parent
+                                        parent = search_parent.parent
                                         break
                                 else:
                                     # Element where hierarchy is not defined
-                                    parent = temp_parent
+                                    parent = search_parent
                                     break
 
-                        # Update current parent when searching
-                        temp_parent = temp_parent.parent
+                        # Update current parent when searching.
+                        search_parent = search_parent.parent
 
-                # Handle switching parent between strong and paragraph tag
+                # Handle switching parent between strong and paragraph tag.
                 if elem_tag == STRONG_TAG_ and previous_paragraph:
-                    # strong
                     current_parent = TreeElement(elem_tag, elem_text, previous_paragraph.parent)
                     previous_paragraph.parent = current_parent
                 else:
                     # Create element
                     current_parent = TreeElement(elem_tag, elem_text, parent)
 
-            # Printing nodetree
+            # Printing node tree
             for pre, fill, node in RenderTree(root):
                 print("%s%s" % (pre, node.tag + " " + node.text))
 
-            # exporter = JsonExporter(indent=2, sort_keys=True)
-            # print(exporter.export(root))
+            exporter = JsonExporter(indent=2, sort_keys=True)
+            yield exporter.export(root)
 
             # Follow all links from allowed domains.
             for next_page in LinkExtractor().extract_links(response):
@@ -179,6 +167,9 @@ class TrondheimSpider(scrapy.Spider):
                     if allowed_path in next_page.url:
                         yield response.follow(next_page, self.parse)
                         break
+
+
+
 
 
 """
