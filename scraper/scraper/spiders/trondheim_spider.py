@@ -17,13 +17,10 @@ class TreeElement(NodeMixin):
         self.id = tree_node_id
         tree_node_id += 1
 
-# TODO: Create tablesupport - remember to check for <thead>
-# TODO: Fix unicode character
 # TODO: fix support for newlines etc.
-# TODO: find a way to separate between two anchor tags with different level of hierarchy
 # TODO: Consider creating a better way to map new entities in hierarchy. Maybe some sort of interface?
-# PROBLEM: <p> that comes before a strong tag is consideres only a p tag and has not the hierarchy level required
-
+# TODO PROBLEM: <p> that comes before a strong tag is consideres only a p tag and has not the hierarchy level required
+# TODO: FIX STRONG <P> <P> <P> hierarchy
 
 
 class TrondheimSpider(scrapy.Spider):
