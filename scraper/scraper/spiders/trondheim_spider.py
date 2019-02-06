@@ -3,7 +3,7 @@ from scrapy.linkextractors import LinkExtractor
 from scrapy.http import HtmlResponse
 from bs4 import BeautifulSoup
 from anytree import RenderTree, NodeMixin
-from anytree.exporter import JsonExporter
+from anytree.exporter import DictExporter
 
 tree_node_id = 0
 
@@ -51,7 +51,7 @@ class TrondheimSpider(scrapy.Spider):
             'h4': { 'level': 4, 'attributes': [] },
             'h5': { 'level': 5, 'attributes': [] },
             'h6': { 'level': 6, 'attributes': [] },
-            'strong': { 'level': 7, 'attributes': [] },
+            # 'strong': { 'level': 7, 'attributes': [] },
             'p': { 'level': 8, 'attributes': [] },
             'a': { 'level': 9, 'attributes': [{ 'class': 'arie' }] },
         }
@@ -168,8 +168,13 @@ class TrondheimSpider(scrapy.Spider):
             for pre, fill, node in RenderTree(root):
                 print("%s%s" % (pre, node.tag + " " + node.text))
 
-            exporter = JsonExporter(indent=2, sort_keys=True)
-            yield exporter.export(root)
+            exporter = DictExporter()
+            tree = exporter.export(root)
+
+            yield {
+                'url': response.url,
+                'tree': tree,
+            }
 
             # Follow all links from allowed domains.
             for next_page in LinkExtractor().extract_links(response):
@@ -179,6 +184,10 @@ class TrondheimSpider(scrapy.Spider):
                     if allowed_path in next_page.url:
                         yield response.follow(next_page, self.parse)
                         break
+
+
+
+
 
 
 
