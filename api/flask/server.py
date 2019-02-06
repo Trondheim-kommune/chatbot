@@ -2,6 +2,8 @@ import json
 from flask import *
 import dialogflow_v2beta1
 import os
+from flask_exceptions import InvalidDialogFlowID
+import google.api_core.exceptions as google_exceptions
 
 app = Flask(__name__)
 
@@ -14,9 +16,32 @@ entities_loaded = False
 PROJECT_ID = os.getenv("PROJECT_ID")
 
 
+# Register handle for flask_exceptions error messages.
+@app.errorhandler(InvalidDialogFlowID)
+def handle_invalid_usage(error):
+    response = jsonify(error.to_dict())
+    response.status_code = error.status_code
+    return response
+
+
+def create_success_response(message, data=None):
+    """
+    Used to create the json success response.
+    """
+    response = {}
+    if data:
+        # Extra information if needed.
+        response["data"] = data
+    # Status is either OK or ERROR
+    response["status"] = "OK"
+    # Human readable message.
+    response["message"] = message
+    return json.dumps(response)
+
+
 @app.route("/", methods=["GET"])
 def test():
-    return "Success."
+    return create_success_response("Success")
 
 
 @app.route("/v1/webhook", methods=["POST"])
@@ -117,15 +142,14 @@ def create_intent_post():
     except KeyError:
         training_phrases = []
 
-    response = create_intent(intent_name, training_phrases)
-
     try:
-        # Return the newly created intent ID.
-        return response.name
-    except:
-        return "Could not get intent ID, failed to insert intent."
+        intent = create_intent(intent_name, training_phrases)
+        return create_success_response("Intent created", data=intent.name)
+    except google_exceptions.FailedPrecondition as e:
+        # Intent with same name exception.
+        raise InvalidDialogFlowID(str(e), status_code=400)
 
-      
+
 def create_intent(intent_name, training_phrases):
     """
     This method creates only a single intent.
@@ -138,8 +162,8 @@ def create_intent(intent_name, training_phrases):
 
     intent = create_intent_object(intent_name, training_phrases)
     return client.create_intent(parent, intent)
-  
-  
+
+
 def get_entities():
     """This method is used for fetching every entity and caching it."""
     global entities_loaded
@@ -166,11 +190,14 @@ def batch_create_intents_post():
     json_input_data = json.loads(request.data)
     intents = json_input_data["data"]
 
-    counter = batch_create_intents(intents)
-
-    # Since reponse is an operation/ future object we don't really have anything to return here. So just a simple
-    # counter, so atleast we know how many intents we created.
-    return "Successfully inserted " + str(counter) + " intents."
+    try:
+        # Since response from batch_create_intents is an operation/ future object we don't really have anything to
+        # return here. So just a simple counter, so atleast we know how many intents we created.
+        counter = batch_create_intents(intents)
+        return create_success_response("Batch created " + str(counter) + " intents.")
+    except google_exceptions.FailedPrecondition as e:
+        # Intent with same name exception.
+        raise InvalidDialogFlowID(str(e), status_code=400)
 
 
 def batch_create_intents(intents):
@@ -197,13 +224,17 @@ def batch_create_intents(intents):
     return counter
 
 
-@app.route("/v1/batch_create_entities", methods=["POST"])
+@app.route("/v1/batch_create_entities", methods=["POST", "GET"])
 def batch_create_entities_post():
     json_input_data = json.loads(request.data)
     entity_types = json_input_data["data"]
 
-    ID_list = batch_create_entities(entity_types)
-    return json.dumps({"data": ID_list})
+    try:
+        ID_list = batch_create_entities(entity_types)
+        return create_success_response("Batch created entities.", data=ID_list)
+    except google_exceptions.FailedPrecondition as e:
+        # Entity with same name exception.
+        raise InvalidDialogFlowID(str(e), status_code=400)
 
 
 def batch_create_entities(entity_types):
@@ -222,6 +253,7 @@ def batch_create_entities(entity_types):
         entity_type_out = {"display_name": entity_type["entity_type_name"], "kind": "KIND_MAP",
                            "entities": entity_type["entities"]}
         response = client.create_entity_type(parent, entity_type_out)
+
         ID_list.append(response.name.split("/")[-1])
     # After we have inserted all the new entities we get_entities() again.
     # TODO: it would be more efficient to add to the dictionary whilst uploading new entities.
@@ -234,10 +266,13 @@ def batch_create_entities(entity_types):
 def batch_delete_entities_post():
     json_input_data = json.loads(request.data)
     entity_ids = json_input_data["data"]
-    batch_delete_entities(entity_ids)
 
-    # Since reponse is an operation/ future object we don't really have anything to return here.
-    return "Success"
+    try:
+        batch_delete_entities(entity_ids)
+        # Since reponse is an operation/ future object we don't really have anything to return here.
+        return create_success_response("Batch deleted entities.")
+    except google_exceptions.FailedPrecondition as e:
+        raise InvalidDialogFlowID(str(e), status_code=400)
 
 
 def batch_delete_entities(entity_ids):
