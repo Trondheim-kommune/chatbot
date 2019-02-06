@@ -16,7 +16,12 @@ class TreeElement(NodeMixin):
         self.parent = parent
         self.id = tree_node_id
         tree_node_id += 1
-
+[{"name": "ul", "tag": "ul", "text": "\n", "id": 23}
+{"name": "li", "tag": "li", "text": "Rektor har ansvaret for å be om bistand fra PP"
+                                    "T i de sakene hvor rektor vurderer det nødvendig. "
+                                    "\nBistand kan resultere i sakkyndig vurdering i samarbeid mellom skole og PPT. "
+                                    "I påvente av eventuell sakkyndig vurdering skal rektor påse at nødvendige tiltak"
+                                    " iverksettes.\n", "id": 77}
 # TODO: fix support for newlines etc.
 # TODO: Consider creating a better way to map new entities in hierarchy. Maybe some sort of interface?
 # TODO PROBLEM: <p> that comes before a strong tag is consideres only a p tag and has not the hierarchy level required
@@ -83,7 +88,7 @@ class TrondheimSpider(scrapy.Spider):
 
             for elem in elements:
                 soup = BeautifulSoup(elem.extract(), 'html.parser')
-                elem_text = soup.text
+                elem_text = soup.text.trim()
                 elem_tag = list(soup.children)[0].name
                 #elem_attributes = list(soup.children)[0].attrs
                 elem_in_hierarchy = hierarchy[elem_tag]
