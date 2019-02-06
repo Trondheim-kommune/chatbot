@@ -33,12 +33,12 @@ class TrondheimSpider(scrapy.Spider):
     # The links to start the crawling process on.
     start_urls = [
         # 'https://www.trondheim.kommune.no/tema/skole/Opplaring/spesialundervisning/handbok-i-spesialpedagogikk/',
-        'https://trondheim.kommune.no/tema/kultur-og-fritid/lokaler/husebybadet'
+        'https://trondheim.kommune.no'
     ]
 
     allowed_paths = [
         # 'https://www.trondheim.kommune.no/tema/skole/Opplaring/spesialundervisning/handbok-i-spesialpedagogikk/',
-        'https://trondheim.kommune.no/tema/kultur-og-fritid/lokaler/husebybadet'
+        'https://trondheim.kommune.no/tema'
     ]
 
     def get_hierarchy(self):
@@ -50,7 +50,7 @@ class TrondheimSpider(scrapy.Spider):
             'h3': { 'level': 3, 'attributes': [] },
             'h4': { 'level': 4, 'attributes': [] },
             'h5': { 'level': 5, 'attributes': [] },
-            'h6': { 'level': 2, 'attributes': [] },
+            'h6': { 'level': 6, 'attributes': [] },
             'strong': { 'level': 7, 'attributes': [] },
             'p': { 'level': 8, 'attributes': [] },
             'a': { 'level': 9, 'attributes': [{ 'class': 'arie' }] },
@@ -106,7 +106,19 @@ class TrondheimSpider(scrapy.Spider):
                         TreeElement(elem_tag, meta_content['content'], meta_parent)
                     continue
 
-                # Remove anchors in navbar. Useless info to map.
+                # Remove anchors in navbar.                 # Parent for current element
+                parent = None
+
+                # Keep track of paragraph tag to be able to switch position with strong tags
+                previous_paragraph = None
+
+                # Save keywords from meta tags.
+                if elem_tag == META_TAG_:
+                    meta_content = soup.find('meta', attrs={"name": "keywords"})
+
+                    if meta_content:
+                        TreeElement(elem_tag, meta_content['content'], meta_parent)
+                    continue
                 if elem_tag == ANCHOR_TAG_ and current_parent == root:
                     continue
                 else:
