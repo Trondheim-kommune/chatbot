@@ -17,61 +17,51 @@ class TreeElement(NodeMixin):
         self.id = tree_node_id
         tree_node_id += 1
 
-# TODO: fix non-empty treeobjects
-# TODO: Consider creating a better way to map new entities in hierarchy. Maybe some sort of interface?
-# TODO PROBLEM: <p> that comes before a strong tag is consideres only a p tag and has not the hierarchy level required
-# TODO: FIX STRONG <P> <P> <P> hierarchy
-# TODO: Remove unrelevant infomation
-
 
 class TrondheimSpider(scrapy.Spider):
     # Name of the spider. This is the name to use from the Scrapy CLI.
     name = 'trondheim'
+    garbage_elements = ['footer', 'header']
+    # Hierarchy for sorting categories
+    hierarchy = {
+        'title': {'level': 0, },
+        'h1': {'level': 1 },
+        'h2': {'level': 2 },
+        'h3': {'level': 3 },
+        'h4': {'level': 4 },
+        'h5': {'level': 5 },
+        'h6': {'level': 6 },
+        'tbody': {'level': 6 },
+        'tr': {'level': 7},
+        'th': {'level': 8},
+        'strong': { 'level': 8 },
+        'p': {'level': 8 },
+        'ul': {'level': 8 },
+        'li': {'level': 9 },
+        'a': {'level': 10 }
+    }
 
     # The links to start the crawling process on.
     start_urls = [
-         'https://www.trondheim.kommune.no/tema/skole/Opplaring/spesialundervisning/handbok-i-spesialpedagogikk/',
-        #'https://trondheim.kommune.no/tema/kultur-og-fritid/lokaler/husebybadet'
+         'https://www.trondheim.kommune.no/'
     ]
 
     allowed_paths = [
-         'https://www.trondheim.kommune.no/tema/skole/Opplaring/spesialundervisning/handbok-i-spesialpedagogikk/',
-        #'https://trondheim.kommune.no/tema/kultur-og-fritid/lokaler/husebybadet'
+         'https://www.trondheim.kommune.no/tema/'
     ]
 
-    def get_hierarchy(self):
-        """Returns a hierarchy of the nodes on the different pages."""
-        return {
-            'title': { 'level': 0, },
-            'h1': { 'level': 1, },
-            'h2': { 'level': 2, },
-            'h3': { 'level': 3, },
-            'h4': { 'level': 4, },
-            'h5': { 'level': 5, },
-            'h6': { 'level': 6, },
-            # 'strong': { 'level': 7, },
-            'p': { 'level': 8, },
-            'a': { 'level': 10, },
-            'ul': {'level': 8, },
-            'li': { 'level': 9, },
-            'tbody': {'level': 6, },
-            'tr': {'level': 7},
-            'th': {'level': 8}
-        }
-        
     # Parses the latest response.
     def parse(self, response):
-        META_TAG_ = 'meta'
-        ANCHOR_TAG_ = 'a'
-        STRONG_TAG_ = 'strong'
-
-        hierarchy = self.get_hierarchy()
+        hierarchy = self.hierarchy
 
         # Only store HTML responses, not other attachments.
         if isinstance(response, HtmlResponse):
-            tag_strings = ','.join(hierarchy.keys())
+            soup = BeautifulSoup(response.text)
+            elements = soup.find_all(hierarchy.keys())
 
-            elements = response.css(tag_strings)
+            # Dispose of header and footer
+            for garbage in soup.find_all(self.garbage_elements):
+                garbage.decompose()
 
             # Root element
             root = TreeElement('title', 'title not existing', None)
@@ -82,18 +72,19 @@ class TrondheimSpider(scrapy.Spider):
             # Current position, parent, in hierarchy
             current_parent = root
 
+            # Keep track of paragraph tag to be able to switch position with strong tags
+            previous_paragraph = None
+
             for elem in elements:
-                soup = BeautifulSoup(elem.extract(), 'html.parser')
-                elem_text = soup.text.strip()
-                elem_tag = list(soup.children)[0].name
-                #elem_attributes = list(soup.children)[0].attrs
-                elem_in_hierarchy = hierarchy[elem_tag]
-                elem_level = elem_in_hierarchy['level']
+                elem_text = elem.text.strip()
+                elem_tag = elem.name
 
                 # Do not allow tree nodes with empty text
                 if not elem_text:
                     continue
 
+                elem_in_hierarchy = hierarchy[elem_tag]
+                elem_level = elem_in_hierarchy['level']
 
                 # When found title/root element
                 if elem_tag == "title":
@@ -103,15 +94,9 @@ class TrondheimSpider(scrapy.Spider):
                     current_parent = root
                     continue
 
-                # Parent for current element
-                parent = None
-
-                # Keep track of paragraph tag to be able to switch position with strong tags
-                previous_paragraph = None
-
                 # Save keywords from meta tags.
-                if elem_tag == META_TAG_:
-                    meta_content = soup.find(META_TAG_, attrs={"name": "keywords"})
+                if elem_tag == 'meta':
+                    meta_content = soup.find('meta', attrs={"name": "keywords"})
 
                     if meta_content:
                         TreeElement(elem_tag, meta_content['content'], meta_parent)
@@ -120,11 +105,8 @@ class TrondheimSpider(scrapy.Spider):
                 # Parent for current element
                 parent = None
 
-                # Keep track of paragraph tag to be able to switch position with strong tags
-                previous_paragraph = None
-
                 # Save keywords from meta tags.
-                if elem_tag == META_TAG_:
+                if elem_tag == 'meta':
                     meta_content = soup.find('meta', attrs={"name": "keywords"})
 
                     if meta_content:
@@ -132,7 +114,7 @@ class TrondheimSpider(scrapy.Spider):
                     continue
 
                 # Remove anchors in navbar.
-                if elem_tag == ANCHOR_TAG_ and current_parent == root:
+                if elem_tag == 'a' and current_parent == root:
                     continue
                 else:
                     # search for appropriate parent
@@ -170,12 +152,15 @@ class TrondheimSpider(scrapy.Spider):
                         search_parent = search_parent.parent
 
                 # Handle switching parent between strong and paragraph tag.
-                if elem_tag == STRONG_TAG_ and previous_paragraph:
+                if elem_tag == 'strong' and previous_paragraph:
                     current_parent = TreeElement(elem_tag, elem_text, previous_paragraph.parent)
                     previous_paragraph.parent = current_parent
                 else:
                     # Create element
                     current_parent = TreeElement(elem_tag, elem_text, parent)
+
+                    if elem_tag == 'p':
+                        previous_paragraph = current_parent
 
             # Printing node tree
             for pre, fill, node in RenderTree(root):
