@@ -20,7 +20,7 @@ class TreeElement(NodeMixin):
 # TODO: Create tablesupport - remember to check for <thead>
 # TODO: Fix unicode character
 # TODO: fix support for newlines etc.
-# TODO: SKill mellom dropdown og link
+# TODO: find a way to separate between two anchor tags with different level of hierarchy
 # TODO: Consider creating a better way to map new entities in hierarchy. Maybe some sort of interface?
 # PROBLEM: <p> that comes before a strong tag is consideres only a p tag and has not the hierarchy level required
 
@@ -32,28 +32,33 @@ class TrondheimSpider(scrapy.Spider):
 
     # The links to start the crawling process on.
     start_urls = [
-        # 'https://www.trondheim.kommune.no/tema/skole/Opplaring/spesialundervisning/handbok-i-spesialpedagogikk/',
-        'https://trondheim.kommune.no'
+         'https://www.trondheim.kommune.no/tema/skole/Opplaring/spesialundervisning/handbok-i-spesialpedagogikk/',
+        #'https://trondheim.kommune.no/tema/kultur-og-fritid/lokaler/husebybadet'
     ]
 
     allowed_paths = [
-        # 'https://www.trondheim.kommune.no/tema/skole/Opplaring/spesialundervisning/handbok-i-spesialpedagogikk/',
-        'https://trondheim.kommune.no/tema'
+         'https://www.trondheim.kommune.no/tema/skole/Opplaring/spesialundervisning/handbok-i-spesialpedagogikk/',
+        #'https://trondheim.kommune.no/tema/kultur-og-fritid/lokaler/husebybadet'
     ]
 
     def get_hierarchy(self):
         """Returns a hierarchy of the nodes on the different pages."""
         return {
-            'title': { 'level': 0, 'attributes': [] },
-            'h1': { 'level': 1, 'attributes': [] },
-            'h2': { 'level': 2, 'attributes': [] },
-            'h3': { 'level': 3, 'attributes': [] },
-            'h4': { 'level': 4, 'attributes': [] },
-            'h5': { 'level': 5, 'attributes': [] },
-            'h6': { 'level': 6, 'attributes': [] },
-            # 'strong': { 'level': 7, 'attributes': [] },
-            'p': { 'level': 8, 'attributes': [] },
-            'a': { 'level': 9, 'attributes': [{ 'class': 'arie' }] },
+            'title': { 'level': 0, },
+            'h1': { 'level': 1, },
+            'h2': { 'level': 2, },
+            'h3': { 'level': 3, },
+            'h4': { 'level': 4, },
+            'h5': { 'level': 5, },
+            'h6': { 'level': 6, },
+            # 'strong': { 'level': 7, },
+            'p': { 'level': 8, },
+            'a': { 'level': 10, },
+            'ul': {'level': 8, },
+            'li': { 'level': 9, },
+            'tbody': {'level': 6, },
+            'tr': {'level': 7},
+            'th': {'level': 8}
         }
         
     # Parses the latest response.
@@ -83,6 +88,10 @@ class TrondheimSpider(scrapy.Spider):
                 soup = BeautifulSoup(elem.extract(), 'html.parser')
                 elem_text = soup.text
                 elem_tag = list(soup.children)[0].name
+                #elem_attributes = list(soup.children)[0].attrs
+                elem_in_hierarchy = hierarchy[elem_tag]
+                elem_level = elem_in_hierarchy['level']
+
 
                 # When found title/root element
                 if elem_tag == "title":
@@ -100,7 +109,7 @@ class TrondheimSpider(scrapy.Spider):
 
                 # Save keywords from meta tags.
                 if elem_tag == META_TAG_:
-                    meta_content = soup.find('meta', attrs={"name": "keywords"})
+                    meta_content = soup.find(META_TAG_, attrs={"name": "keywords"})
 
                     if meta_content:
                         TreeElement(elem_tag, meta_content['content'], meta_parent)
@@ -124,27 +133,27 @@ class TrondheimSpider(scrapy.Spider):
                 else:
                     # search for appropriate parent
                     search_parent = current_parent
+
                     while True:
                         # if we find root
                         if search_parent == root:
                             parent = root
                             break
 
-                        # Same type of element have same level of hierarchy
-                        # TODO: Consider adding support for defining level based on different classes
                         if search_parent.tag == elem_tag:
                             parent = search_parent.parent
                             break
                         else:
-                            elem_in_hierarchy = hierarchy[elem_tag]
+                            # Whether search parent is in hierarchy
                             search_parent_in_hierarchy = hierarchy[search_parent.tag]
+
                             if search_parent_in_hierarchy:
                                 # If both tags in hierarchy check hierarchy level
                                 if elem_in_hierarchy:
-                                    if elem_in_hierarchy['level'] > search_parent_in_hierarchy['level']:
+                                    if elem_level > search_parent_in_hierarchy['level']:
                                         parent = search_parent
                                         break
-                                    elif elem_in_hierarchy['level'] == search_parent_in_hierarchy['level']:
+                                    elif elem_level == search_parent_in_hierarchy['level']:
                                         # If elements are in same level in hierarchy
                                         parent = search_parent.parent
                                         break
