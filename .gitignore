@@ -4,4 +4,4 @@ __pycache__/
 *.pyc
 .pytest_cache
 backupagent.json
-scraper/*.json
+scraper/**/*.json
