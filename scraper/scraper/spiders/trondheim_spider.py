@@ -16,16 +16,12 @@ class TreeElement(NodeMixin):
         self.parent = parent
         self.id = tree_node_id
         tree_node_id += 1
-[{"name": "ul", "tag": "ul", "text": "\n", "id": 23}
-{"name": "li", "tag": "li", "text": "Rektor har ansvaret for å be om bistand fra PP"
-                                    "T i de sakene hvor rektor vurderer det nødvendig. "
-                                    "\nBistand kan resultere i sakkyndig vurdering i samarbeid mellom skole og PPT. "
-                                    "I påvente av eventuell sakkyndig vurdering skal rektor påse at nødvendige tiltak"
-                                    " iverksettes.\n", "id": 77}
-# TODO: fix support for newlines etc.
+
+# TODO: fix non-empty treeobjects
 # TODO: Consider creating a better way to map new entities in hierarchy. Maybe some sort of interface?
 # TODO PROBLEM: <p> that comes before a strong tag is consideres only a p tag and has not the hierarchy level required
 # TODO: FIX STRONG <P> <P> <P> hierarchy
+# TODO: Remove unrelevant infomation
 
 
 class TrondheimSpider(scrapy.Spider):
@@ -88,11 +84,15 @@ class TrondheimSpider(scrapy.Spider):
 
             for elem in elements:
                 soup = BeautifulSoup(elem.extract(), 'html.parser')
-                elem_text = soup.text.trim()
+                elem_text = soup.text.strip()
                 elem_tag = list(soup.children)[0].name
                 #elem_attributes = list(soup.children)[0].attrs
                 elem_in_hierarchy = hierarchy[elem_tag]
                 elem_level = elem_in_hierarchy['level']
+
+                # Do not allow tree nodes with empty text
+                if not elem_text:
+                    continue
 
 
                 # When found title/root element
@@ -117,7 +117,7 @@ class TrondheimSpider(scrapy.Spider):
                         TreeElement(elem_tag, meta_content['content'], meta_parent)
                     continue
 
-                # Remove anchors in navbar.                 # Parent for current element
+                # Parent for current element
                 parent = None
 
                 # Keep track of paragraph tag to be able to switch position with strong tags
@@ -130,6 +130,8 @@ class TrondheimSpider(scrapy.Spider):
                     if meta_content:
                         TreeElement(elem_tag, meta_content['content'], meta_parent)
                     continue
+
+                # Remove anchors in navbar.
                 if elem_tag == ANCHOR_TAG_ and current_parent == root:
                     continue
                 else:
