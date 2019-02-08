@@ -45,7 +45,8 @@ class TrondheimSpider(scrapy.Spider):
 
     # These selectors will be removed from all pages, as they contain very
     # little actual information, and are equal on all pages.
-    garbage_elements = ['footer', 'header']
+    garbage_elements = ['.footer', '.header', 'body > .container',
+                        '.skip-link']
 
     # Hierarchy for sorting categories.
     hierarchy = {
@@ -143,8 +144,9 @@ class TrondheimSpider(scrapy.Spider):
 
         # We remove the header and footer tags from the page to reduce
         # bloat, as these contain little useful information.
-        for garbage_element in soup.find_all(self.garbage_elements):
-            garbage_element.decompose()
+        for garbage_selector in self.garbage_elements:
+            for garbage_element in soup.select(garbage_selector):
+                garbage_element.decompose()
 
         # We extract the page title and use it to create the tree root.
         root = TreeElement('title', soup.find('title').text)
