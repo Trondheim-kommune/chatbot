@@ -1,8 +1,6 @@
-import sys
 import os
-sys.path[0] += "/.." 
 
-from ModelFactory import ModelFactory
+from model.ModelFactory import ModelFactory
 
 fact = ModelFactory.get_instance()
 

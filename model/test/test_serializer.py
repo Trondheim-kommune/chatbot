@@ -1,6 +1,6 @@
-from Serializer import KeyWord
-from Serializer import Serializer
-from Serializer import Content
+from model.Serializer import KeyWord
+from model.Serializer import Serializer
+from model.Serializer import Content
 import pytest
 import json
 
