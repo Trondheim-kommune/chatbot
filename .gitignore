@@ -5,3 +5,7 @@ __pycache__/
 .pytest_cache
 backupagent.json
 scraper/**/*.json
+build/
+dist/
+Agent25-google.json
+agent25_project.egg-info/
