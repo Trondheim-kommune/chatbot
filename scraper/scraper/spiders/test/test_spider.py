@@ -4,8 +4,6 @@ import json
 
 from scraper.scraper.spiders import trondheim_spider as ts
 
-file_name_huseby = "huseby.html"
-
 
 def fake_response_from_file(file_name, url=None):
     """
@@ -34,7 +32,7 @@ def test_scraper_snapshot():
     spider = ts.TrondheimSpider()
 
     # Crawl the html file and returns the tree structure
-    tree = spider.parse(fake_response_from_file(file_name_huseby))
+    tree = spider.parse(fake_response_from_file("huseby.html"))
 
     # Handle absolute path
     responses_dir = os.path.dirname(os.path.realpath(__file__))
