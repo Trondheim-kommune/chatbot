@@ -4,8 +4,11 @@ import dialogflow_v2beta1
 import os
 from flask_exceptions import InvalidDialogFlowID
 import google.api_core.exceptions as google_exceptions
+from model.MongoDBControllerWebhook import MongoDBControllerWebhook
 
 app = Flask(__name__)
+
+mongo_controller = MongoDBControllerWebhook()
 
 # This dictionary contains a mapping from synonyms to entity_type in order to match training phrases with
 # entities.
@@ -71,18 +74,7 @@ def get_response():
         default_fulfillment_text = None
 
     return json.dumps(
-        {"fulfillmentText": get_fulfillment_text(raw_query_text, intent, entities, default_fulfillment_text)})
-
-
-def get_fulfillment_text(raw_query_text, intent, entities, def_fulfil_text):
-    """
-    TODO: Write this method once we have mongoDB in place.
-    """
-    print(raw_query_text)
-    print(intent)
-    print(entities)
-    print(def_fulfil_text)
-    return "Works"
+        {"fulfillmentText": mongo_controller.webhook_query(raw_query_text, intent, entities, default_fulfillment_text)})
 
 
 def create_intent_object(intent_name, training_phrases, match_entity=True):
@@ -222,6 +214,12 @@ def batch_create_intents(intents):
 
     client.batch_update_intents(parent, "no", intent_batch_inline={"intents": intents_out})
     return counter
+
+
+def get_all_intents():
+    client = dialogflow_v2beta1.IntentsClient()
+    parent = client.project_agent_path(PROJECT_ID)
+    return client.list_intents(parent)
 
 
 @app.route("/v1/batch_create_entities", methods=["POST", "GET"])
