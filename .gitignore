@@ -4,4 +4,6 @@ __pycache__/
 *.pyc
 .pytest_cache
 backupagent.json
-
+build/
+dist/
+Agent25-google.json
