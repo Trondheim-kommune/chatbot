@@ -5,6 +5,7 @@ import time
 
 sys.path[0] += "/.."
 import server
+from flask_exceptions import InvalidDialogFlowID
 
 
 # Just see if we can create an intent object that is correct.
@@ -55,7 +56,7 @@ def app():
 def test_get_homepage(app):
     response = app.test_client().get('/')
     assert response.status_code == 200
-    assert b"Success." in response.data
+    assert b'{"message": "Success", "status": "OK"}' in response.data
 
 
 def test_add_and_remove_entities(app):
@@ -114,6 +115,33 @@ def test_add_and_remove_entities(app):
     assert response_2.status_code == 200
 
 
+def test_add_intents_same_name_throws_exception(app):
+    input_dict = {
+        "type": "batch_create_intents",
+        "data": [
+            {
+                "intent_name": "1",
+                "training_phrases": [
+                    "jeg har en Bmw",
+                    "Jeg har noe som sier vrooooom"
+                ]
+            },
+            {
+                "intent_name": "2",
+                "training_phrases": [
+                    "jeg har også en Bmw",
+                    "Jeg har noe som sier bada bing bada bong"
+                ]
+            }
+        ]
+    }
+    response = app.test_client().post('/v1/batch_create_intents', data=json.dumps(input_dict))
+    assert response.status_code == 400
+    response_json = json.loads(response.data.decode())
+    assert "400 Intent with the display_name '1' already exists." in response_json["message"]
+    assert "ERROR" in response_json["status"]
+
+
 def test_add_intents(app):
     # Just because I want a unique name I use epoch time here.
     epoch_time = str(int(time.time()))
@@ -139,4 +167,4 @@ def test_add_intents(app):
     }
     response = app.test_client().post('/v1/batch_create_intents', data=json.dumps(input_dict))
     assert response.status_code == 200
-    assert b'Success' in response.data
+    assert b'{"message": "Batch created 2 intents.", "status": "OK"}' in response.data
