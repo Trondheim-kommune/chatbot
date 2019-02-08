@@ -1,7 +1,5 @@
 from scrapy.http import Request, HtmlResponse
-import os
-import json
-
+import os, json
 from scraper.scraper.spiders import trondheim_spider as ts
 
 
@@ -44,7 +42,6 @@ def test_scraper_snapshot():
 
     # Sort and compare snapshots
     for t in tree:
-        t = json.loads(json.dumps(t))
         html_tree_snapshot = json.loads(html_tree_snapshot)
         assert sorted(t.items()) == sorted(html_tree_snapshot.items())
 

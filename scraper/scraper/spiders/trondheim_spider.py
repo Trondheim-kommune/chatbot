@@ -33,6 +33,9 @@ class TrondheimSpider(scrapy.Spider):
     # when the crawler is run in a terminal.
     DEBUG = False
 
+    # If strong tag should be seen as a sub header
+    USE_STRONG_TAG_AS_HEADER = True
+
     # The links to start the crawling process on.
     start_urls = [
          'https://www.trondheim.kommune.no'
@@ -40,7 +43,9 @@ class TrondheimSpider(scrapy.Spider):
 
     # Paths on the site which are allowed.
     allowed_paths = [
-         'https://www.trondheim.kommune.no/tema'
+         'https://www.trondheim.kommune.no/tema',
+         'https://www.trondheim.kommune.no/aktuelt',
+         'https://www.trondheim.kommune.no/org'
     ]
 
     # These selectors will be removed from all pages, as they contain very
@@ -161,6 +166,10 @@ class TrondheimSpider(scrapy.Spider):
         previous_paragraph = None
 
         for elem in elements:
+            # Replace br tag with newline
+            for br in elem.find_all('br'):
+                br.replace_with('\n')
+
             # Remove trailing and tailing spaces from the node contents.
             elem_text = elem.text.strip()
 
@@ -170,8 +179,9 @@ class TrondheimSpider(scrapy.Spider):
             # Do not allow tree nodes with empty text.
             if not elem_text: continue
 
-            # Handle switching parent between strong and paragraph tag.
-            if elem_tag == 'strong' and previous_paragraph:
+            # Handle switching parent between strong and paragraph tag if
+            # strong tag is considered a sub header
+            if self.USE_STRONG_TAG_AS_HEADER and elem_tag == 'strong' and previous_paragraph:
                 current_parent = TreeElement(elem_tag, elem_text, previous_paragraph.parent)
                 previous_paragraph.parent = current_parent
                 continue

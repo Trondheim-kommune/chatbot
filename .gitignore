@@ -4,7 +4,7 @@ __pycache__/
 *.pyc
 .pytest_cache
 backupagent.json
-scraper/**/*.json
+*trondheim.json
 build/
 dist/
 Agent25-google.json
