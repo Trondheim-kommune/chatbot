@@ -59,4 +59,3 @@ Werkzeug==0.14.1
 zope.interface==4.6.0
 pytest-cov==2.6.1
 codecov
-pytest-cov
