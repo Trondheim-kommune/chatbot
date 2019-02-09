@@ -1,8 +1,8 @@
 import json
-from flask import *
+from flask import Flask, jsonify, request
 import dialogflow_v2beta1
 import os
-from flask_exceptions import InvalidDialogFlowID
+from api.flask.flask_exceptions import InvalidDialogFlowID
 import google.api_core.exceptions as google_exceptions
 from model.MongoDBControllerWebhook import MongoDBControllerWebhook
 
@@ -10,8 +10,8 @@ app = Flask(__name__)
 
 mongo_controller = MongoDBControllerWebhook()
 
-# This dictionary contains a mapping from synonyms to entity_type in order to match training phrases with
-# entities.
+# This dictionary contains a mapping from synonyms to entity_type in order to
+# match training phrases with entities.
 entities = {}
 # A simple flag if you have already loaded the entities or not.
 entities_loaded = False
@@ -69,19 +69,22 @@ def get_response():
         entities = []
 
     try:
-        default_fulfillment_text = json_input_data["queryResult"]["fulfillmentMessages"][0]["text"]["text"][0]
+        default_fulfillment_text = \
+            json_input_data["queryResult"]["fulfillmentMessages"][0]["text"][
+                "text"][0]
     except KeyError:
         default_fulfillment_text = None
 
-    return json.dumps(
-        {"fulfillmentText": mongo_controller.webhook_query(raw_query_text, intent, entities, default_fulfillment_text)})
+    return json.dumps({"fulfillmentText": mongo_controller.webhook_query(
+        raw_query_text, intent, entities, default_fulfillment_text)})
 
 
 def create_intent_object(intent_name, training_phrases, match_entity=True):
     """
-    This method take in a name and training phrases and creates the intent object and maps intents to entities
-    if it finds a match. (Also a variable match_entity if you do not wish to match with entities you can turn it off.
-
+    This method take in a name and training phrases and creates the intent
+    object and maps intents to entities if it finds a match. (Also a
+    variable match_entity if you do not wish to match with entities you
+    can turn it off.)
     """
     intent = {
         "display_name": intent_name,
@@ -97,19 +100,22 @@ def create_intent_object(intent_name, training_phrases, match_entity=True):
         for word in training_phrase.split():
             try:
                 if not match_entity:
-                    # If you don't want to match with entities just append regular and continue to the next one.
+                    # If you don't want to match with entities just append
+                    # regular and continue to the next one.
                     parts.append({"text": word + " "})
                     continue
-                # This is when we find an entity matching this specific word in the training phrase.
-                # Then we need to add entity type to the word and add the parameter to the intent.
+                # This is when we find an entity matching this specific word
+                # in the training phrase. Then we need to add entity type to
+                # the word and add the parameter to the intent.
                 entity_type = entities[word]
-                parts.append({"text": word + " ", "entity_type": "@" + entity_type,
-                              "alias": entity_type})
+                parts.append(
+                    {"text": word + " ", "entity_type": "@" + entity_type,
+                     "alias": entity_type})
 
                 parameters.append({"display_name": entity_type,
-                                   "entity_type_display_name": "@" + entity_type,
-                                   "value": "$" + entity_type
-                                   })
+                                   "entity_type_display_name": "@" +
+                                   entity_type,
+                                   "value": "$" + entity_type})
 
             except KeyError:
                 # All the non-matching words.
@@ -183,10 +189,12 @@ def batch_create_intents_post():
     intents = json_input_data["data"]
 
     try:
-        # Since response from batch_create_intents is an operation/ future object we don't really have anything to
-        # return here. So just a simple counter, so atleast we know how many intents we created.
+        # Since response from batch_create_intents is an operation/ future
+        # object we don't really have anything to return here. So just a
+        # simple counter, so atleast we know how many intents we created.
         counter = batch_create_intents(intents)
-        return create_success_response("Batch created " + str(counter) + " intents.")
+        return create_success_response(
+            "Batch created " + str(counter) + " intents.")
     except google_exceptions.FailedPrecondition as e:
         # Intent with same name exception.
         raise InvalidDialogFlowID(str(e), status_code=400)
@@ -194,8 +202,8 @@ def batch_create_intents_post():
 
 def batch_create_intents(intents):
     """
-    This is used to insert multiple intents at the same time, much more efficient than running the
-    create_intent multiple times.
+    This is used to insert multiple intents at the same time, much more
+    efficient than running the create_intent multiple times.
     :param intents: A list of intents you want to create.
     :return: a simple int of
     """
@@ -205,14 +213,16 @@ def batch_create_intents(intents):
     counter = 0
 
     for intent in intents:
-        current_intent = create_intent_object(intent["intent_name"], intent["training_phrases"])
+        current_intent = create_intent_object(intent["intent_name"],
+                                              intent["training_phrases"])
         intents_out.append(current_intent)
         counter += 1
 
     client = dialogflow_v2beta1.IntentsClient()
     parent = client.project_agent_path(PROJECT_ID)
 
-    client.batch_update_intents(parent, "no", intent_batch_inline={"intents": intents_out})
+    client.batch_update_intents(parent, "no",
+                                intent_batch_inline={"intents": intents_out})
     return counter
 
 
@@ -248,13 +258,15 @@ def batch_create_entities(entity_types):
     ID_list = []
 
     for entity_type in entity_types:
-        entity_type_out = {"display_name": entity_type["entity_type_name"], "kind": "KIND_MAP",
+        entity_type_out = {"display_name": entity_type["entity_type_name"],
+                           "kind": "KIND_MAP",
                            "entities": entity_type["entities"]}
         response = client.create_entity_type(parent, entity_type_out)
 
         ID_list.append(response.name.split("/")[-1])
     # After we have inserted all the new entities we get_entities() again.
-    # TODO: it would be more efficient to add to the dictionary whilst uploading new entities.
+    # TODO: it would be more efficient to add to the dictionary whilst
+    # uploading new entities.
     get_entities()
 
     return ID_list
@@ -267,7 +279,8 @@ def batch_delete_entities_post():
 
     try:
         batch_delete_entities(entity_ids)
-        # Since reponse is an operation/ future object we don't really have anything to return here.
+        # Since reponse is an operation/ future object we don't really have
+        # anything to return here.
         return create_success_response("Batch deleted entities.")
     except google_exceptions.FailedPrecondition as e:
         raise InvalidDialogFlowID(str(e), status_code=400)
@@ -284,8 +297,9 @@ def batch_delete_entities(entity_ids):
 
     entity_ids_fixed_path = []
 
-    # This may seems weird and it seems like it would not be necessary but there is a bug with the api and
-    # therefore we have to append the beginning of the path to every entity_id in order to get this to work.
+    # This may seems weird and it seems like it would not be necessary but
+    # there is a bug with the api and therefore we have to append the
+    # beginning of the path to every entity_id in order to get this to work.
     for entity_id in entity_ids:
         entity_ids_fixed_path.append(parent + "/entityTypes/" + entity_id)
 

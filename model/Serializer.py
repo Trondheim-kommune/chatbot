@@ -85,8 +85,12 @@ class Serializer:
                     # more sophisticated here in the future.. with regards to
                     # keyword generation
                     iterator(
-                        idx + 1, child["children"], title=title + " " + child["text"]
-                    )
+                        idx +
+                        1,
+                        child["children"],
+                        title=title +
+                        " " +
+                        child["text"])
                 else:
                     content = Content(title, child["text"])
                     self.__model["contents"].append(content)

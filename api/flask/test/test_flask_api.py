@@ -1,18 +1,19 @@
-import sys
 import pytest
 import json
 import time
 
-sys.path[0] += "/.."
-import server
-from flask_exceptions import InvalidDialogFlowID
+from api.flask import server
 
 
 # Just see if we can create an intent object that is correct.
 def test_create_intent_object():
-    # match_entitity = False because entities might change in future and I don't want this test to break in the future.
-    intent = server.create_intent_object("Husbybadet", ["Når åpner husbybadet?", "husbybadet åpningstid"],
-                                         match_entity=False)
+    # match_entitity = False because entities might change in future and I
+    # don't want this test to break in the future.
+    intent = server.create_intent_object(
+        "Husbybadet", [
+            "Når åpner husbybadet?", "husbybadet åpningstid"],
+        match_entity=False)
+
     correct_intent = {
         "display_name": "Husbybadet",
         "parameters": [],
@@ -56,7 +57,7 @@ def app():
 def test_get_homepage(app):
     response = app.test_client().get('/')
     assert response.status_code == 200
-    assert b'{"message": "Success", "status": "OK"}' in response.data
+    assert b'{"status": "OK", "message": "Success"}' in response.data
 
 
 def test_add_and_remove_entities(app):
@@ -104,14 +105,17 @@ def test_add_and_remove_entities(app):
         ]
     }
 
-    response = app.test_client().post('/v1/batch_create_entities', data=json.dumps(input_dict))
+    response = app.test_client().post('/v1/batch_create_entities',
+                                      data=json.dumps(input_dict))
     assert response.status_code == 200
     response_json = json.loads(response.data.decode())
     # Make sure you got 2 IDs back.
     assert 2 == len(response_json["data"])
 
     # Now we want to delete the 2 new entities.
-    response_2 = app.test_client().post('/v1/batch_delete_entities', data=json.dumps({"data": response_json["data"]}))
+    response_2 = app.test_client().post('/v1/batch_delete_entities',
+                                        data=json.dumps(
+                                            {"data": response_json["data"]}))
     assert response_2.status_code == 200
 
 
@@ -135,10 +139,12 @@ def test_add_intents_same_name_throws_exception(app):
             }
         ]
     }
-    response = app.test_client().post('/v1/batch_create_intents', data=json.dumps(input_dict))
+    response = app.test_client().post('/v1/batch_create_intents',
+                                      data=json.dumps(input_dict))
     assert response.status_code == 400
     response_json = json.loads(response.data.decode())
-    assert "400 Intent with the display_name '1' already exists." in response_json["message"]
+    assert "400 Intent with the display_name '1' already exists." in \
+           response_json["message"]
     assert "ERROR" in response_json["status"]
 
 
@@ -165,6 +171,8 @@ def test_add_intents(app):
             }
         ]
     }
-    response = app.test_client().post('/v1/batch_create_intents', data=json.dumps(input_dict))
+    response = app.test_client().post('/v1/batch_create_intents',
+                                      data=json.dumps(input_dict))
     assert response.status_code == 200
-    assert b'{"message": "Batch created 2 intents.", "status": "OK"}' in response.data
+    assert b'{"status": "OK", "message": "Batch created 2 intents."}' in \
+        response.data

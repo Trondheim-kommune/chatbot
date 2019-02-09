@@ -14,6 +14,8 @@ constantly==15.1.0
 cryptography==2.5
 cssselect==1.0.3
 dialogflow==0.5.2
+entrypoints==0.3
+flake8==3.7.5
 Flask==1.0.2
 google-api-core==1.7.0
 google-auth==1.6.2
@@ -26,6 +28,7 @@ itsdangerous==1.1.0
 Jinja2==2.10
 lxml==4.3.0
 MarkupSafe==1.1.0
+mccabe==0.6.1
 more-itertools==5.0.0
 parsel==1.5.1
 pluggy==0.8.1
@@ -36,6 +39,8 @@ pyasn1-modules==0.2.3
 pycparser==2.19
 PyDispatcher==2.0.5
 PyHamcrest==1.9.0
+pycodestyle==2.5.0
+pyflakes==2.1.0
 pymongo==3.7.2
 pyOpenSSL==19.0.0
 pytest==4.2.0
