@@ -9,11 +9,11 @@ before_install:
 install:
   - pip install -r requirements.txt
 script:
-  - pytest --cov-report term --cov=app/test/
+  - pytest --cov-report term 
   - flake8 --exclude=venv,build .
 
 after_success:
-  - codecov
+  - codecov -t CODECOV_TOKEN
 env:
   global:
     - secure: 2hEAy3I1u5iHUzOO/YnRQJYuw06lc/PVAefgW9vwOStXsE44i8vI+qkY1SQUG7DfoVYKkpoz+zjMP49R59wCwgOFWnwJ/28v5Fe6RB2pMvzjLWXtcH8+woqJZ5nfIY2gFBNASHeBpBaCf1znqhlqWRQaABmcVQgUsmTQtIGWW8bISFdP6HPvWE0+fbpa7XIjelpQJ0L7noOMSMd234SoBWpTi2e5QUgbpDIihU4xtZPEbxWF5xLT9gqHvoMw3BJIBMm2BJJ5yoiqRmKCRH6kQO1aakrdXrcutI9GjNQpJLuPDCjD85cKmUp8GHSiyu0gMTQ5+NuK5sNXuOqcc4+FxnM1KJEUN1oGyn0e2jCnhq55YE8whYzLmUqGsqS2SuNp1dU27VwlNPe0J03zPyLvwIz6/RL1N3IAY4Zp+PWdAU6GDUOB1+NBexuD8ZUiTX0ArBM7gAo5OnGheW+aPaLvt5TC+dEfdiE8V3dYyGtyx4ozjFdaG5/LSy/Pla+cutCrChHtvHwC9imUSyMxrHZ8Hr+vA8A5R9WCLIiFY5ubGPmiQntverB3W15MV6A9IxCPksdW1OkQrlCc0JbMdI97Egex+Xww4K97/65Yd3AaWrlHD42ENVoVdqGz18CZQaaXa4JPAPur07Nt/ksYX7MqeHBVSQSf+fn+8rJAhj4254g=
