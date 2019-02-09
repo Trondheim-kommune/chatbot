@@ -41,6 +41,9 @@ class Content:
     def __repr__(self):
         return str(self.get_content())
 
+    def toJSON(self):
+        return json.dumps(self.get_content())
+
 
 class Serializer:
     """ Translate JSON output from scraper to model schema """
@@ -89,31 +92,35 @@ class Serializer:
             model["url"] = data["url"]
 
             # Actual data in the tree
-            child_data = data["tree"]["children"] 
+            if "children" in data["tree"]:
+                child_data = data["tree"]["children"]
+            else:
+                continue
 
             # Extract meta keywords if they exist
             if child_data[0]["tag"] == "meta":
                 # Tokenizing the keywords on comma
-                model["header_meta_keywords"] = child_data[0]["text"].split(",")
-                # Remove meta element from the list before iterating over the rest
-                # of the list
+                model["header_meta_keywords"] = child_data[0]["text"].split(
+                    ",")
+                # Remove meta element from the list before iterating
+                # over the rest of the list
                 child_data.pop(0)
 
             def iterator(idx, data, model, title):
-                """ Recursively traverse the children and create new Contents from
-                paragraphs """
+                """ Recursively traverse the children and create new Contents
+                from paragraphs """
                 for child in data:
                     if "children" in child.keys():
-                        # currently just concatenates titles.. need to do something
-                        # more sophisticated here in the future.. with regards to
-                        # keyword generation
+                        # currently just concatenates titles.. need to do
+                        # something more sophisticated here in the future..
+                        # with regards to keyword generation
                         iterator(idx + 1, child["children"], model,
                                  title=title + " " + child["text"])
                     else:
-                        # Hit a leaf node in recursion tree. We extract the text
-                        # here and continue
+                        # Hit a leaf node in recursion tree. We extract the
+                        # text here and continue
                         content = Content(title, [child["text"]])
-                        model["contents"].append(content)
+                        model["contents"].append(content.get_content())
 
                 return model
 
