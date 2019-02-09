@@ -1,4 +1,4 @@
-[![codecov](https://codecov.io/gh/vegarab/agent-25/branch/feat%2F%2318-test-automation/graph/badge.svg?token=ArL47bWQSN)](https://codecov.io/gh/vegarab/agent-25)
+[![codecov](https://codecov.io/gh/vegarab/agent-25/branch/dev/graph/badge.svg?token=ArL47bWQSN)](https://codecov.io/gh/vegarab/agent-25)
 # agent-25
 This is a chatbot using google dialogflow, which scrapes and indexes sites
 itself. The project is developed in cooperation with Trondheim Kommune, where
