@@ -57,7 +57,9 @@ def app():
 def test_get_homepage(app):
     response = app.test_client().get('/')
     assert response.status_code == 200
-    assert b'{"message": "Success", "status": "OK"}' in response.data
+    response_json = json.loads(response.data.decode())
+    assert "OK" == response_json["status"]
+    assert "Success" == response_json["message"]
 
 
 def test_add_and_remove_entities(app):
@@ -174,5 +176,7 @@ def test_add_intents(app):
     response = app.test_client().post('/v1/batch_create_intents',
                                       data=json.dumps(input_dict))
     assert response.status_code == 200
-    assert b'{"message": "Batch created 2 intents.", "status": "OK"}' in \
-        response.data
+
+    response_json = json.loads(response.data.decode())
+    assert "OK" == response_json["status"]
+    assert "Batch created 2 intents." == response_json["message"]
