@@ -10,11 +10,14 @@ class MongoDBControllerWebhook:
     def webhook_query(self, raw_query_text, intent, entities, default_text):
         """
         Called when a user asks a question.
-        dialogflow --> Flask --> Controller --> model --> controller --> flask --> dialogflow
+        dialogflow --> Flask --> Controller --> model --> controller -->
+        flask --> dialogflow
+
         :param raw_query_text: This is the full query text from the user.
         :param intent: The intent that got automatically matched.
         :param entities: The entities that got matched.
-        :param default_text: The randomly chosen static reply if the intent has any.
+        :param default_text: The randomly chosen static reply if the intent
+        has any.
 
         :return: This should just return a simple string.
         """

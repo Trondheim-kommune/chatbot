@@ -9,7 +9,8 @@ class MongoDBControllerDialogFlowAPI:
 
     def create_intents(self, intents):
         """
-        :param intents: The intents you want to create. Check https://github.com/vegarab/agent-25/wiki/Flask-API-formats
+        :param intents: The intents you want to create. Check
+        https://github.com/vegarab/agent-25/wiki/Flask-API-formats
         for format.
         :return: A counter of how many intents created.
         """
@@ -25,7 +26,8 @@ class MongoDBControllerDialogFlowAPI:
 
     def create_entities(self, entity_types):
         """
-        :param entity_types: A list of entity types. Check https://github.com/vegarab/agent-25/wiki/Flask-API-formats
+        :param entity_types: A list of entity types. Check
+        https://github.com/vegarab/agent-25/wiki/Flask-API-formats
         for format.
         :return: a list of the entity ID's created.
         """
@@ -33,7 +35,8 @@ class MongoDBControllerDialogFlowAPI:
 
     def get_entities(self):
         """
-        :return: This just returns the already cached entities in the server module.
-        This might be a bad idea and may change in the future to be more like get_intents.
+        :return: This just returns the already cached entities in the server
+        module. This might be a bad idea and may change in the future to be
+        more like get_intents.
         """
         return server.entities
