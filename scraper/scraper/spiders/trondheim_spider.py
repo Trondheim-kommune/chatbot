@@ -38,14 +38,14 @@ class TrondheimSpider(scrapy.Spider):
 
     # The links to start the crawling process on.
     start_urls = [
-         'https://www.trondheim.kommune.no'
+        'https://www.trondheim.kommune.no'
     ]
 
     # Paths on the site which are allowed.
     allowed_paths = [
-         'https://www.trondheim.kommune.no/tema',
-         'https://www.trondheim.kommune.no/aktuelt',
-         'https://www.trondheim.kommune.no/org'
+        'https://www.trondheim.kommune.no/tema',
+        'https://www.trondheim.kommune.no/aktuelt',
+        'https://www.trondheim.kommune.no/org'
     ]
 
     # These selectors will be removed from all pages, as they contain very
@@ -55,35 +55,33 @@ class TrondheimSpider(scrapy.Spider):
 
     # Hierarchy for sorting categories.
     hierarchy = {
-        'h1': { 'level': 1 },
-        'h2': { 'level': 2 },
-        'h3': { 'level': 3 },
-        'h4': { 'level': 4 },
-        'h5': { 'level': 5 },
-        'h6': { 'level': 6 },
-        'tbody': { 'level': 6 },
-        'tr': { 'level': 7 },
-        'th': { 'level': 8 },
-        'strong': { 'level': 8 },
-        'p': { 'level': 8 },
-        'ul': { 'level': 8 },
-        'li': { 'level': 9 },
-        'a': { 'level': 10 },
+        'h1': {'level': 1},
+        'h2': {'level': 2},
+        'h3': {'level': 3},
+        'h4': {'level': 4},
+        'h5': {'level': 5},
+        'h6': {'level': 6},
+        'tbody': {'level': 6},
+        'tr': {'level': 7},
+        'th': {'level': 8},
+        'strong': {'level': 8},
+        'p': {'level': 8},
+        'ul': {'level': 8},
+        'li': {'level': 9},
+        'a': {'level': 10},
     }
-
 
     def extract_metadata(self, root, soup):
         """Extract keywords metadata from the header of the page and add them
         as children of the tree root element."""
 
         # Attempt finding the keywords meta tag on the page.
-        keywords = soup.find('meta', attrs={ 'name': 'keywords' })
+        keywords = soup.find('meta', attrs={'name': 'keywords'})
 
         if keywords and 'content' in keywords.attrs:
             # Add the keywords beneath the title in the tree, if the meta tag
             # has the content attribute correctly specified.
             TreeElement('meta', keywords.attrs['content'], parent=root)
-
 
     def locate_parent(self, elem_tag, current_parent, root):
         """Locate the parent element on which we should insert the next
@@ -121,7 +119,7 @@ class TrondheimSpider(scrapy.Spider):
                     if elem_level > search_parent_in_hierarchy['level']:
                         parent = search_parent
                         break
-                    
+
                     if elem_level == search_parent_in_hierarchy['level']:
                         # If elements are in same level in hierarchy.
                         parent = search_parent.parent
@@ -137,14 +135,13 @@ class TrondheimSpider(scrapy.Spider):
         # Return the parent element candidate.
         return parent
 
-
     def generate_tree(self, response):
         """Creates a tree structure describing the given page. This structure
         is based on headers, creating a hierarchy based on text pieces which
         are positioned in between different types of headers."""
 
         soup = BeautifulSoup(response.text, 'lxml')
-        
+
         elements = soup.find_all(self.hierarchy.keys())
 
         # We remove the header and footer tags from the page to reduce
@@ -157,12 +154,13 @@ class TrondheimSpider(scrapy.Spider):
         root = TreeElement('title', soup.find('title').text)
 
         # Attempt extracting the keywords and adding them to the tree.
-        self.extract_metadata(root, soup)        
+        self.extract_metadata(root, soup)
 
         # Current position in the hierarchy.
         current_parent = root
 
-        # Keep track of paragraph tag to be able to switch position with strong tags.
+        # Keep track of paragraph tag to be able to switch
+        # position with strong tags.
         previous_paragraph = None
 
         for elem in elements:
@@ -177,12 +175,15 @@ class TrondheimSpider(scrapy.Spider):
             elem_tag = elem.name
 
             # Do not allow tree nodes with empty text.
-            if not elem_text: continue
+            if not elem_text:
+                continue
 
             # Handle switching parent between strong and paragraph tag if
             # strong tag is considered a sub header
-            if self.USE_STRONG_TAG_AS_HEADER and elem_tag == 'strong' and previous_paragraph:
-                current_parent = TreeElement(elem_tag, elem_text, previous_paragraph.parent)
+            if self.USE_STRONG_TAG_AS_HEADER and elem_tag == 'strong' \
+                    and previous_paragraph:
+                current_parent = TreeElement(
+                    elem_tag, elem_text, previous_paragraph.parent)
                 previous_paragraph.parent = current_parent
                 continue
 
@@ -193,10 +194,10 @@ class TrondheimSpider(scrapy.Spider):
             current_parent = TreeElement(elem_tag, elem_text, parent)
 
             # Update the previous paragraph.
-            if elem_tag == 'p': previous_paragraph = current_parent
-        
-        return root
+            if elem_tag == 'p':
+                previous_paragraph = current_parent
 
+        return root
 
     def parse(self, response):
         """Parses pages which have been requested from the server."""

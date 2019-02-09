@@ -1,9 +1,12 @@
 from scrapy.http import Request, HtmlResponse
-import os, json
+import os
+import json
 from scraper.scraper.spiders import trondheim_spider as ts
 
+HB = 'https://trondheim.kommune.no/tema/kultur-og-fritid/lokaler/husebybadet'
 
-def fake_response_from_file(file_name, url=None):
+
+def fake_response_from_file(file_name, url=HB):
     """
     Create a Scrapy fake HTTP response from a HTML file
     @param file_name: The relative filename from the responses directory,
@@ -11,14 +14,13 @@ def fake_response_from_file(file_name, url=None):
     @param url: The URL of the response.
     returns: A scrapy HTTP response which can be used for unittesting.
     """
-    if not url:
-        url = 'https://trondheim.kommune.no/tema/kultur-og-fritid/lokaler/husebybadet'
 
     request = Request(url=url)
     responses_dir = os.path.dirname(os.path.realpath(__file__))
     file_content = open(os.path.join(responses_dir, file_name), 'r').read()
 
-    return HtmlResponse(url=url, body=file_content, request=request, encoding='utf-8')
+    return HtmlResponse(url=url, body=file_content, request=request,
+                        encoding='utf-8')
 
 
 def test_scraper_snapshot():
@@ -44,4 +46,3 @@ def test_scraper_snapshot():
     for t in tree:
         html_tree_snapshot = json.loads(html_tree_snapshot)
         assert sorted(t.items()) == sorted(html_tree_snapshot.items())
-
