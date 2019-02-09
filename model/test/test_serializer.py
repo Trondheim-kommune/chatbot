@@ -16,11 +16,11 @@ def test_serialize_data():
 
     assert test_data[0]["url"] == serialized_data[0]["url"]
     assert (
-        test_data[0]["contents"][0].get_content()["texts"]
+        test_data[0]["contents"][0]["texts"]
         == serialized_data[0]["contents"][0]["texts"]
     )
     assert (
-        test_data[0]["contents"][1].get_content()["texts"]
+        test_data[0]["contents"][1]["texts"]
         == serialized_data[0]["contents"][1]["texts"]
     )
     assert (

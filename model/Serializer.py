@@ -1,4 +1,6 @@
 import json
+import copy
+import urllib.request
 
 
 class KeyWord:
@@ -49,6 +51,7 @@ class Serializer:
     """ Translate JSON output from scraper to model schema """
 
     __file_name = None
+    __url = None
     __MODEL_SCHEMA = {
         "title": "",
         "description": "",
@@ -62,18 +65,26 @@ class Serializer:
     __models = []
     __data = []
 
-    def __init__(self, file_name):
+    def __init__(self, file_name=None, url=None):
         self.file_name = file_name
+        self.url = url
         self.load_data()
 
     def load_data(self):
         """ Load all JSON data from a file and sets self.__data. Mostly used
         for testing-purposes: real data from scraper is a list of several JSON
         objects """
-        with open(self.file_name, "r") as f:
-            data = json.load(f)
-            for item in data:
-                self.__data.append(item)
+
+        if self.file_name:
+            with open(self.file_name, "r") as f:
+                data = json.load(f)
+                for item in data:
+                    self.__data.append(item)
+        elif self.url:
+            with urllib.request.urlopen(self.url) as url:
+                data = json.loads(url.read().decode())
+                for item in data:
+                    self.__data.append(item)
 
     def get_data(self):
         return self.__data
@@ -85,10 +96,12 @@ class Serializer:
         """ Serialize a page object from the web scraper to the data model
         schema """
 
+        print(len(self.__data))
         # Iterate over all pages in the JSON data from scraper
         for data in self.__data:
             # TODO: add more metadata
-            model = self.__MODEL_SCHEMA
+            model = copy.deepcopy(self.__MODEL_SCHEMA)
+            print(model)
             model["url"] = data["url"]
 
             # Actual data in the tree
@@ -115,7 +128,7 @@ class Serializer:
                         # something more sophisticated here in the future..
                         # with regards to keyword generation
                         iterator(idx + 1, child["children"], model,
-                                 title=title + " " + child["text"])
+                                 title=title)
                     else:
                         # Hit a leaf node in recursion tree. We extract the
                         # text here and continue
