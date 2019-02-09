@@ -7,10 +7,13 @@ from api.flask import server
 
 # Just see if we can create an intent object that is correct.
 def test_create_intent_object():
-    # match_entitity = False because entities might change in future and I don't want this test to break in the future.
-    intent = server.create_intent_object("Husbybadet", ["Når åpner husbybadet?",
-                                                        "husbybadet åpningstid"],
-                                         match_entity=False)
+    # match_entitity = False because entities might change in future and I
+    # don't want this test to break in the future.
+    intent = server.create_intent_object(
+        "Husbybadet", [
+            "Når åpner husbybadet?", "husbybadet åpningstid"],
+        match_entity=False)
+
     correct_intent = {
         "display_name": "Husbybadet",
         "parameters": [],
@@ -54,7 +57,7 @@ def app():
 def test_get_homepage(app):
     response = app.test_client().get('/')
     assert response.status_code == 200
-    assert b'{"message": "Success", "status": "OK"}' in response.data
+    assert b'{"status": "OK", "message": "Success"}' in response.data
 
 
 def test_add_and_remove_entities(app):
@@ -171,4 +174,5 @@ def test_add_intents(app):
     response = app.test_client().post('/v1/batch_create_intents',
                                       data=json.dumps(input_dict))
     assert response.status_code == 200
-    assert b'{"message": "Batch created 2 intents.", "status": "OK"}' in response.data
+    assert b'{"status": "OK", "message": "Batch created 2 intents."}' in \
+        response.data
