@@ -46,8 +46,7 @@ class Serializer:
     """ Translate JSON output from scraper to model schema """
 
     __file_name = None
-    __data = None
-    __model = {
+    __MODEL_SCHEMA = {
         "title": "",
         "description": "",
         "url": "",
@@ -57,42 +56,66 @@ class Serializer:
         "contents": [],
         "indexed": "",
     }
+    __models = []
+    __data = []
 
     def __init__(self, file_name):
         self.file_name = file_name
         self.load_data()
 
     def load_data(self):
+        """ Load all JSON data from a file and sets self.__data. Mostly used
+        for testing-purposes: real data from scraper is a list of several JSON
+        objects """
         with open(self.file_name, "r") as f:
-            self.__data = json.load(f)
+            data = json.load(f)
+            for item in data:
+                self.__data.append(item)
 
     def get_data(self):
         return self.__data
 
-    def get_model(self):
-        return self.__model
+    def get_models(self):
+        return self.__models
 
     def serialize_data(self):
-        # TODO: add more metadata
-        self.__model["url"] = self.__data["url"]
+        """ Serialize a page object from the web scraper to the data model
+        schema """
 
-        def iterator(idx, data, title):
-            """ Recursively traverse the children and create new Contents from
-            paragraphs """
-            for child in data:
-                if "children" in child.keys():
-                    # currently just concatenates titles.. need to do something
-                    # more sophisticated here in the future.. with regards to
-                    # keyword generation
-                    iterator(
-                        idx +
-                        1,
-                        child["children"],
-                        title=title +
-                        " " +
-                        child["text"])
-                else:
-                    content = Content(title, child["text"])
-                    self.__model["contents"].append(content)
+        # Iterate over all pages in the JSON data from scraper
+        for data in self.__data:
+            # TODO: add more metadata
+            model = self.__MODEL_SCHEMA
+            model["url"] = data["url"]
 
-        iterator(0, self.__data["tree"]["children"], "")
+            # Actual data in the tree
+            child_data = data["tree"]["children"] 
+
+            # Extract meta keywords if they exist
+            if child_data[0]["tag"] == "meta":
+                # Tokenizing the keywords on comma
+                model["header_meta_keywords"] = child_data[0]["text"].split(",")
+                # Remove meta element from the list before iterating over the rest
+                # of the list
+                child_data.pop(0)
+
+            def iterator(idx, data, model, title):
+                """ Recursively traverse the children and create new Contents from
+                paragraphs """
+                for child in data:
+                    if "children" in child.keys():
+                        # currently just concatenates titles.. need to do something
+                        # more sophisticated here in the future.. with regards to
+                        # keyword generation
+                        iterator(idx + 1, child["children"], model,
+                                 title=title + " " + child["text"])
+                    else:
+                        # Hit a leaf node in recursion tree. We extract the text
+                        # here and continue
+                        content = Content(title, [child["text"]])
+                        model["contents"].append(content)
+
+                return model
+
+            model = iterator(0, child_data, model, "")
+            self.__models.append(model)

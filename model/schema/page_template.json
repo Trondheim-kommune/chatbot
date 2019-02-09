@@ -10,7 +10,7 @@
 			{ 
 				"title": "string",
 				"keywords": [ {"keyword": "string", "confidence": "number"} ],
-				"text": ["string"]
+				"texts": ["string"]
 			}
 		],
 	"indexed": "boolean"
