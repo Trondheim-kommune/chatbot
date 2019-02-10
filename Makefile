@@ -1,5 +1,8 @@
 install:
-	python setup.py install
+	pip install .
+
+setup:
+	pip install .
 
 test: setup
 	pytest
