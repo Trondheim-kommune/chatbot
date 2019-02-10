@@ -58,4 +58,4 @@ w3lib==1.20.0
 Werkzeug==0.14.1
 zope.interface==4.6.0
 pytest-cov==2.6.1
-codecov
+codecov==2.0.15
