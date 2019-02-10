@@ -1,21 +1,23 @@
+[
 {
     "title": "",
     "description": "",
     "url": "https://ntnu.no",
     "last_modified": "",
-    "header_meta_keywords": [],
+    "header_meta_keywords": ["revisjon", "forvaltningsrevisjon"],
     "keywords": [],
     "contents": [
         {
             "title": "",
             "keywords": [],
-            "texts": "emner"
+            "texts": ["emner2"]
         },
         {
-            "title": " mange bra emner",
+            "title": "mange bra emner22",
             "keywords": [],
-            "texts": "Informatikk prosjektarbeid 2 er et kjempe bra emne!"
+            "texts": ["Informatikk prosjektarbeid 2 er et kjempe bra emne!2"]
         }
     ],
     "indexed": ""
 }
+]
