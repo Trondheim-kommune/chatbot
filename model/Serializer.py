@@ -96,12 +96,10 @@ class Serializer:
         """ Serialize a page object from the web scraper to the data model
         schema """
 
-        print(len(self.__data))
         # Iterate over all pages in the JSON data from scraper
         for data in self.__data:
             # TODO: add more metadata
             model = copy.deepcopy(self.__MODEL_SCHEMA)
-            print(model)
             model["url"] = data["url"]
 
             # Actual data in the tree
@@ -123,7 +121,7 @@ class Serializer:
                 """ Recursively traverse the children and create new Contents
                 from paragraphs """
                 for child in data:
-                    if "children" in child.keys():
+                    if "children" in child:
                         # currently just concatenates titles.. need to do
                         # something more sophisticated here in the future..
                         # with regards to keyword generation
