@@ -9,18 +9,23 @@ def test_serialize_data():
     # Test that data is serialized correctly
     ser = Serializer("model/test/test_data/test_data.json")
     ser.serialize_data()
-    test_data = ser.get_model()
+    test_data = ser.get_models()
+
     with open("model/test/test_data/test_data_serialized.json", "r") as f:
         serialized_data = json.load(f)
 
-    assert test_data["url"] == serialized_data["url"]
+    assert test_data[0]["url"] == serialized_data[0]["url"]
     assert (
-        test_data["contents"][0].get_content()["texts"]
-        == serialized_data["contents"][0]["texts"]
+        test_data[0]["contents"][0]["texts"]
+        == serialized_data[0]["contents"][0]["texts"]
     )
     assert (
-        test_data["contents"][1].get_content()["texts"]
-        == serialized_data["contents"][1]["texts"]
+        test_data[0]["contents"][1]["texts"]
+        == serialized_data[0]["contents"][1]["texts"]
+    )
+    assert (
+        test_data[0]["header_meta_keywords"][0]
+        == serialized_data[0]["header_meta_keywords"][0]
     )
 
 
