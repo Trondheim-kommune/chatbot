@@ -69,7 +69,7 @@ class Serializer:
         "last_modified": "",
         "header_meta_keywords": [],
         "keywords": [],
-        "contents": [],
+        "content": {},
         "indexed": "",
     }
     __models = []
@@ -156,7 +156,7 @@ class Serializer:
                 # over the rest of the list
                 child_data.pop(0)
 
-            def iterator(idx, data, model, title):
+            def iterator(idx, data, model_template, models, title):
                 """ Recursively traverse the children and create new Contents
                 from paragraphs """
                 for child in data:
@@ -164,18 +164,35 @@ class Serializer:
                         # currently just concatenates titles.. need to do
                         # something more sophisticated here in the future..
                         # with regards to keyword generation
-                        iterator(idx + 1, child["children"], model, title=title)
+                        iterator(idx + 1, child["children"], model_template, models,
+                                 title=title + " " + child["text"])
                     else:
                         # Hit a leaf node in recursion tree. We extract the
                         # text here and continue
-                        content = Content(title, [child["text"]])
-                        model["contents"].append(content.get_content())
+                        keywords = [KeyWord(*keyword) for keyword in self.get_keywords(title)]
+                        content = Content(title, [child["text"]], keywords)
+                        new_model = copy.deepcopy(model_template)
+                        new_model["content"] = content.get_content()
+                        models.append(new_model)
 
-                return model
+                return models
 
-            model = iterator(0, child_data, model, "")
-            self.__models.append(model)
+            models = iterator(0, child_data, model, [], "")
+            for model in models:
+                self.__models.append(model)
 
+
+def serialize(obj):
+    if isinstance(obj, KeyWord):
+        return obj.get_keyword()
+    return obj.__dict__
+
+ser = Serializer("../scraper/trondheim.json")
+ser.serialize_data()
+test_data = ser.get_models()
+
+print("Output:", len(test_data))
+print(json.dumps(test_data, default=serialize))
 
 # serializer = Serializer(file_name='trondheim.json')
 # print(list(serializer.get_keywords('Trondheim kommune tilbyr barnehager for barn helt opp til voksen alder')))
