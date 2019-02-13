@@ -34,7 +34,11 @@ class ModelFactory:
     def post_document(self, data, collection):
         """ Posts JSON data to colletion in db """
         col = self.get_collection(collection)
-        data = json_util.loads(data)
+
+        # Converts the data correctly if not a dict (str)
+        if not isinstance(data, dict):
+            data = json_util.loads(data)
+
         response = col.insert_one(data)
         return response  # TODO: Fix
 
