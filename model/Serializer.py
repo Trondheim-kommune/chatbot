@@ -1,6 +1,24 @@
 import json
 import copy
 import urllib.request
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+
+def sort_coo(coo_matrix):
+    tuples = zip(coo_matrix.col, coo_matrix.data)
+    return sorted(tuples, key=lambda x: (x[1], x[0]), reverse=True)
+
+
+def extract_top(feature_names, sorted_items, n=10):
+    features = []
+    scores = []
+
+    # Retrieve index of the word and the corresponding value.
+    for i, score in sorted_items[:n]:
+        features.append(feature_names[i])
+        scores.append(score)
+
+    return zip(features, scores)
 
 
 class KeyWord:
@@ -70,6 +88,12 @@ class Serializer:
         self.url = url
         self.load_data()
 
+        vectorizer, transformed_corpus, feature_names = self.get_tfidf_model()
+
+        self.transformed_corpus = transformed_corpus
+        self.feature_names = feature_names
+        self.vectorizer = vectorizer
+
     def load_data(self):
         """ Load all JSON data from a file and sets self.__data. Mostly used
         for testing-purposes: real data from scraper is a list of several JSON
@@ -92,6 +116,30 @@ class Serializer:
     def get_models(self):
         return self.__models
 
+    def get_tfidf_model(self):
+        corpus = []
+
+        for data in self.__data:
+            queue = list(data['tree'].get('children', []))
+
+            while queue:
+                node = queue.pop(0)
+
+                if 'children' in node:
+                    corpus.append(node['text'])
+                    queue.append(node['children'])
+
+        vectorizer = TfidfVectorizer(max_df=0.85)
+        transformed_corpus = vectorizer.fit_transform(corpus)
+        feature_names = vectorizer.get_feature_names()
+
+        return vectorizer, transformed_corpus, feature_names
+
+    def get_keywords(self, document):
+        tfidf_vector = self.vectorizer.transform([document])
+        sorted_items = sort_coo(tfidf_vector.tocoo())
+        return extract_top(self.feature_names, sorted_items, 10)
+
     def serialize_data(self):
         """ Serialize a page object from the web scraper to the data model
         schema """
@@ -109,10 +157,9 @@ class Serializer:
                 continue
 
             # Extract meta keywords if they exist
-            if child_data[0]["tag"] == "meta":
+            if len(child_data) > 0 and child_data[0]["tag"] == "meta":
                 # Tokenizing the keywords on comma
-                model["header_meta_keywords"] = child_data[0]["text"].split(
-                    ",")
+                model["header_meta_keywords"] = child_data[0]["text"].split(",")
                 # Remove meta element from the list before iterating
                 # over the rest of the list
                 child_data.pop(0)
@@ -125,8 +172,7 @@ class Serializer:
                         # currently just concatenates titles.. need to do
                         # something more sophisticated here in the future..
                         # with regards to keyword generation
-                        iterator(idx + 1, child["children"], model,
-                                 title=title)
+                        iterator(idx + 1, child["children"], model, title=title)
                     else:
                         # Hit a leaf node in recursion tree. We extract the
                         # text here and continue
@@ -137,3 +183,7 @@ class Serializer:
 
             model = iterator(0, child_data, model, "")
             self.__models.append(model)
+
+
+# serializer = Serializer(file_name='trondheim.json')
+# print(list(serializer.get_keywords('Trondheim kommune tilbyr barnehager for barn helt opp til voksen alder')))
