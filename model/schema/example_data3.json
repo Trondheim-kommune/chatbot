@@ -1,0 +1,47 @@
+{
+    "title": "Svømmehall - Husebybadet - Trondheim kommune",
+    "description": "string",
+    "url": "https://www.trondheim.kommune.no/tema/kultur-og-fritid/lokaler/husebybadet/",
+    "last_modified": "2019-21-01-23T18:25:43.511Z",
+    "header_meta_keywords": [
+        "svømmehall",
+        "husebybadet",
+        "bad",
+        "badebleier",
+        "svømmeutstyr"
+    ],
+    "keywords": [
+        "åpningstid",
+        "huseby",
+        "svømming",
+        "fasiliteter",
+        "swim",
+        "tag",
+        "pris",
+        "badevakt"
+    ],
+    "content": {
+        "title": "Babysvømming",
+        "keywords": [
+            {
+                "keyword": "mandag",
+                "confidence": "0.7"
+            },
+            {
+                "keyword": "onsdag",
+                "confidence": 0.76
+            },
+            {
+                "keyword": "vannet",
+                "confidence": 0.32
+            },
+            {
+                "keyword": "temperatur",
+                "confidence": 0.56
+            }
+        ],
+        "texts": [
+            "Mandag, onsdag, fredag: 14.00–15.00 Her er det drop-in timer med instruktør i vannet. Foresatte må ta kontakt med instruktøren hvis de ønsker hjelp. Babyene kan starte fra de er seks til åtte uker gamle. Temperaturen i vannet er 33 grader."
+        ]
+    }
+}
