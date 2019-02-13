@@ -209,7 +209,6 @@ class TrondheimSpider(scrapy.Spider):
             if elem_tag == 'p':
                 previous_paragraph = current_parent
 
-
         return root
 
     def parse(self, response):
