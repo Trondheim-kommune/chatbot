@@ -198,16 +198,16 @@ class TrondheimSpider(scrapy.Spider):
 
             # Concatenation of p tags with same parent to collect
             # the same type of information spread among different p tags
-            if elem_tag == 'p' and previous_paragraph and \
-                previous_paragraph.parent == parent:
-                previous_paragraph.text += " " + elem_text
-            else:
-                # Create the new elemenet.
-                current_parent = TreeElement(elem_tag, elem_text, parent)
-
-            # Update the previous paragraph.
             if elem_tag == 'p':
+                if previous_paragraph and previous_paragraph.parent == parent:
+                    previous_paragraph.text += " " + elem_text
+                    continue
+
+                # Update the previous paragraph.
                 previous_paragraph = current_parent
+
+            # Create the new elemenet.
+            current_parent = TreeElement(elem_tag, elem_text, parent)
 
         return root
 
