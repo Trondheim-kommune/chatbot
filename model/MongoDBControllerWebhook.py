@@ -1,5 +1,6 @@
 import ModelFactory as mf
 import os
+from Random import random
 
 
 class MongoDBControllerWebhook:
@@ -36,5 +37,15 @@ class MongoDBControllerWebhook:
             print("we fallin back boys")
             return "fallback"
 
-        return model_factory.get_document(" ".join(entities), "test2")
+        doc = model_factory.get_document(" ".join(entities), "test2")
+
+        try:
+            texts = doc['content']['texts']
+            return texts[random.randint(0, len(texts)-1)]
+        except KeyError:
+            raise Exception("Document doesn't have content and texts. "
+                  "Unable to retrieve text from document in dbcontroller webhook")
+        finally:
+            return "Jeg fant ikke informasjonen du spurte etter."
+
 
