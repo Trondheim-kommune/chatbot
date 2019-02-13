@@ -41,11 +41,9 @@ class MongoDBControllerWebhook:
 
         try:
             texts = doc['content']['texts']
-            return texts[Random.randint(0, len(texts)-1)]
+            return texts[Random.randint(0, len(texts) - 1)]
         except KeyError:
             raise Exception("Document doesn't have content and texts. "
-                  "Unable to retrieve text from document in dbcontroller webhook")
+                            "Unable to retrieve text from document in dbcontroller webhook")
         finally:
             return "Jeg fant ikke informasjonen du spurte etter."
-
-

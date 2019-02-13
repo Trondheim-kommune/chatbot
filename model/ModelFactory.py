@@ -3,7 +3,6 @@ from bson import json_util
 
 
 class ModelFactory:
-
     __instance = None
     __database = None
 
