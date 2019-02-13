@@ -1,6 +1,6 @@
-import ModelFactory as mf
+from model.ModelFactory import ModelFactory
 import os
-from Random import random
+from random import Random
 
 
 class MongoDBControllerWebhook:
@@ -29,7 +29,7 @@ class MongoDBControllerWebhook:
         print("default_text:", default_text)
 
         # Connect to database to retrieve documents
-        model_factory = mf.ModelFactory()
+        model_factory = ModelFactory.get_instance()
         model_factory.set_database("agent25.tinusf.com", "test_db",
                                    str(os.getenv('DB_USER')), str(os.getenv('DB_PWD')))
 
@@ -41,7 +41,7 @@ class MongoDBControllerWebhook:
 
         try:
             texts = doc['content']['texts']
-            return texts[random.randint(0, len(texts)-1)]
+            return texts[Random.randint(0, len(texts)-1)]
         except KeyError:
             raise Exception("Document doesn't have content and texts. "
                   "Unable to retrieve text from document in dbcontroller webhook")
