@@ -3,7 +3,7 @@ import os
 import json
 from scraper.scraper.spiders import trondheim_spider as ts
 
-HB = 'https://trondheim.kommune.no/tema/kultur-og-fritid/lokaler/husebybadet'
+HB = 'https://www.trondheim.kommune.no/tema/kultur-og-fritid/lokaler/husebybadet/'
 
 
 def fake_response_from_file(file_name, url=HB):
