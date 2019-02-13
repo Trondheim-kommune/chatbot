@@ -4,6 +4,7 @@ from progressbar import ProgressBar
 
 from model.Serializer import Serializer
 from model.ModelFactory import ModelFactory
+from pymongo import TEXT
 
 
 def main():
@@ -28,7 +29,10 @@ def main():
     pbar = ProgressBar()
     for i, doc in enumerate(pbar(data)):
         factory.post_document(doc, "dev")
-    print('Successfully inserted {} documents'.format(i+1))
+    print('Successfully inserted {} documents'.format(i + 1))
+
+    factory.get_collection("dev").create_index(
+        [("keywords", TEXT), ("content.keywords.keyword", TEXT)], default_language="norwegian")
 
 
 if __name__ == '__main__':
