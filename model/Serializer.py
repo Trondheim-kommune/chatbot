@@ -140,11 +140,3 @@ class Serializer:
             models = iterator(0, child_data, model, [], "")
             for model in models:
                 self.__models.append(model)
-
-
-ser = Serializer("../scraper/trondheim2.json")
-ser.serialize_data()
-test_data = ser.get_models()
-
-print("Output:", len(test_data))
-print(json.dumps(test_data))
