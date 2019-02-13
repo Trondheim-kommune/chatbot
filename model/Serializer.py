@@ -10,15 +10,7 @@ def sort_coo(coo_matrix):
 
 
 def extract_top(feature_names, sorted_items, n=10):
-    features = []
-    scores = []
-
-    # Retrieve index of the word and the corresponding value.
-    for i, score in sorted_items[:n]:
-        features.append(feature_names[i])
-        scores.append(score)
-
-    return zip(features, scores)
+    return [(feature_names[i], score) for i, score in sorted_items[:n]]
 
 
 class KeyWord:
