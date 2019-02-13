@@ -199,7 +199,7 @@ class TrondheimSpider(scrapy.Spider):
             # Concatenation of p tags with same parent to collect
             # the same type of information spread among different p tags
             if elem_tag == 'p' and previous_paragraph and \
-                    previous_paragraph.parent == parent:
+                previous_paragraph.parent == parent:
                 previous_paragraph.text += " " + elem_text
             else:
                 # Create the new elemenet.
