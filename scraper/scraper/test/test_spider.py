@@ -43,6 +43,7 @@ def test_scraper_snapshot():
         html_tree_snapshot = data.readlines()[1]
 
     # Sort and compare snapshots
-    for t in tree:
-        html_tree_snapshot = json.loads(html_tree_snapshot)
-        assert sorted(t.items()) == sorted(html_tree_snapshot.items())
+    t = next(tree)
+    assert sorted(
+        json.loads(str(html_tree_snapshot)[:-1]).items()
+    ) == sorted(t.items())
