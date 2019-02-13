@@ -196,12 +196,19 @@ class TrondheimSpider(scrapy.Spider):
             # Locate the parent element to use based on the hierarchy.
             parent = self.locate_parent(elem_tag, current_parent, root)
 
-            # Create the new elemenet.
-            current_parent = TreeElement(elem_tag, elem_text, parent)
+            # Concatenation of p tags with same parent to collect
+            # the same type of information spread among different p tags
+            if elem_tag == 'p' and previous_paragraph and \
+                    previous_paragraph.parent == parent:
+                previous_paragraph.text += " " + elem_text
+            else:
+                # Create the new elemenet.
+                current_parent = TreeElement(elem_tag, elem_text, parent)
 
             # Update the previous paragraph.
             if elem_tag == 'p':
                 previous_paragraph = current_parent
+
 
         return root
 
