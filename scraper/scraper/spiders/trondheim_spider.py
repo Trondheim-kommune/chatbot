@@ -30,17 +30,17 @@ class TrondheimSpider(scrapy.Spider):
 
     # When this flag is set, we display additional debugging information
     # when the crawler is run in a terminal.
-    # Add -a debug=<boolean> to the end of the command for debug mode
-    # Default: False
-    # Ex: scrapy crawl trondheim -o trondheim.json -a debug=True
-    debug = False
+    # Add -a debug=<string> to the end of the command for debug mode
+    # Default: None
+    # Ex to enable: scrapy crawl trondheim -o trondheim.json -a debug=true
+    debug = None
 
     # If strong tag should be seen as a sub header
-    # Add -a strong_headers=<boolean> to the end of the command.
-    # True to set strong as header
-    # Default: False
-    # Ex: scrapy crawl trondheim -o trondheim.json -a debug=False -a strong_headers=True
-    strong_headers = False
+    # Add -a strong_headers=<string> to the end of the command.
+    # None to not set strong tag as header
+    # Default: None
+    # Ex to enable: scrapy crawl trondheim -o trondheim.json -a strong_headers=true
+    strong_headers = None
 
     # The links to start the crawling process on.
     start_urls = [
@@ -185,8 +185,8 @@ class TrondheimSpider(scrapy.Spider):
                 continue
 
             # Handle switching parent between strong and paragraph tag if
-            # strong tag is considered a sub header
-            if self.strong_headers is True and elem_tag == 'strong' \
+            # strong tag is considered a sub header flag is enabled
+            if self.strong_headers and elem_tag == 'strong' \
                     and previous_paragraph:
                 current_parent = TreeElement(
                     elem_tag, elem_text, previous_paragraph.parent)
@@ -220,7 +220,7 @@ class TrondheimSpider(scrapy.Spider):
             root = self.generate_tree(response)
 
             # Pretty print the node tree if the DEBUG flag is set.
-            if self.debug is True:
+            if self.debug:
                 for pre, fill, node in RenderTree(root):
                     print('%s%s: %s' % (pre, node.tag, node.text))
 
