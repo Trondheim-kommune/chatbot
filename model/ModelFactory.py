@@ -40,10 +40,13 @@ class ModelFactory:
         cursor.sort([('score', {'$meta': "textScore"})]).limit(1)
 
         # Return first (highest score) document
-        for c in cursor:
-            return c
-
-        return None
+        result = None
+        try:
+            result = cursor.next()
+        except StopIteration:
+            raise StopIteration("Cursor is empty")
+        finally:
+            return result
 
     # TODO: some validation on response to make sure everything is posted
     def post_document(self, data, collection):
