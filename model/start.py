@@ -5,7 +5,6 @@ from progressbar import ProgressBar
 
 from model.Serializer import Serializer
 from model.ModelFactory import ModelFactory
-from pymongo import TEXT
 
 
 def main():
@@ -32,7 +31,7 @@ def main():
         factory.post_document(doc, "dev")
     print('Successfully inserted {} documents'.format(i + 1))
 
-    util.set_index("dev")
+    util.set_index("dev", factory)
 
 
 if __name__ == '__main__':
