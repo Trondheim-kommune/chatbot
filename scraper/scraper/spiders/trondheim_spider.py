@@ -186,7 +186,7 @@ class TrondheimSpider(scrapy.Spider):
 
             # Handle switching parent between strong and paragraph tag if
             # strong tag is considered a sub header
-            if self.sh and elem_tag == 'strong' \
+            if self.sh is True and elem_tag == 'strong' \
                     and previous_paragraph:
                 current_parent = TreeElement(
                     elem_tag, elem_text, previous_paragraph.parent)
@@ -220,7 +220,7 @@ class TrondheimSpider(scrapy.Spider):
             root = self.generate_tree(response)
 
             # Pretty print the node tree if the DEBUG flag is set.
-            if self.debug:
+            if self.debug is True:
                 for pre, fill, node in RenderTree(root):
                     print('%s%s: %s' % (pre, node.tag, node.text))
 
