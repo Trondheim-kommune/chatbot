@@ -1,5 +1,6 @@
 import sys
 import os
+import util
 from progressbar import ProgressBar
 
 from model.Serializer import Serializer
@@ -31,11 +32,7 @@ def main():
         factory.post_document(doc, "dev")
     print('Successfully inserted {} documents'.format(i + 1))
 
-    # Create indexing based on three different keyword fields
-    # Set the default language to norwegian to map similar words
-    factory.get_collection("dev").create_index(
-        [("keywords", TEXT), ("content.keywords.keyword", TEXT),
-         ("header_meta_keywords", TEXT)], default_language="norwegian")
+    util.set_index("dev")
 
 
 if __name__ == '__main__':

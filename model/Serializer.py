@@ -138,5 +138,4 @@ class Serializer:
                 return models
 
             models = iterator(0, child_data, model, [], "")
-            for model in models:
-                self.__models.append(model)
+            self.__models += models
