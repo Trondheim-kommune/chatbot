@@ -28,19 +28,29 @@ class TrondheimSpider(scrapy.Spider):
     # Name of the spider. This is the name to use from the Scrapy CLI.
     name = 'trondheim'
 
-    # When this flag is set, we display additional debugging information
-    # when the crawler is run in a terminal.
-    # Add -a debug=<string> to the end of the command for debug mode
+    # FLAGS #
+    # These can be combined as long as every flag comes after an '-a'
+    # Don't include flags to disable option by default
+
+    # Enable to display additional debugging information to output
+    # when the crawler is run.
+    # Add '-a debug=<string>' to the end of the command to enable.
     # Default: None
     # Ex to enable: scrapy crawl trondheim -o trondheim.json -a debug=true
     debug = None
 
     # If strong tag should be seen as a sub header
-    # Add -a strong_headers=<string> to the end of the command.
-    # None to not set strong tag as header
+    # Add '-a strong_headers=<string>' to the end of the command to enable.
     # Default: None
     # Ex to enable: scrapy crawl trondheim -o trondheim.json -a strong_headers=true
     strong_headers = None
+
+    # concatenation_p
+    # Enable concatenation of p tags under same header to be seen as one p tag.
+    # Add '-a concatenation_p=<string>' to the end of the command to enable.
+    # Default: None
+    # Ex to enable: scrapy crawl trondheim -o trondheim.json -a concatenation_p=true
+    concatenation_p = None
 
     # The links to start the crawling process on.
     start_urls = [
@@ -199,7 +209,8 @@ class TrondheimSpider(scrapy.Spider):
             # Concatenation of p tags with same parent to collect
             # the same type of information spread among different p tags
             if elem_tag == 'p':
-                if previous_paragraph and previous_paragraph.parent == parent:
+                if self.concatenation_p and previous_paragraph \
+                        and previous_paragraph.parent == parent:
                     previous_paragraph.text += "\n\n" + elem_text
                     continue
 
