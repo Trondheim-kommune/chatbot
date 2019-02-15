@@ -4,23 +4,26 @@ from scrapy.http import HtmlResponse
 from bs4 import BeautifulSoup
 from anytree import RenderTree, NodeMixin
 from anytree.exporter import DictExporter
+from hashlib import sha1
 
 
 class TreeElement(NodeMixin):
-
     # A counter used to give an unique ID to all nodes.
     counter = 0
 
-    def __init__(self, tag, text=None, parent=None):
+    def __init__(self, tag, text=None, parent=None, hashed_id=""):
         """Tree node which stores information about an HTML tag."""
 
         self.tag = tag
         self.text = text
         self.parent = parent
 
-        # We use the current counter value for the ID, and then increment
-        # it so that the value will always be unique.
-        self.id = TreeElement.counter
+        # The id is decided by using sha1 hashing on the URL the element is in
+        # and adding the element number in order from 0 split by "-"
+        # For a URL giving the sha1 hash before "-" and element number/id=15 gives
+        # a347b21969e0a00b945293b28def7396a691c914-15
+        # This is used to compare diff between new and stored html pages
+        self.id = hashed_id + "-" + str(TreeElement.counter)
         TreeElement.counter += 1
 
 
@@ -140,6 +143,9 @@ class TrondheimSpider(scrapy.Spider):
         is based on headers, creating a hierarchy based on text pieces which
         are positioned in between different types of headers."""
 
+        # Reset id to 0 for every tree correpsonding to URL
+        TreeElement.counter = 0
+
         soup = BeautifulSoup(response.text, 'lxml')
 
         elements = soup.find_all(self.hierarchy.keys())
@@ -183,15 +189,24 @@ class TrondheimSpider(scrapy.Spider):
             if self.USE_STRONG_TAG_AS_HEADER and elem_tag == 'strong' \
                     and previous_paragraph:
                 current_parent = TreeElement(
-                    elem_tag, elem_text, previous_paragraph.parent)
+                    elem_tag,
+                    elem_text,
+                    previous_paragraph.parent,
+                    sha1(response.url.encode()).hexdigest(),
+                )
                 previous_paragraph.parent = current_parent
                 continue
 
             # Locate the parent element to use based on the hierarchy.
             parent = self.locate_parent(elem_tag, current_parent, root)
 
-            # Create the new elemenet.
-            current_parent = TreeElement(elem_tag, elem_text, parent)
+            # Create the new elemenet
+            current_parent = TreeElement(
+                elem_tag,
+                elem_text,
+                parent,
+                sha1(response.url.encode()).hexdigest(),
+            )
 
             # Update the previous paragraph.
             if elem_tag == 'p':
