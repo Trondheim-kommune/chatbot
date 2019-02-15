@@ -1,6 +1,5 @@
 import sys
-import os
-import util
+import model.db_util as util
 from progressbar import ProgressBar
 
 from model.Serializer import Serializer
@@ -19,8 +18,7 @@ def main():
 
     factory = ModelFactory.get_instance()
 
-    factory.set_database("agent25.tinusf.com", "dev_db",
-                         str(os.getenv('DB_USER')), str(os.getenv("DB_PWD")))
+    util.set_db(factory)
 
     # Drop database due to duplicate data when running this
     factory.get_database().drop_collection("dev")

@@ -1,5 +1,4 @@
-import os
-
+import model.db_util as util
 from model.ModelFactory import ModelFactory
 
 fact = ModelFactory.get_instance()
@@ -8,8 +7,7 @@ fact = ModelFactory.get_instance()
 def test_get_document_single_field():
     global fact
     data = '{"name": "testname"}'
-    fact.set_database("agent25.tinusf.com", "test_db",
-                      str(os.getenv('DB_USER')), str(os.getenv('DB_PWD')))
+    util.set_db(fact, db="test_db")
 
     fact.post_document(data, "test")
 
@@ -22,8 +20,7 @@ def test_get_document_single_field():
 def test_get_document_multiple_fields():
     global fact
     data = '{"name": "testname", "surname": "testsurname"}'
-    fact.set_database("agent25.tinusf.com", "test_db",
-                      str(os.getenv('DB_USER')), str(os.getenv('DB_PWD')))
+    util.set_db(fact, db="test_db")
 
     fact.post_document(data, "test")
     doc = fact.get_document({"name": "testname", "surname": "testsurname"},
@@ -37,8 +34,7 @@ def test_get_document_multiple_fields():
 def test_update_document():
     global fact
     data = '{"name": "testname"}'
-    fact.set_database("agent25.tinusf.com", "test_db",
-                      str(os.getenv('DB_USER')), str(os.getenv('DB_PWD')))
+    util.set_db(fact, db="test_db")
 
     fact.post_document(data, "test")
     newdata = '{"name": "nottestname"}'
