@@ -31,8 +31,9 @@ def test_scraper_snapshot():
     # Instansiate the spider
     spider = ts.TrondheimSpider()
 
-    # The testing html uses strong tags as headers
+    # The testing html uses strong tags as headers and concatenation p tags
     spider.strong_headers = "true"
+    spider.concatenation_p = "true"
 
     # Crawl the html file and returns the tree structure
     tree = spider.parse(fake_response_from_file("huseby.html"))
