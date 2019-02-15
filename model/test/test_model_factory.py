@@ -1,5 +1,5 @@
+import model.db_util as util
 from pymongo import TEXT
-import os
 import json
 
 from model.ModelFactory import ModelFactory
@@ -9,10 +9,9 @@ fact = ModelFactory.get_instance()
 
 def test_get_document():
     global fact
+    util.set_db(fact, db="test_db")
     with open("model/test/test_data/test_data_model_factory.json", 'r') as f:
         data = json.load(f)
-    fact.set_database("agent25.tinusf.com", "test_db",
-                      str(os.getenv('DB_USER')), str(os.getenv('DB_PWD')))
 
     fact.post_document(data[0], "test")
     fact.post_document(data[1], "test")
@@ -26,8 +25,6 @@ def test_get_document():
     # Test second document
     assert fact.get_document("bra test", "test")['content'] == data[1]['content']
     assert fact.get_document("bra arbeid emne", "test")['content'] == data[1]['content']
-
-    # Test gibberish should not give a document
     assert not fact.get_document("sakfscfdsojimad", "test")
 
     fact.get_database().drop_collection("test")
@@ -36,8 +33,7 @@ def test_get_document():
 def test_update_document():
     global fact
     data = '{"name": "testname"}'
-    fact.set_database("agent25.tinusf.com", "test_db",
-                      str(os.getenv('DB_USER')), str(os.getenv('DB_PWD')))
+    util.set_db(fact, db="test_db")
 
     fact.post_document(data, "test")
     fact.get_collection("test").create_index(

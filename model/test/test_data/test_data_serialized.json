@@ -1,23 +1,40 @@
 [
-{
-    "title": "",
-    "description": "",
-    "url": "https://ntnu.no",
-    "last_modified": "",
-    "header_meta_keywords": ["revisjon", "forvaltningsrevisjon"],
-    "keywords": [],
-    "contents": [
-        {
+    {
+        "title": "",
+        "description": "",
+        "url": "https://ntnu.no",
+        "last_modified": "",
+        "header_meta_keywords": [
+            "revisjon",
+            "forvaltningsrevisjon"
+        ],
+        "keywords": [],
+        "content": {
             "title": "",
             "keywords": [],
-            "texts": ["emner2"]
+            "texts": [
+                "emner2"
+            ]
         },
-        {
+        "indexed": ""
+    },
+    {
+        "title": "",
+        "description": "",
+        "url": "https://ntnu.no",
+        "last_modified": "",
+        "header_meta_keywords": [
+            "revisjon",
+            "forvaltningsrevisjon"
+        ],
+        "keywords": [],
+        "content": {
             "title": "mange bra emner22",
             "keywords": [],
-            "texts": ["Informatikk prosjektarbeid 2 er et kjempe bra emne!2"]
-        }
-    ],
-    "indexed": ""
-}
+            "texts": [
+                "Informatikk prosjektarbeid 2 er et kjempe bra emne!2"
+            ]
+        },
+        "indexed": ""
+    }
 ]

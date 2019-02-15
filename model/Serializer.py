@@ -59,7 +59,7 @@ class Serializer:
         "last_modified": "",
         "header_meta_keywords": [],
         "keywords": [],
-        "contents": [],
+        "content": {},
         "indexed": "",
     }
     __models = []
@@ -117,7 +117,7 @@ class Serializer:
                 # over the rest of the list
                 child_data.pop(0)
 
-            def iterator(idx, data, model, title):
+            def iterator(idx, data, model_template, models, title):
                 """ Recursively traverse the children and create new Contents
                 from paragraphs """
                 for child in data:
@@ -125,15 +125,17 @@ class Serializer:
                         # currently just concatenates titles.. need to do
                         # something more sophisticated here in the future..
                         # with regards to keyword generation
-                        iterator(idx + 1, child["children"], model,
-                                 title=title)
+                        iterator(idx + 1, child["children"], model_template, models,
+                                 title=title + " " + child["text"])
                     else:
                         # Hit a leaf node in recursion tree. We extract the
                         # text here and continue
                         content = Content(title, [child["text"]])
-                        model["contents"].append(content.get_content())
+                        new_model = copy.deepcopy(model_template)
+                        new_model["content"] = content.get_content()
+                        models.append(new_model)
 
-                return model
+                return models
 
-            model = iterator(0, child_data, model, "")
-            self.__models.append(model)
+            models = iterator(0, child_data, model, [], "")
+            self.__models += models
