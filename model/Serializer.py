@@ -1,7 +1,6 @@
 import json
 import copy
 import urllib.request
-from sklearn.feature_extraction.text import TfidfVectorizer
 from model.keyword_gen import get_keywords, get_tfidf_model
 from progressbar import ProgressBar
 
@@ -30,10 +29,10 @@ class Content:
     def __init__(self, title, texts, keywords=[]):
         self.__title = title
         self.__texts = texts
-        #if keywords:
-        #    for keyword in keywords:
-        #        if not isinstance(keyword, KeyWord):
-        #            raise TypeError("Must be KeyWord type")
+        """if keywords:
+            for keyword in keywords:
+                if not isinstance(keyword, KeyWord):
+                    raise TypeError("Must be KeyWord type")"""
         self.__keywords = keywords
 
     def get_content(self):
@@ -155,7 +154,8 @@ class Serializer:
                     else:
                         # Hit a leaf node in recursion tree. We extract the
                         # text here and continue
-                        keywords = [KeyWord(*keyword) for keyword in get_keywords(self.vectorizer, self.feature_names, title)]
+                        keywords = [KeyWord(*keyword) for keyword in get_keywords(self.vectorizer, 
+                            self.feature_names, title)]
                         keywords_real = []
                         for k in keywords:
                             keywords_real.append(serialize(k))
@@ -177,4 +177,3 @@ def serialize(obj):
     if isinstance(obj, KeyWord):
         return obj.get_keyword()
     return obj.__dict__
-

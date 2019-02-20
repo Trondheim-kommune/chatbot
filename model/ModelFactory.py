@@ -39,7 +39,6 @@ class ModelFactory:
         # Sort and retrieve the one top scored document
         cursor.sort([('score', {'$meta': "textScore"})]).limit(5)
 
-        # Return first (highest score) document
         #return next(cursor, None)
         answers = []
         for c in cursor:

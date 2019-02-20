@@ -60,3 +60,4 @@ zope.interface==4.6.0
 pytest-cov==2.6.1
 codecov==2.0.15
 progressbar==2.5
+sklearn
