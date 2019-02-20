@@ -3,6 +3,7 @@ import random
 import model.db_util as util
 from sklearn.metrics.pairwise import cosine_similarity
 from model.keyword_gen import get_tfidf_model
+from progressbar import ProgressBar
 
 
 class MongoDBControllerWebhook:
@@ -40,8 +41,7 @@ class MongoDBControllerWebhook:
 
         docs = factory.get_document(raw_query_text, "dev")
 
-        def get_text(doc): return ' '.join(doc['content']['texts'])
-
+        def get_text(doc): return doc['content']['title'] + ':\n' + ' '.join(doc['content']['texts']) + '\n' + doc['url']
         corpus = [get_text(doc) for doc in docs]
         vectorizer, corpus_matrix, feature_names = get_tfidf_model(corpus)
 

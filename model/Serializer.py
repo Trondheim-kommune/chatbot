@@ -3,6 +3,7 @@ import copy
 import urllib.request
 from sklearn.feature_extraction.text import TfidfVectorizer
 from model.keyword_gen import get_keywords, get_tfidf_model
+from progressbar import ProgressBar
 
 
 class KeyWord:
@@ -120,7 +121,9 @@ class Serializer:
         schema """
 
         # Iterate over all pages in the JSON data from scraper
-        for data in self.__data:
+        print('Serializing {} contents'.format(len(self.__data)))
+        pbar = ProgressBar()
+        for data in pbar(self.__data):
             # TODO: add more metadata
             model = copy.deepcopy(self.__MODEL_SCHEMA)
             model["url"] = data["url"]
@@ -148,7 +151,7 @@ class Serializer:
                         # something more sophisticated here in the future..
                         # with regards to keyword generation
                         iterator(idx + 1, child["children"], model_template, models,
-                                 title=title + " " + child["text"])
+                                 title=title + child["text"] + ' - ')
                     else:
                         # Hit a leaf node in recursion tree. We extract the
                         # text here and continue
@@ -166,6 +169,8 @@ class Serializer:
             models = iterator(0, child_data, model, [], "")
 
             self.__models += models
+
+        print('Successfully serialized all contents')
 
 
 def serialize(obj):
