@@ -15,6 +15,7 @@ def test_serialize_data():
         serialized_data = json.load(f)
 
     assert test_data[0]["url"] == serialized_data[0]["url"]
+    assert test_data[0]["id"] == serialized_data[0]["id"]
     assert (
         test_data[0]["content"]["texts"]
         == serialized_data[0]["content"]["texts"]
