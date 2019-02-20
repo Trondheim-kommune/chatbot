@@ -37,10 +37,14 @@ class ModelFactory:
         )
 
         # Sort and retrieve the one top scored document
-        cursor.sort([('score', {'$meta': "textScore"})]).limit(1)
+        cursor.sort([('score', {'$meta': "textScore"})]).limit(5)
 
         # Return first (highest score) document
-        return next(cursor, None)
+        #return next(cursor, None)
+        answers = []
+        for c in cursor:
+            answers.append(c)
+        return answers
 
     # TODO: some validation on response to make sure everything is posted
     def post_document(self, data, collection):
