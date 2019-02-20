@@ -2,15 +2,7 @@ import json
 import copy
 import urllib.request
 from sklearn.feature_extraction.text import TfidfVectorizer
-
-
-def sort_coo(coo_matrix):
-    tuples = zip(coo_matrix.col, coo_matrix.data)
-    return sorted(tuples, key=lambda x: (x[1], x[0]), reverse=True)
-
-
-def extract_top(feature_names, sorted_items, n=10):
-    return [(feature_names[i], score) for i, score in sorted_items[:n]]
+from model.keyword_gen import get_keywords, get_tfidf_model
 
 
 class KeyWord:
@@ -37,11 +29,11 @@ class Content:
     def __init__(self, title, texts, keywords=[]):
         self.__title = title
         self.__texts = texts
-        if keywords:
-            for keyword in keywords:
-                if not isinstance(keyword, KeyWord):
-                    raise TypeError("Must be KeyWord type")
-            self.__keywords = keywords
+        #if keywords:
+        #    for keyword in keywords:
+        #        if not isinstance(keyword, KeyWord):
+        #            raise TypeError("Must be KeyWord type")
+        self.__keywords = keywords
 
     def get_content(self):
         return {
@@ -121,16 +113,7 @@ class Serializer:
                     corpus.append(node['text'])
                     queue.append(node['children'])
 
-        vectorizer = TfidfVectorizer(max_df=0.85)
-        transformed_corpus = vectorizer.fit_transform(corpus)
-        feature_names = vectorizer.get_feature_names()
-
-        return vectorizer, transformed_corpus, feature_names
-
-    def get_keywords(self, document):
-        tfidf_vector = self.vectorizer.transform([document])
-        sorted_items = sort_coo(tfidf_vector.tocoo())
-        return extract_top(self.feature_names, sorted_items, 10)
+        return get_tfidf_model(corpus)
 
     def serialize_data(self):
         """ Serialize a page object from the web scraper to the data model
@@ -169,8 +152,11 @@ class Serializer:
                     else:
                         # Hit a leaf node in recursion tree. We extract the
                         # text here and continue
-                        keywords = [KeyWord(*keyword) for keyword in self.get_keywords(title)]
-                        content = Content(title, [child["text"]], keywords)
+                        keywords = [KeyWord(*keyword) for keyword in get_keywords(self.vectorizer, self.feature_names, title)]
+                        keywords_real = []
+                        for k in keywords:
+                            keywords_real.append(serialize(k))
+                        content = Content(title, [child["text"]], keywords_real)
                         new_model = copy.deepcopy(model_template)
                         new_model["content"] = content.get_content()
                         models.append(new_model)
@@ -187,12 +173,3 @@ def serialize(obj):
         return obj.get_keyword()
     return obj.__dict__
 
-ser = Serializer("../scraper/trondheim.json")
-ser.serialize_data()
-test_data = ser.get_models()
-
-print("Output:", len(test_data))
-print(json.dumps(test_data, default=serialize))
-
-# serializer = Serializer(file_name='trondheim.json')
-# print(list(serializer.get_keywords('Trondheim kommune tilbyr barnehager for barn helt opp til voksen alder')))

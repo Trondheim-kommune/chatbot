@@ -1,6 +1,8 @@
 from model.ModelFactory import ModelFactory
 import random
 import model.db_util as util
+from sklearn.metrics.pairwise import cosine_similarity
+from model.keyword_gen import get_tfidf_model
 
 
 class MongoDBControllerWebhook:
@@ -38,14 +40,14 @@ class MongoDBControllerWebhook:
 
         docs = factory.get_document(raw_query_text, "dev")
 
-        try:
-            answers = ' '
-            for doc in docs:
-                answers += doc['content']['texts'][0] + '-------'
+        def get_text(doc): return ' '.join(doc['content']['texts'])
 
-            print(answers)
-            return answers
-            #return random.choice(texts)
+        corpus = [get_text(doc) for doc in docs]
+        vectorizer, corpus_matrix, feature_names = get_tfidf_model(corpus)
+
+        try:
+            scores = cosine_similarity(vectorizer.transform([raw_query_text]), corpus_matrix)[0]
+            return get_text(docs[scores.tolist().index(max(scores))])
         except KeyError:
             raise Exception("Document doesn't have content and texts. "
                             "Unable to retrieve text from document in dbcontroller webhook")
