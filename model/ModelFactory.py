@@ -1,10 +1,8 @@
 import pymongo
-
 from bson import json_util
 
 
 class ModelFactory:
-
     __instance = None
     __database = None
 
@@ -30,6 +28,20 @@ class ModelFactory:
                                      )
         self.database = client[db_name]
 
+    def get_document(self, query, collection):
+        """ Takes a dictionary and checks if all fields in dictionary matches
+        the same fields in a document. If so, returns the document """
+        col = self.get_collection(collection)
+        cursor = col.find(
+            {'$text': {'$search': query}}, {'score': {'$meta': "textScore"}}
+        )
+
+        # Sort and retrieve the one top scored document
+        cursor.sort([('score', {'$meta': "textScore"})]).limit(1)
+
+        # Return first (highest score) document
+        return next(cursor, None)
+
     # TODO: some validation on response to make sure everything is posted
     def post_document(self, data, collection):
         """ Posts JSON data to colletion in db """
@@ -41,12 +53,6 @@ class ModelFactory:
 
         response = col.insert_one(data)
         return response  # TODO: Fix
-
-    def get_document(self, query, collection):
-        """ Takes a dictionary and checks if all fields in dictionary matches
-        the same fields in a document. If so, returns the document """
-        col = self.get_collection(collection)
-        return col.find_one({"$and": [query]})
 
     def update_document(self, query, data, collection):
         """ Updates the document specified in query with the new data """

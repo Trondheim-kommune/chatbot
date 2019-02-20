@@ -1,5 +1,5 @@
 import sys
-import os
+import model.db_util as util
 from progressbar import ProgressBar
 
 from model.Serializer import Serializer
@@ -18,8 +18,7 @@ def main():
 
     factory = ModelFactory.get_instance()
 
-    factory.set_database("agent25.tinusf.com", "dev_db",
-                         str(os.getenv('DB_USER')), str(os.getenv("DB_PWD")))
+    util.set_db(factory)
 
     # Drop database due to duplicate data when running this
     factory.get_database().drop_collection("dev")
@@ -28,7 +27,9 @@ def main():
     pbar = ProgressBar()
     for i, doc in enumerate(pbar(data)):
         factory.post_document(doc, "dev")
-    print('Successfully inserted {} documents'.format(i+1))
+    print('Successfully inserted {} documents'.format(i + 1))
+
+    util.set_index("dev", factory)
 
 
 if __name__ == '__main__':

@@ -15,6 +15,8 @@ SPIDER_MODULES = ['scraper.spiders']
 NEWSPIDER_MODULE = 'scraper.spiders'
 
 FEED_EXPORT_ENCODING = 'utf-8'
+# Remove printing to output when in production and not needing output
+# LOG_ENABLED = False
 
 # Crawl responsibly by identifying yourself (and your website)
 # on the user-agent

@@ -16,12 +16,12 @@ def test_serialize_data():
 
     assert test_data[0]["url"] == serialized_data[0]["url"]
     assert (
-        test_data[0]["contents"][0]["texts"]
-        == serialized_data[0]["contents"][0]["texts"]
+        test_data[0]["content"]["texts"]
+        == serialized_data[0]["content"]["texts"]
     )
     assert (
-        test_data[0]["contents"][1]["texts"]
-        == serialized_data[0]["contents"][1]["texts"]
+        test_data[1]["content"]["texts"]
+        == serialized_data[1]["content"]["texts"]
     )
     assert (
         test_data[0]["header_meta_keywords"][0]

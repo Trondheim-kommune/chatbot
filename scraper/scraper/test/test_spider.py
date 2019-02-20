@@ -3,7 +3,7 @@ import os
 import json
 from scraper.scraper.spiders import trondheim_spider as ts
 
-HB = 'https://trondheim.kommune.no/tema/kultur-og-fritid/lokaler/husebybadet'
+HB = 'https://www.trondheim.kommune.no/tema/kultur-og-fritid/lokaler/husebybadet/'
 
 
 def fake_response_from_file(file_name, url=HB):
@@ -31,6 +31,10 @@ def test_scraper_snapshot():
     # Instansiate the spider
     spider = ts.TrondheimSpider()
 
+    # The testing html uses strong tags as headers and concatenation p tags
+    spider.strong_headers = "true"
+    spider.concatenation_p = "true"
+
     # Crawl the html file and returns the tree structure
     tree = spider.parse(fake_response_from_file("huseby.html"))
 
@@ -43,6 +47,7 @@ def test_scraper_snapshot():
         html_tree_snapshot = data.readlines()[1]
 
     # Sort and compare snapshots
-    for t in tree:
-        html_tree_snapshot = json.loads(html_tree_snapshot)
-        assert sorted(t.items()) == sorted(html_tree_snapshot.items())
+    t = next(tree)
+    assert sorted(
+        json.loads(str(html_tree_snapshot)[:-1]).items()
+    ) == sorted(t.items())

@@ -1,4 +1,6 @@
-# import mongoDB's query function
+from model.ModelFactory import ModelFactory
+import random
+import model.db_util as util
 
 
 class MongoDBControllerWebhook:
@@ -26,8 +28,21 @@ class MongoDBControllerWebhook:
         print("entities:", entities)
         print("default_text:", default_text)
 
+        # Connect to database to retrieve documents
+        factory = ModelFactory.get_instance()
+        util.set_db(factory, db="test_db")
+
         if intent == "Default Fallback Intent":
             print("we fallin back boys")
             return "fallback"
 
-        return "Normal"
+        doc = factory.get_document(" ".join(entities), "test2")
+
+        try:
+            texts = doc['content']['texts']
+            return random.choice(texts)
+        except KeyError:
+            raise Exception("Document doesn't have content and texts. "
+                            "Unable to retrieve text from document in dbcontroller webhook")
+        finally:
+            return "Jeg fant ikke informasjonen du spurte etter."
