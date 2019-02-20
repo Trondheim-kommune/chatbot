@@ -30,19 +30,24 @@ class MongoDBControllerWebhook:
 
         # Connect to database to retrieve documents
         factory = ModelFactory.get_instance()
-        util.set_db(factory, db="test_db")
+        util.set_db(factory, db="dev_db")
 
-        if intent == "Default Fallback Intent":
+        """if intent == "Default Fallback Intent":
             print("we fallin back boys")
-            return "fallback"
+            return "fallback"""""
 
-        doc = factory.get_document(" ".join(entities), "test2")
+        docs = factory.get_document(raw_query_text, "dev")
 
         try:
-            texts = doc['content']['texts']
-            return random.choice(texts)
+            answers = ' '
+            for doc in docs:
+                answers += doc['content']['texts'][0] + '-------'
+
+            print(answers)
+            return answers
+            #return random.choice(texts)
         except KeyError:
             raise Exception("Document doesn't have content and texts. "
                             "Unable to retrieve text from document in dbcontroller webhook")
-        finally:
-            return "Jeg fant ikke informasjonen du spurte etter."
+        #finally:
+            #return "Jeg fant ikke informasjonen du spurte etter."
