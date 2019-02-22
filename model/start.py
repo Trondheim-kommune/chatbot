@@ -1,5 +1,6 @@
 import sys
 import model.db_util as util
+import pymongo
 from progressbar import ProgressBar
 
 from model.Serializer import Serializer
@@ -15,10 +16,18 @@ def main():
     ser = Serializer(filepath)
     ser.serialize_data()
     data = ser.get_models()
+    insert_documents(data)
 
+
+def insert_documents(data, db="dev_db"):
+    """
+    :param data: Is a list of serialized documents that should be inserted.
+    :param db: To which db the documents should be inserted.
+    :return: a list of conflict document ids.
+    """
     factory = ModelFactory.get_instance()
 
-    util.set_db(factory)
+    util.set_db(factory, db=db)
 
     """
     How we use MongoDB:
@@ -26,13 +35,13 @@ def main():
         One for manual entries called "manual"
         One for production called "prod"
         One for the in_progress collection called "in_progress"
-    
-    After we have scraped we add all the scraped data into the collection "in_progress" and then 
-    we go through every entry in the "manual" collection and use that entry's ID to query both 
+
+    After we have scraped we add all the scraped data into the collection "in_progress" and then
+    we go through every entry in the "manual" collection and use that entry's ID to query both
     prod and in_progress collection. We compare the two contents in prod and in_progress to see
-    if something changed from last time this was run and now. If they do not have the same 
-    content then we need to alert someone that the manual entry needs to be updated.    
-    
+    if something changed from last time this was run and now. If they do not have the same
+    content then we need to alert someone that the manual entry needs to be updated.
+
     When this is done in_progress will become our new prod.
     """
 
@@ -72,12 +81,17 @@ def main():
 
     # Delete the backup prod and rename prod to prod2 and then rename in_progress to prod.
     factory.get_database().drop_collection("prod2")
-    factory.get_database().get_collection("prod").rename("prod2")
+    try:
+        factory.get_database().get_collection("prod").rename("prod2")
+    except pymongo.errors.OperationFailure:
+        pass
     factory.get_database().get_collection("in_progress").rename("prod")
 
     util.set_index("in_progress", factory)
     util.set_index("prod", factory)
     util.set_index("manual", factory)
+
+    return conflict_ids
 
 
 if __name__ == '__main__':
