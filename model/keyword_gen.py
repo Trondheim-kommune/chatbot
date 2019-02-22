@@ -28,9 +28,17 @@ class Tokenizer(object):
     def __init__(self):
         self.lemmatize = Lemmatizer(LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES)
 
+    def has_digits(self, token):
+        return any(char.isdigit() for char in token)
+
     def __call__(self, doc):
+        # Tokenize the document.
         tokens = [self.lemmatize(token.text, token.pos_)[0] for token in nb(doc)]
+        # Remove punctuation tokens.
         tokens = [token for token in tokens if token not in string.punctuation]
+        # Remove tokens which contain any number.
+        tokens = [token for token in tokens if not self.has_digits(token)]
+        # Return the finished list of tokens.
         return tokens
 
 
