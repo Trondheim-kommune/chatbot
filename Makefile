@@ -6,5 +6,5 @@ setup:
 
 test: setup
 	pytest
-	flake8 --exclude=venv,build .
+	flake8 --exclude=venv,build,website .
 
