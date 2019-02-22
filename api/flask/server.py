@@ -327,7 +327,6 @@ def get_all_conflict_ids():
     return json.dumps(conflict_ids)
 
 
-
 @app.route("/v1/get_content", methods=["POST"])
 def get_content():
     """
@@ -375,7 +374,6 @@ def get_docs_from_url():
     for doc in docs:
         out.append({"id": doc["id"], "title": doc["content"]["title"]})
     return json.dumps(out)
-
 
 
 get_entities()
