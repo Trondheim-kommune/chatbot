@@ -12,3 +12,12 @@ def set_index(collection, factory):
 
 def set_db(factory, ip="agent25.tinusf.com", db="dev_db"):
     factory.set_database(ip, db, str(os.getenv('DB_USER')), str(os.getenv("DB_PWD")))
+
+
+# If the documented is previosly manually changed, return the manually changed document
+def check_manually_changed(factory, document):
+    if document["manually_changed"]:
+        id = document["id"]
+        return next(factory.get_collection("manual").find({"id": id}), None)
+    else:
+        return document
