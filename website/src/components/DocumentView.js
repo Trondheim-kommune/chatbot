@@ -10,10 +10,11 @@ export default class DocumentView extends React.Component {
     // Each DocumentItem represents a document from the conflict_ids collection
     let documentItems;
     documentItems = this.props.docs.map((doc, i) => (
-      <DocumentItem id={doc.id} title={doc.title} key={i} />
+      <DocumentItem id={doc.id} title={doc.title} key={i} changeView={this.props.changeView} />
     ));
     return (
       <div>
+        <h1>{this.props.title}</h1>
         {/* <h1>{this.props.header}</h1> */}
         {documentItems}
       </div>

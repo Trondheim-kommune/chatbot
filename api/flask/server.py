@@ -1,5 +1,5 @@
 import json
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, Response
 import dialogflow_v2beta1
 import os
 from api.flask.flask_exceptions import InvalidDialogFlowID
@@ -7,8 +7,10 @@ import google.api_core.exceptions as google_exceptions
 from model.MongoDBControllerWebhook import MongoDBControllerWebhook
 import model.db_util as util
 from model.ModelFactory import ModelFactory
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 mongo_controller = MongoDBControllerWebhook()
 
@@ -325,13 +327,14 @@ def get_all_conflict_ids():
     return json.dumps(conflict_ids)
 
 
+
 @app.route("/v1/get_content", methods=["POST"])
 def get_content():
     """
     :return: the content of the prod document and manual document (if we have it)
     """
     json_input_data = json.loads(request.data)
-    id = json_input_data["data"]["conflict_id"]
+    id = json_input_data["data"]["id"]
 
     document_prod = next(factory.get_collection("prod").find({"id": id}), None)
     output = {"prod": document_prod["content"]}
@@ -370,9 +373,9 @@ def get_docs_from_url():
 
     out = []
     for doc in docs:
-        print(doc)
         out.append({"id": doc["id"], "title": doc["content"]["title"]})
     return json.dumps(out)
+
 
 
 get_entities()
