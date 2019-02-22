@@ -1,4 +1,5 @@
 {
+	"id": "string",
 	"title": "string",
 	"description": "string",
 	"url": "string",
@@ -21,5 +22,5 @@
 			"string"
 		]
 	},
-	"indexed": "boolean"
+	"manually_changed": "boolean"
 }

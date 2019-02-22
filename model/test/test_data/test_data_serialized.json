@@ -1,5 +1,6 @@
 [
     {
+        "id": "832",
         "title": "",
         "description": "",
         "url": "https://ntnu.no",
@@ -16,7 +17,7 @@
                 "emner2"
             ]
         },
-        "indexed": ""
+        "manually_changed": false
     },
     {
         "title": "",
@@ -35,6 +36,6 @@
                 "Informatikk prosjektarbeid 2 er et kjempe bra emne!2"
             ]
         },
-        "indexed": ""
+        "manually_changed": false
     }
 ]

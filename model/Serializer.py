@@ -53,6 +53,7 @@ class Serializer:
     __file_name = None
     __url = None
     __MODEL_SCHEMA = {
+        "id": "",
         "title": "",
         "description": "",
         "url": "",
@@ -60,7 +61,7 @@ class Serializer:
         "header_meta_keywords": [],
         "keywords": [],
         "content": {},
-        "indexed": "",
+        "manually_changed": False,
     }
     __models = []
     __data = []
@@ -96,6 +97,8 @@ class Serializer:
         """ Serialize a page object from the web scraper to the data model
         schema """
 
+        accepted_tags = ["p", "a", "li"]
+
         # Iterate over all pages in the JSON data from scraper
         for data in self.__data:
             # TODO: add more metadata
@@ -127,11 +130,13 @@ class Serializer:
                         # with regards to keyword generation
                         iterator(idx + 1, child["children"], model_template, models,
                                  title=title + " " + child["text"])
-                    else:
+                    elif child["tag"] in accepted_tags:
                         # Hit a leaf node in recursion tree. We extract the
                         # text here and continue
+
                         content = Content(title, [child["text"]])
                         new_model = copy.deepcopy(model_template)
+                        new_model["id"] = child["id"]
                         new_model["content"] = content.get_content()
                         models.append(new_model)
 
