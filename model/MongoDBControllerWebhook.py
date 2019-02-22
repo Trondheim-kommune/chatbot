@@ -39,16 +39,20 @@ class MongoDBControllerWebhook:
 
         docs = factory.get_document(raw_query_text, "dev")
 
-        def get_text(doc): 
-            pep8_suger = ' '.join(doc['content']['texts']) + '\n' + doc['url']
-            return doc['content']['title'] + ':\n' + pep8_suger
+        def get_corpus_text(doc):
+            content = ' '.join(doc['content']['texts'])
+            return doc['content']['title'] + ' ' + content
 
-        corpus = [get_text(doc) for doc in docs]
+        def get_answer_text(doc): 
+            content = ' '.join(doc['content']['texts']) + '\n' + doc['url']
+            return doc['content']['title'] + ':\n' + content
+
+        corpus = [get_corpus_text(doc) for doc in docs]
         vectorizer, corpus_matrix, feature_names = get_tfidf_model(corpus)
 
         try:
             scores = cosine_similarity(vectorizer.transform([raw_query_text]), corpus_matrix)[0]
-            answer = get_text(docs[scores.tolist().index(max(scores))])
+            answer = get_answer_text(docs[scores.tolist().index(max(scores))])
             print("Answer: ", answer)
             return answer
         except KeyError:

@@ -29,21 +29,16 @@ class ModelFactory:
         self.database = client[db_name]
 
     def get_document(self, query, collection):
-        """ Takes a dictionary and checks if all fields in dictionary matches
-        the same fields in a document. If so, returns the document """
+        """ Searches for documents using MongoDB in a given document collection. """
         col = self.get_collection(collection)
-        cursor = col.find(
-            {'$text': {'$search': query}}, {'score': {'$meta': "textScore"}}
-        )
 
-        # Sort and retrieve the one top scored document
-        cursor.sort([('score', {'$meta': "textScore"})]).limit(5)
+        cursor = col.find({ '$text': { '$search': query }}, { 'score': { '$meta': 'textScore' }})
 
-        #return next(cursor, None)
-        answers = []
-        for c in cursor:
-            answers.append(c)
-        return answers
+        # Sort and retrieve some of the top scoring documents.
+        cursor.sort([('score', {'$meta': 'textScore' })]).limit(15)
+
+        return list(cursor)
+
 
     # TODO: some validation on response to make sure everything is posted
     def post_document(self, data, collection):

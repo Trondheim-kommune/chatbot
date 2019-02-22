@@ -31,7 +31,6 @@ class Tokenizer(object):
     def __call__(self, doc):
         tokens = [self.lemmatize(token.text, token.pos_)[0] for token in nb(doc)]
         tokens = [token for token in tokens if token not in string.punctuation]
-        print(tokens)
         return tokens
 
 
