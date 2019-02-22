@@ -67,7 +67,7 @@ def test_insert_document_and_check_conflict():
     manual document instead of the document in prod collection.
     """
     id = "295cc564fe771fbb92b3278a6eee2d5cbcae2606-3"
-    correct_conflicts = [id]
+    correct_conflicts = [{"conflict_id": id, "title": " Velkommen til Trondheim kommune"}]
 
     f = open("model/test/test_data/test_data_in_progress.json")
     serialized_data = json.load(f)
@@ -78,7 +78,8 @@ def test_insert_document_and_check_conflict():
 
     # Check if the document was a conflict.
     conflict_ids = insert_documents(serialized_data, db="test_db")
-    assert correct_conflicts[0] == conflict_ids[0]
+    assert correct_conflicts[0]["conflict_id"] == conflict_ids[0]["conflict_id"]
+    assert correct_conflicts[0]["title"] == conflict_ids[0]["title"]
 
     # Fetch the document from the prod collection.
     factory = ModelFactory.get_instance()
