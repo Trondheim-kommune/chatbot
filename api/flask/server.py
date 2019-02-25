@@ -1,5 +1,5 @@
 import json
-from flask import Flask, jsonify, request, Response
+from flask import Flask, jsonify, request
 import dialogflow_v2beta1
 import os
 from api.flask.flask_exceptions import InvalidDialogFlowID
@@ -337,11 +337,10 @@ def get_content():
 
     document_prod = next(factory.get_collection("prod").find({"id": id}), None)
     output = {"prod": document_prod["content"]}
-    try:
-        document_manual = next(factory.get_collection("manual").find({"id": id}), None)
+    document_manual = next(factory.get_collection("manual").find({"id": id}), None)
+
+    if document_manual:
         output["manual"] = document_manual["content"]
-    except:
-        pass
     return json.dumps(output)
 
 
