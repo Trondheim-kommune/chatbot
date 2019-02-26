@@ -32,7 +32,7 @@ class TrondheimSpider(scrapy.Spider):
     # The following few lines contain command line flags.
     # All flags default to false, so do not explicitly set them as so.
     # See the GitHub Wiki for information about how these are used.
-
+    
     # Enable to display additional debugging information to output when the crawler is run.
     # In practice, this will pretty print the exported tree when a page is scraped.
     debug = None
@@ -59,12 +59,15 @@ class TrondheimSpider(scrapy.Spider):
     # Pages in this list will be visited and links on them will
     # be visited, however the data will not be scrapaed.
     scrape_blacklist = [
+        # Do not add data from the home page, it ranks highly but is completely useless.
         re.compile('https://www.trondheim.kommune.no/?$'),
     ]
 
     # These links will never be visited, even if the path is allowed above.
     visit_blacklist = [
+        # News articles.
         re.compile('https://www.trondheim.kommune.no/aktuelt'),
+        # Avoid misinformation about health and safety.
         re.compile('https://www.trondheim.kommune.no/tema/helse-og-omsorg'),
     ]
 
@@ -92,8 +95,8 @@ class TrondheimSpider(scrapy.Spider):
     }
 
     def extract_metadata(self, root, soup):
-        """Extract keywords metadata from the header of the page and add them
-        as children of the tree root element."""
+        ''' Extract keywords metadata from the header of the page and add them
+        as children of the tree root element. '''
 
         # Attempt finding the keywords meta tag on the page.
         keywords = soup.find('meta', attrs={'name': 'keywords'})
@@ -104,8 +107,8 @@ class TrondheimSpider(scrapy.Spider):
             TreeElement('meta', keywords.attrs['content'], parent=root)
 
     def locate_parent(self, elem_tag, current_parent, root):
-        """Locate the parent element on which we should insert the next
-        node in the tree, based on our hierarchy of tags."""
+        ''' Locate the parent element on which we should insert the next
+        node in the tree, based on our hierarchy of tags. '''
 
         # Data about this elements positin in the hierarchy.
         elem_in_hierarchy = self.hierarchy[elem_tag]
@@ -160,13 +163,16 @@ class TrondheimSpider(scrapy.Spider):
         is based on headers, creating a hierarchy based on text pieces which
         are positioned in between different types of headers. '''
 
-        # Reset id to 0 for every tree correpsonding to URL
+        # Reset id to 0 when on a new page.
         TreeElement.counter = 0
 
+        # Hash the page URL, it will be used as an ID.
         page_id = sha1(response.url.encode()).hexdigest()
 
+        # Parse the HTML using BeautifulSoup. Make sure we use LXML for parsing.
         soup = BeautifulSoup(response.text, 'lxml')
 
+        # We only care about elements on the page which are defined in the hierarchy.
         elements = soup.find_all(self.hierarchy.keys())
 
         # We remove the header and footer tags from the page to reduce
@@ -189,7 +195,7 @@ class TrondheimSpider(scrapy.Spider):
         previous_paragraph = None
 
         for elem in elements:
-            # Replace br tag with newline
+            # Replace BR tags with newlines.
             for br in elem.find_all('br'):
                 br.replace_with('\n')
 
@@ -204,7 +210,7 @@ class TrondheimSpider(scrapy.Spider):
                 continue
 
             # Handle switching parent between strong and paragraph tag if
-            # strong tag is considered a sub header flag is enabled
+            # the flag enabling this feature is set.
             if self.strong_headers and elem_tag == 'strong' and previous_paragraph:
                 current_parent = TreeElement(
                     elem_tag,
@@ -212,24 +218,26 @@ class TrondheimSpider(scrapy.Spider):
                     page_id,
                     previous_paragraph.parent,
                 )
+
                 previous_paragraph.parent = current_parent
+
                 continue
 
             # Locate the parent element to use based on the hierarchy.
             parent = self.locate_parent(elem_tag, current_parent, root)
 
-            # Concatenation of p tags with same parent to collect
-            # the same type of information spread among different p tags
+            # Concatenation of paragraph tags with same parent to collect
+            # the same type of information spread among different paragraph tags.
             if elem_tag == 'p':
-                if self.concatenation_p and previous_paragraph \
+                if self.concatenate_p and previous_paragraph \
                         and previous_paragraph.parent == parent:
-                    previous_paragraph.text += "\n\n" + elem_text
+                    previous_paragraph.text += '\n\n' + elem_text
                     continue
 
                 # Update the previous paragraph.
                 previous_paragraph = current_parent
 
-            # Create the new elemenet
+            # Create the new element.
             current_parent = TreeElement(
                 elem_tag,
                 elem_text,
