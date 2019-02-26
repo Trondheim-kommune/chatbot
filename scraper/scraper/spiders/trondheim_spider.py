@@ -69,6 +69,14 @@ class TrondheimSpider(scrapy.Spider):
         re.compile('https://www.trondheim.kommune.no/aktuelt'),
         # Avoid misinformation about health and safety.
         re.compile('https://www.trondheim.kommune.no/tema/helse-og-omsorg'),
+        # These pages are pretty boring and contain an awful lot of maps.
+        re.compile('https://www.trondheim.kommune.no/tema/bygg-kart-og-eiendom'),
+        # These pages contain large blocks of text.
+        re.compile('https://www.trondheim.kommune.no/tema/skatt-og-naring'),
+        # These pages are quite technical in their nature.
+        re.compile('https://www.trondheim.kommune.no/tema/veg-vann-og-avlop'),
+        # These pages are difficult to parse and contain little information.
+        re.compile('https://www.trondheim.kommune.no/aktuelt/utvalgt/om-kommunen'),
     ]
 
     # These selectors will be removed from all pages, as they contain very
