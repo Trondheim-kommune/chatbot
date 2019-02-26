@@ -29,46 +29,49 @@ class TrondheimSpider(scrapy.Spider):
     # Name of the spider. This is the name to use from the Scrapy CLI.
     name = 'trondheim'
 
-    # FLAGS #
-    # These can be combined as long as every flag comes after an '-a'
-    # Don't include flags to disable option by default
+    # The following few lines contain command line flags.
+    # All flags default to false, so do not explicitly set them as so.
+    # See the GitHub Wiki for information about how these are used.
 
-    # Enable to display additional debugging information to output
-    # when the crawler is run.
-    # Add '-a debug=<string>' to the end of the command to enable.
-    # Default: None
-    # Ex to enable: scrapy crawl trondheim -o trondheim.json -a debug=true
+    # Enable to display additional debugging information to output when the crawler is run.
+    # In practice, this will pretty print the exported tree when a page is scraped.
     debug = None
 
-    # If strong tag should be seen as a sub header
-    # Add '-a strong_headers=<string>' to the end of the command to enable.
-    # Default: None
-    # Ex to enable: scrapy crawl trondheim -o trondheim.json -a strong_headers=true
+    # If a strong tag should be seen as a sub header.
     strong_headers = None
 
-    # concatenation_p
-    # Enable concatenation of p tags under same header to be seen as one p tag.
-    # Add '-a concatenation_p=<string>' to the end of the command to enable.
-    # Default: None
-    # Ex to enable: scrapy crawl trondheim -o trondheim.json -a concatenation_p=true
-    concatenation_p = None
+    # Enable concatenation of paragaph tags under same header to be seen as one paragraph.
+    concatenate_p = None
 
     # The links to start the crawling process on.
     start_urls = [
-        'https://www.trondheim.kommune.no'
+        'https://www.trondheim.kommune.no',
     ]
 
-    # Paths on the site which are allowed.
+    # Paths on the site which are allowed. Only paths which match
+    # these will ever be visited.
     allowed_paths = [
-        'https://www.trondheim.kommune.no/tema',
-        'https://www.trondheim.kommune.no/aktuelt',
-        'https://www.trondheim.kommune.no/org'
+        re.compile('https://www.trondheim.kommune.no/tema'),
+        re.compile('https://www.trondheim.kommune.no/aktuelt'),
+        re.compile('https://www.trondheim.kommune.no/org'),
+    ]
+
+    # Pages in this list will be visited and links on them will
+    # be visited, however the data will not be scrapaed.
+    scrape_blacklist = [
+        re.compile('https://www.trondheim.kommune.no/?$'),
+    ]
+
+    # These links will never be visited, even if the path is allowed above.
+    visit_blacklist = [
+        re.compile('https://www.trondheim.kommune.no/aktuelt'),
+        re.compile('https://www.trondheim.kommune.no/tema/helse-og-omsorg'),
     ]
 
     # These selectors will be removed from all pages, as they contain very
     # little actual information, and are equal on all pages.
     garbage_elements = ['.footer', '.header', 'body > .container',
-                        '.skip-link']
+                        '.skip-link', '.navigation', '.nav']
 
     # Hierarchy for sorting categories.
     hierarchy = {
@@ -230,40 +233,47 @@ class TrondheimSpider(scrapy.Spider):
             current_parent = TreeElement(
                 elem_tag,
                 elem_text,
+                page_id,
                 parent,
-                sha1(response.url.encode()).hexdigest(),
             )
 
         return root
 
     def parse(self, response):
-        """Parses pages which have been requested from the server."""
+        ''' Parses pages which have been requested from the server. '''
 
         # Only store HTML responses, not other attachments.
         if isinstance(response, HtmlResponse):
-            # Generate a tree structure describing this page.
-            root = self.generate_tree(response)
+            if not any(re.match(regex, response.url) for regex in self.scrape_blacklist):
+                # Generate a tree structure describing this page.
+                root = self.generate_tree(response)
 
-            # Pretty print the node tree if the DEBUG flag is set.
-            if self.debug:
-                for pre, fill, node in RenderTree(root):
-                    print('%s%s: %s' % (pre, node.tag, node.text))
+                # Pretty print the node tree if the DEBUG flag is set.
+                if self.debug:
+                    for pre, fill, node in RenderTree(root):
+                        # We remove newlines from the text with spaces to preserve
+                        # the shape of the tree when printing in the terminal.
+                        print('%s%s: %s' % (pre, node.tag, node.text.replace('\n', ' ')))
 
-            # Export the tree using the DictExporter. Scrapy will then convert
-            # this dictionary to a JSON structure for us, automatically.
-            exporter = DictExporter()
-            tree = exporter.export(root)
+                    # Also add a new line before the next tree.
+                    print()
 
-            yield {
-                # Export the page URL and the tree structure.
-                'url': response.url,
-                'tree': tree,
-            }
+                # Export the tree using the DictExporter. Scrapy will then convert
+                # this dictionary to a JSON structure for us, automatically.
+                exporter = DictExporter()
+                tree = exporter.export(root)
+
+                yield {
+                    # Export the page URL and the tree structure.
+                    'url': response.url,
+                    'tree': tree,
+                }
 
             # Follow all links from allowed domains.
             for next_page in LinkExtractor().extract_links(response):
                 for allowed_path in self.allowed_paths:
                     # Only follow links that are in the list of allowed paths.
-                    if allowed_path in next_page.url:
+                    if re.match(allowed_path, next_page.url) and not \
+                            any(re.match(regex, response.url) for regex in self.visit_blacklist):
                         yield response.follow(next_page, self.parse)
                         break
