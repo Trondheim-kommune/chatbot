@@ -5,25 +5,23 @@ from bs4 import BeautifulSoup
 from anytree import RenderTree, NodeMixin
 from anytree.exporter import DictExporter
 from hashlib import sha1
+import re
 
 
 class TreeElement(NodeMixin):
     # A counter used to give an unique ID to all nodes.
     counter = 0
 
-    def __init__(self, tag, text=None, parent=None, hashed_id=""):
-        """Tree node which stores information about an HTML tag."""
+    def __init__(self, tag, page_id, text=None, parent=None):
+        ''' Tree node which stores information about an HTML tag. '''
 
         self.tag = tag
         self.text = text
         self.parent = parent
 
-        # The id is decided by using sha1 hashing on the URL the element is in
-        # and adding the element number in order from 0 split by "-"
-        # For a URL giving the sha1 hash before "-" and element number/id=15 gives
-        # a347b21969e0a00b945293b28def7396a691c914-15
-        # This is used to compare diff between new and stored html pages
-        self.id = hashed_id + "-" + str(TreeElement.counter)
+        # We hash the URL of all pages and add a counter for the element
+        # after it. This is used to diff new and stored HTML pages.
+        self.id = '%s-%s'.format(page_id, TreeElement.counter)
         TreeElement.counter += 1
 
 
@@ -155,12 +153,14 @@ class TrondheimSpider(scrapy.Spider):
         return parent
 
     def generate_tree(self, response):
-        """Creates a tree structure describing the given page. This structure
+        ''' Creates a tree structure describing the given page. This structure
         is based on headers, creating a hierarchy based on text pieces which
-        are positioned in between different types of headers."""
+        are positioned in between different types of headers. '''
 
         # Reset id to 0 for every tree correpsonding to URL
         TreeElement.counter = 0
+
+        page_id = sha1(response.url.encode()).hexdigest()
 
         soup = BeautifulSoup(response.text, 'lxml')
 
@@ -173,7 +173,7 @@ class TrondheimSpider(scrapy.Spider):
                 garbage_element.decompose()
 
         # We extract the page title and use it to create the tree root.
-        root = TreeElement('title', soup.find('title').text)
+        root = TreeElement('title', soup.find('title').text, page_id)
 
         # Attempt extracting the keywords and adding them to the tree.
         self.extract_metadata(root, soup)
@@ -202,13 +202,12 @@ class TrondheimSpider(scrapy.Spider):
 
             # Handle switching parent between strong and paragraph tag if
             # strong tag is considered a sub header flag is enabled
-            if self.strong_headers and elem_tag == 'strong' \
-                    and previous_paragraph:
+            if self.strong_headers and elem_tag == 'strong' and previous_paragraph:
                 current_parent = TreeElement(
                     elem_tag,
                     elem_text,
+                    page_id,
                     previous_paragraph.parent,
-                    sha1(response.url.encode()).hexdigest(),
                 )
                 previous_paragraph.parent = current_parent
                 continue
