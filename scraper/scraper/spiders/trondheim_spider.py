@@ -94,7 +94,7 @@ class TrondheimSpider(scrapy.Spider):
         'a': {'level': 10},
     }
 
-    def extract_metadata(self, root, soup):
+    def extract_metadata(self, root, soup, page_id):
         ''' Extract keywords metadata from the header of the page and add them
         as children of the tree root element. '''
 
@@ -104,7 +104,7 @@ class TrondheimSpider(scrapy.Spider):
         if keywords and 'content' in keywords.attrs:
             # Add the keywords beneath the title in the tree, if the meta tag
             # has the content attribute correctly specified.
-            TreeElement('meta', keywords.attrs['content'], parent=root)
+            TreeElement('meta', page_id, keywords.attrs['content'], parent=root)
 
     def locate_parent(self, elem_tag, current_parent, root):
         ''' Locate the parent element on which we should insert the next
@@ -182,10 +182,10 @@ class TrondheimSpider(scrapy.Spider):
                 garbage_element.decompose()
 
         # We extract the page title and use it to create the tree root.
-        root = TreeElement('title', soup.find('title').text, page_id)
+        root = TreeElement('title', page_id, soup.find('title').text)
 
         # Attempt extracting the keywords and adding them to the tree.
-        self.extract_metadata(root, soup)
+        self.extract_metadata(root, soup, page_id)
 
         # Current position in the hierarchy.
         current_parent = root
@@ -214,8 +214,8 @@ class TrondheimSpider(scrapy.Spider):
             if self.strong_headers and elem_tag == 'strong' and previous_paragraph:
                 current_parent = TreeElement(
                     elem_tag,
-                    elem_text,
                     page_id,
+                    elem_text,
                     previous_paragraph.parent,
                 )
 
@@ -240,8 +240,8 @@ class TrondheimSpider(scrapy.Spider):
             # Create the new element.
             current_parent = TreeElement(
                 elem_tag,
-                elem_text,
                 page_id,
+                elem_text,
                 parent,
             )
 
