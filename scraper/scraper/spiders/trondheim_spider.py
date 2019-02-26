@@ -76,6 +76,8 @@ class TrondheimSpider(scrapy.Spider):
     garbage_elements = ['.footer', '.header', 'body > .container',
                         '.skip-link', '.navigation', '.nav']
 
+    not_found_text = 'Finner ikke siden'
+
     # Hierarchy for sorting categories.
     hierarchy = {
         'h1': {'level': 1},
@@ -181,7 +183,13 @@ class TrondheimSpider(scrapy.Spider):
             for garbage_element in soup.select(garbage_selector):
                 garbage_element.decompose()
 
-        # We extract the page title and use it to create the tree root.
+        # Locate the title element. It might be used for the tree root.
+        title = soup.find('title').text
+
+        # Do not continue with this page if we detect it as a silent 404.
+        if self.not_found_text in title: return
+
+        # Use the title as the tree root.
         root = TreeElement('title', page_id, soup.find('title').text)
 
         # Attempt extracting the keywords and adding them to the tree.
@@ -247,6 +255,17 @@ class TrondheimSpider(scrapy.Spider):
 
         return root
 
+    def pretty_print_tree(self, root):
+        ''' Print a scraped tree for debugging. '''
+
+        for pre, fill, node in RenderTree(root):
+            # We remove newlines from the text with spaces to preserve
+            # the shape of the tree when printing in the terminal.
+            print('%s%s: %s' % (pre, node.tag, node.text.replace('\n', ' ')))
+
+        # Also add a new line before the next tree.
+        print()
+
     def parse(self, response):
         ''' Parses pages which have been requested from the server. '''
 
@@ -256,26 +275,22 @@ class TrondheimSpider(scrapy.Spider):
                 # Generate a tree structure describing this page.
                 root = self.generate_tree(response)
 
-                # Pretty print the node tree if the DEBUG flag is set.
-                if self.debug:
-                    for pre, fill, node in RenderTree(root):
-                        # We remove newlines from the text with spaces to preserve
-                        # the shape of the tree when printing in the terminal.
-                        print('%s%s: %s' % (pre, node.tag, node.text.replace('\n', ' ')))
+                # The parser might choose to ignore this page, for example when we
+                # detect that the page is a 404 page. In that case, skip the page.
+                if root:
+                    # Pretty print the node tree if the DEBUG flag is set.
+                    if self.debug: self.pretty_print_tree(root)
 
-                    # Also add a new line before the next tree.
-                    print()
+                    # Export the tree using the DictExporter. Scrapy will then convert
+                    # this dictionary to a JSON structure for us, automatically.
+                    exporter = DictExporter()
+                    tree = exporter.export(root)
 
-                # Export the tree using the DictExporter. Scrapy will then convert
-                # this dictionary to a JSON structure for us, automatically.
-                exporter = DictExporter()
-                tree = exporter.export(root)
-
-                yield {
-                    # Export the page URL and the tree structure.
-                    'url': response.url,
-                    'tree': tree,
-                }
+                    yield {
+                        # Export the page URL and the tree structure.
+                        'url': response.url,
+                        'tree': tree,
+                    }
 
             # Follow all links from allowed domains.
             for next_page in LinkExtractor().extract_links(response):
