@@ -155,7 +155,8 @@ class Serializer:
                     elif child["tag"] in accepted_tags:
                         # Hit a leaf node in recursion tree. We extract the
                         # text here and continue
-                        keywords = [KeyWord(*keyword) for keyword in get_keywords(self.__vectorizer,
+                        keywords = [KeyWord(*keyword)
+                                    for keyword in get_keywords(self.__vectorizer,
                                     self.__feature_names, title)]
 
                         content = Content(title, [child["text"]], keywords)
