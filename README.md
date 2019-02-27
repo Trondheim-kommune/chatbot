@@ -13,7 +13,7 @@ needs.
 The text processing part of the project is built around Google DialogFlow.
 The scraping part is made up of a python scraper using scrapy and beautilfulsoup. 
 The data from the scraper is then read into a MongoDB databse. Python Flask is 
-used to create a rest framework to communicate with the backend.
+used to create a REST API to communicate with the backend.
 
 ## Running the application
 Run 
