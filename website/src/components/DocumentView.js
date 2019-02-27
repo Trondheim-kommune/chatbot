@@ -1,6 +1,10 @@
 import React from "react";
 import { fetchData } from "../utils/Util";
-
+/* 
+This component displays the content field in a document from the manual collection
+and the corresponding document in the prod collection.
+You can edit the "texts" field and the "keywords" field manually.
+ */
 export default class DocumentView extends React.Component {
   constructor() {
     super();
@@ -13,6 +17,7 @@ export default class DocumentView extends React.Component {
     // Fetch content
     const data = { "data": { "id": this.props.id } };
     const content = await fetchData("http://localhost:8080/v1/get_content", data);
+    console.log(content.url)
     if (! "manual" in content) {
       this.setState({ manual: content.prod, automatic: content.prod, url: content.url });
     } else {
@@ -59,10 +64,12 @@ export default class DocumentView extends React.Component {
   render() {
     let textAreasManual;
     if (this.state.manual) {
+      /* map through the texts field from manual */
       textAreasManual = this.state.manual.texts.map((text, i) => (
         <textarea
           key={i}
           rows="10"
+          cols="50"
           value={text}
           onChange={(e) => {
             const value = e.target.value;
@@ -84,6 +91,7 @@ export default class DocumentView extends React.Component {
 
     let keywordsManual;
     if (this.state.manual) {
+      /* Map through the keywords from manual */
       keywordsManual = this.state.manual.keywords.map((keyword, i) => (
         <div key={i} className="keyword">
           <input
@@ -134,11 +142,13 @@ export default class DocumentView extends React.Component {
 
     let textAreasAutomatic;
     if (this.state.automatic) {
+      /* Map through the texts field from prod */
       textAreasAutomatic = this.state.automatic.texts.map((text, i) => (
         <textarea
           readOnly
           key={i}
           rows="10"
+          cols="50"
           value={text}
         />
       ));
@@ -146,6 +156,7 @@ export default class DocumentView extends React.Component {
 
     let keywordsAutomatic;
     if (this.state.automatic) {
+      /* Map through the keywords field from prod */
       keywordsAutomatic = this.state.automatic.keywords.map((keyword, i) => (
         <div key={i} className="keyword">
           <input
@@ -164,25 +175,37 @@ export default class DocumentView extends React.Component {
 
     return (
       <div>
-        <h1>Content</h1>
         {this.state.url &&
-          <p>{this.state.url}
-          </p>}
+          <h1><a href={this.state.url}>{this.state.url}</a>
+          </h1>}
         {this.state.manual &&
           <div>
-            <h2>Manual</h2>
+            <h2>Manuelle endringer</h2>
+            <p>
+              Her kan du endre svarene til botten manuelt. Oppdater teksten og trykk på lagre
+              for å oppdatere.
+              <br />
+              Man kan også oppdatere, legge til og slette nøkkelord og selvsikkerheten deres.
+            </p>
             <form onSubmit={(e) => this.handleSubmit(e)}>
+              <strong>Svar:</strong><br />
               {textAreasManual}
+              <br /><strong>Nøkkelord:</strong><br />
               {keywordsManual}
               <button onClick={(e) => this.createNewKeyword(e)}>Nytt nøkkelord</button>
-              <input type="submit" value="Save" />
+              <br /><input type="submit" value="Lagre" />
             </form>
           </div>
         }
         {this.state.automatic &&
           <div>
-            <h2>Automatic</h2>
+            {this.state.url &&
+              <h2> Automatisk hentet fra <a href={this.state.url}>{this.state.url}</a>
+              </h2>}
+            <p>Sammenlign de manuelle endringene med informasjonen hentet fra nettsiden</p>
+            <strong>Svar:</strong><br />
             {textAreasAutomatic}
+            <br /><strong>Nøkkelord:</strong><br />
             {keywordsAutomatic}
           </div>
         }
