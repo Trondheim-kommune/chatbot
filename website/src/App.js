@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 import "./App.css";
 import Search from "./components/Search";
-import DocumentView from "./components/DocumentList"
+import DocumentList from "./components/DocumentList"
 import { fetchData } from "./utils/Util";
-import ContentView from "./components/DocumentView";
+import DocumentView from "./components/DocumentView";
 
 class App extends Component {
   state = {
@@ -25,12 +25,15 @@ class App extends Component {
   render() {
     return (
       <div>
-        <Search />
         {this.state.view === "main" &&
-          <DocumentView title="Konflikter" docs={this.state.conflictDocs} changeView={this.changeView} />
+          <div>
+            <Search changeView={this.changeView} />
+            <DocumentList title="Konflikter" docs={this.state.conflictDocs} changeView={this.changeView} />
+
+          </div>
         }
         {this.state.view === "document" &&
-          <ContentView id={this.state.id} changeView={this.changeView} />
+          <DocumentView id={this.state.id} changeView={this.changeView} />
         }
       </div>
 
