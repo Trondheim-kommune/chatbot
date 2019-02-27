@@ -43,7 +43,7 @@ class MongoDBControllerWebhook:
             content = ' '.join(doc['content']['texts'])
             return doc['content']['title'] + ' ' + content
 
-        def get_answer_text(doc): 
+        def get_answer_text(doc):
             content = ' '.join(doc['content']['texts']) + '\n' + doc['url']
             return doc['content']['title'] + ':\n' + content
 

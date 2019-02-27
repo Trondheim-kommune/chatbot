@@ -32,13 +32,12 @@ class ModelFactory:
         """ Searches for documents using MongoDB in a given document collection. """
         col = self.get_collection(collection)
 
-        cursor = col.find({ '$text': { '$search': query }}, { 'score': { '$meta': 'textScore' }})
+        cursor = col.find({'$text': {'$search': query}}, {'score': {'$meta': 'textScore'}})
 
         # Sort and retrieve some of the top scoring documents.
-        cursor.sort([('score', {'$meta': 'textScore' })]).limit(15)
+        cursor.sort([('score', {'$meta': 'textScore'})]).limit(15)
 
         return list(cursor)
-
 
     # TODO: some validation on response to make sure everything is posted
     def post_document(self, data, collection):

@@ -111,7 +111,11 @@ class Serializer:
                     corpus.append(node['text'])
                     queue.append(node['children'])
 
-        return get_tfidf_model(corpus)
+        try:
+            return get_tfidf_model(corpus)
+        # Model only contains stopwords
+        except ValueError:
+            return None
 
     def serialize_data(self):
         """ Serialize a page object from the web scraper to the data model
@@ -154,8 +158,8 @@ class Serializer:
                     elif child["tag"] in accepted_tags:
                         # Hit a leaf node in recursion tree. We extract the
                         # text here and continue
-                        keywords = [KeyWord(*keyword) for keyword in get_keywords(self.vectorizer, 
-                            self.feature_names, title)]
+                        keywords = [KeyWord(*keyword) for keyword in get_keywords(self.vectorizer,
+                                    self.feature_names, title)]
 
                         content = Content(title, [child["text"]], keywords)
                         new_model = copy.deepcopy(model_template)

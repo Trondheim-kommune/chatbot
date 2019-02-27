@@ -10,7 +10,8 @@ nb = spacy.load('nb_dep_ud_sm')
 
 def get_stopwords():
     with open('model/stopwords.txt') as stopwords:
-      return [line.strip() for line in stopwords.readlines() if line.strip()]
+        return [line.strip() for line in stopwords.readlines() if line.strip()]
+
 
 stop_words = get_stopwords()
 
