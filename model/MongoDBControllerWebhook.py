@@ -55,4 +55,4 @@ class MongoDBControllerWebhook:
             raise Exception("Document doesn't have content and texts. "
                             "Unable to retrieve text from document in dbcontroller webhook")
         except ValueError:
-            return "Who knows?"
+            return "Jeg fant ikke informasjonen du spurte etter."
