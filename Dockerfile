@@ -8,8 +8,8 @@ COPY ./requirements.txt .
 
 # Install dependencies
 RUN apk update && \
- apk add python3 libressl-dev musl-dev libffi-dev libxslt-dev && \
- apk add --virtual .build-deps gcc g++ python3-dev bash
+ apk add python3 libressl-dev musl-dev libffi-dev libxslt-dev libstdc++ && \
+ apk add --virtual .build-deps gcc g++ python3-dev bash libstdc++
 
 # Install python packages step
 RUN python3 -m pip install -r requirements.txt --no-cache-dir && \
@@ -18,5 +18,11 @@ RUN python3 -m pip install -r requirements.txt --no-cache-dir && \
 # Copy all code
 COPY . .
 
-# Run crawler
-CMD ["scrapy", "crawl" "trondheim", "-o", "test.csv", "-t", "csv"]
+# Show which port to expose to the outside
+EXPOSE 8080
+
+# Install extra package
+RUN ["pip3", "install", "."]
+
+# Start server
+cmd ["./start_server_docker.sh"]

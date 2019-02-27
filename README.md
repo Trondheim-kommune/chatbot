@@ -22,3 +22,17 @@ cd scraper
 scrapy crawl trondheim -o trondheim.json
 ```
 
+## Docker
+The project has also be containerized. Below is a description of how to build and run 
+the container.
+
+To build
+```bash
+docker build .
+```
+
+To run, exposing port 8080
+```bash
+docker run -e PROJECT_ID=$PROJECT_ID -e GOOGLE_APPLICATION_CREDENTIALS="/usr/src/app/backupagent.json" -e DB_USER=$DB_USER -e DB_PWD=$DB_PWD -d -p 8080:8080 <container_id>
+```
+
