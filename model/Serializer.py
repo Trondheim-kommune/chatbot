@@ -111,11 +111,7 @@ class Serializer:
                     corpus.append(node['text'])
                     queue.append(node['children'])
 
-        try:
-            return get_tfidf_model(corpus)
-        # Model only contains stopwords
-        except ValueError:
-            return None
+        return get_tfidf_model(corpus)
 
     def serialize_data(self):
         """ Serialize a page object from the web scraper to the data model
