@@ -33,10 +33,6 @@ class MongoDBControllerWebhook:
         factory = ModelFactory.get_instance()
         util.set_db(factory, db="dev_db")
 
-        """if intent == "Default Fallback Intent":
-            print("we fallin back boys")
-            return "fallback"""""
-
         docs = factory.get_document(raw_query_text, "dev")
 
         def get_corpus_text(doc):
@@ -58,7 +54,5 @@ class MongoDBControllerWebhook:
         except KeyError:
             raise Exception("Document doesn't have content and texts. "
                             "Unable to retrieve text from document in dbcontroller webhook")
-        """
-        finally:
-            return "Jeg fant ikke informasjonen du spurte etter."
-        """
+        except ValueError:
+            return "Who knows?"
