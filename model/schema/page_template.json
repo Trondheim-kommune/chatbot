@@ -1,0 +1,26 @@
+{
+	"id": "string",
+	"title": "string",
+	"description": "string",
+	"url": "string",
+	"last_modified": "datetime",
+	"header_meta_keywords": [
+		"string"
+	],
+	"keywords": [
+		"string"
+	],
+	"content": {
+		"title": "string",
+		"keywords": [
+			{
+				"keyword": "string",
+				"confidence": "number"
+			}
+		],
+		"texts": [
+			"string"
+		]
+	},
+	"manually_changed": "boolean"
+}

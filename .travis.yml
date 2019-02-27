@@ -1,8 +1,21 @@
 language: python
 python:
-    - "3.6"
+  - '3.6'
 cache: pip
+before_install:
+  - pip install -e .
+  - python3 setup.py develop
+  - openssl aes-256-cbc -K $encrypted_a4f35dc526f0_key -iv $encrypted_a4f35dc526f0_iv -in backupagent.json.enc -out backupagent.json -d
 install:
-    - pip install -r requirements.txt
+  - pip install -r requirements.txt
 script:
-    pytest
+  - pytest --cov=./ --cov-config=.coveragerc 
+  - flake8 --exclude=venv,build .
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash) -t $CODECOV_TOKEN
+env:
+  global:
+    - secure: 2hEAy3I1u5iHUzOO/YnRQJYuw06lc/PVAefgW9vwOStXsE44i8vI+qkY1SQUG7DfoVYKkpoz+zjMP49R59wCwgOFWnwJ/28v5Fe6RB2pMvzjLWXtcH8+woqJZ5nfIY2gFBNASHeBpBaCf1znqhlqWRQaABmcVQgUsmTQtIGWW8bISFdP6HPvWE0+fbpa7XIjelpQJ0L7noOMSMd234SoBWpTi2e5QUgbpDIihU4xtZPEbxWF5xLT9gqHvoMw3BJIBMm2BJJ5yoiqRmKCRH6kQO1aakrdXrcutI9GjNQpJLuPDCjD85cKmUp8GHSiyu0gMTQ5+NuK5sNXuOqcc4+FxnM1KJEUN1oGyn0e2jCnhq55YE8whYzLmUqGsqS2SuNp1dU27VwlNPe0J03zPyLvwIz6/RL1N3IAY4Zp+PWdAU6GDUOB1+NBexuD8ZUiTX0ArBM7gAo5OnGheW+aPaLvt5TC+dEfdiE8V3dYyGtyx4ozjFdaG5/LSy/Pla+cutCrChHtvHwC9imUSyMxrHZ8Hr+vA8A5R9WCLIiFY5ubGPmiQntverB3W15MV6A9IxCPksdW1OkQrlCc0JbMdI97Egex+Xww4K97/65Yd3AaWrlHD42ENVoVdqGz18CZQaaXa4JPAPur07Nt/ksYX7MqeHBVSQSf+fn+8rJAhj4254g=
+    - secure: U6S/W88FK1hqjWYSSbctCqn8HT2oxbEYh51UNndzVL/0TtUCXDM1RciTRJUuQa1VRnjEvfVltS4NGPGrBAqKW7B39i6LVvlcWVs1rnANR98RYylxvasduUyUpQj3rOAzbWMvzWQ3mVWSeXeDSsN0lHuVXRHYZSvUF+Ho9whLUiJ2JWJh64XJZ+6ZJSB0BHkLf4nzAvI2MHndRkV5m0H4DApY8jP+Wrn2yhnM6Fc4dAU5ErK2vvFW/hp3RgdZNDda0ycVJSf94vkfItnZN14F/3wMa4NGZjRXCar8uaVfmpHMLYu06UK0oYMQ7MUHBvurix1/WBDL/DdhYQnpKwdJDNOX1bwh30Fn5SNXrTUz0Exppw+uoPTQf8Ifl8TEJnq8NXC442WibdkgDXcuqToToBn0WJgMP+bNxG93k+9uxA/aazuAu4CJK1jHaZecOXDacMJEnzkkb5oFaPE8CL0amFiGgDOHobt9cnuPC9nAlIEOy6JlszS7E35e/EvIIg6LGNLQLykskpZqOQ6GbVNITRPx9NMSNpi+VcRSgnMsfU/Ipg+e166agExaXKF7SUuQMCUPHEmvkcAzTb6SGdX6mwzWDNdBO2oH4c+d4ky9yCnAl2YbrRbHv6hRrXssuKLX3D7XO8x8EuNCdg3ZuXIhoedle2JMNeXbQOA67P6/dzo=
+    - CODECOV_TOKEN="1fd778c5-693b-4580-bb89-e1f62a2ab538"
