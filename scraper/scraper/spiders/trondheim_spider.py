@@ -242,16 +242,14 @@ class TrondheimSpider(scrapy.Spider):
             # Locate the parent element to use based on the hierarchy.
             parent = self.locate_parent(elem_tag, current_parent, root)
 
-            # Concatenation of paragraph tags with same parent to collect
-            # the same type of information spread among different paragraph tags.
-            if elem_tag == 'p':
-                if self.concatenate_p and previous_paragraph \
-                        and previous_paragraph.parent == parent:
-                    previous_paragraph.text += '\n\n' + elem_text
-                    continue
+            # Concatenate paragraph tags which directly follow each other.
+            if self.concatenate_p and elem_tag == 'p' and parent.children:
+                last_child = parent.children[-1]
 
-                # Update the previous paragraph.
-                previous_paragraph = current_parent
+                # Start a new paragraph if the last child already has children.
+                if last_child and last_child.tag == 'p' and not last_child.children:
+                    last_child.text += '\n\n' + elem_text
+                    continue
 
             # Create the new element.
             current_parent = TreeElement(
