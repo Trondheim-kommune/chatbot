@@ -86,20 +86,23 @@ class TrondheimSpider(scrapy.Spider):
 
     # Hierarchy for sorting categories.
     hierarchy = {
-        'h1': {'level': 1},
-        'h2': {'level': 2},
-        'h3': {'level': 3},
-        'h4': {'level': 4},
-        'h5': {'level': 5},
-        'h6': {'level': 6},
-        'tbody': {'level': 6},
-        'tr': {'level': 7},
-        'th': {'level': 8},
-        'strong': {'level': 8},
-        'p': {'level': 8},
-        'ul': {'level': 8},
-        'li': {'level': 9},
-        'a': {'level': 10},
+        # Header elements.
+        'h1': 1,
+        'h2': 2,
+        'h3': 3,
+        'h4': 4,
+        'h5': 5,
+        'h6': 6,
+        # Table elements.
+        'tbody': 6,
+        'tr': 7,
+        'th': 8,
+        # Text elements and lists.
+        'strong': 8,
+        'p': 8,
+        'ul': 8,
+        'li': 9,
+        'a': 10,
     }
 
     # If a tag is listed here, sequences of tabs belonging to one of these types
@@ -123,11 +126,8 @@ class TrondheimSpider(scrapy.Spider):
         ''' Locate the parent element on which we should insert the next
         node in the tree, based on our hierarchy of tags. '''
 
-        # Data about this elements positin in the hierarchy.
-        elem_in_hierarchy = self.hierarchy[elem_tag]
-
         # This elements position in the hierarchy.
-        elem_level = elem_in_hierarchy['level']
+        elem_level = self.hierarchy[elem_tag]
 
         # The parent which will be used for the next node in the tree.
         parent = None
@@ -147,16 +147,16 @@ class TrondheimSpider(scrapy.Spider):
                 break
 
             # Whether the search parent is in the hierarchy or not.
-            search_parent_in_hierarchy = self.hierarchy[search_parent.tag]
+            search_parent_level = self.hierarchy[search_parent.tag]
 
-            if search_parent_in_hierarchy:
+            if search_parent_level:
                 # If both tags are in the hierarchy, check their level.
-                if elem_in_hierarchy:
-                    if elem_level > search_parent_in_hierarchy['level']:
+                if elem_level:
+                    if elem_level > search_parent_level:
                         parent = search_parent
                         break
 
-                    if elem_level == search_parent_in_hierarchy['level']:
+                    if elem_level == search_parent_level:
                         # If elements are in same level in hierarchy.
                         parent = search_parent.parent
                         break
@@ -215,8 +215,7 @@ class TrondheimSpider(scrapy.Spider):
 
         for elem in elements:
             # Replace BR tags with newlines.
-            for br in elem.find_all('br'):
-                br.replace_with('\n')
+            for br in elem.find_all('br'): br.replace_with('\n')
 
             # Remove trailing and tailing spaces from the node contents.
             elem_text = elem.text.strip()
@@ -227,19 +226,33 @@ class TrondheimSpider(scrapy.Spider):
             # Do not allow tree nodes with empty text.
             if not elem_text: continue
 
-            # Handle switching parent between strong and paragraph tag if
-            # the flag enabling this feature is set.
-            if self.strong_headers and elem_tag == 'strong' and previous_paragraph:
-                current_parent = TreeElement(
-                    elem_tag,
-                    page_id,
-                    elem_text,
-                    previous_paragraph.parent,
-                )
+            if self.strong_headers:
+                # If a paragraph contains a strong tag, and the correct lag is set, we
+                # treat that combination as a header. This check avoids adding the strong
+                # tag in addition to the custom header.
+                if elem_tag == 'strong' and current_parent.tag == 'h6' and \
+                        current_parent.text == elem_text:
+                    continue
 
-                previous_paragraph.parent = current_parent
+                if elem_tag == 'p':
+                    # Find all strong tags inside this paragraph.
+                    strongs = elem.find_all('strong')
 
-                continue
+                    # Check if there is only 1 strong tag, and check if it contains
+                    # all of the text inside the paragraph.
+                    if len(strongs) == 1 and elem_text == strongs[0].text.strip():
+                        # Locate the parent in which a H6 tag would be inserted.
+                        parent = self.locate_parent('h6', current_parent, root)
+
+                        # Add a custom H6 element instead of a paragraph or strong element
+                        current_parent = TreeElement(
+                            'h6',
+                            page_id,
+                            elem_text,
+                            parent,
+                        )
+
+                        continue
 
             # Locate the parent element to use based on the hierarchy.
             parent = self.locate_parent(elem_tag, current_parent, root)
