@@ -341,6 +341,9 @@ def get_content():
 
     if document_manual:
         output["manual"] = document_manual["content"]
+
+    # Add the url
+    output["url"] = document_manual["url"]
     return json.dumps(output)
 
 

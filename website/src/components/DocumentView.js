@@ -14,9 +14,9 @@ export default class DocumentView extends React.Component {
     const data = { "data": { "id": this.props.id } };
     const content = await fetchData("http://localhost:8080/v1/get_content", data);
     if (! "manual" in content) {
-      this.setState({ manual: content.prod, automatic: content.prod });
+      this.setState({ manual: content.prod, automatic: content.prod, url: content.url });
     } else {
-      this.setState({ manual: content.manual, automatic: content.prod });
+      this.setState({ manual: content.manual, automatic: content.prod, url: content.url });
     }
   }
 
@@ -165,6 +165,9 @@ export default class DocumentView extends React.Component {
     return (
       <div>
         <h1>Content</h1>
+        {this.state.url &&
+          <p>{this.state.url}
+          </p>}
         {this.state.manual &&
           <div>
             <h2>Manual</h2>
