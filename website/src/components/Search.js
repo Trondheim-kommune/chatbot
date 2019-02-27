@@ -2,6 +2,10 @@ import React from "react"
 import { fetchData } from "../utils/Util";
 import DocumentList from "./DocumentList"
 
+/* 
+This component is a search bar. You search by url and get a DocumentList
+containing the search results
+*/
 export default class Search extends React.Component {
   constructor(props) {
     super(props);
@@ -12,8 +16,8 @@ export default class Search extends React.Component {
   }
   handleSubmit = async (e) => {
     e.preventDefault();
-    // Do something with the url
 
+    // Title and id based on url
     const data = { "data": { "url": this.state.url } };
     const content = await fetchData("http://localhost:8080/v1/get_docs_from_url", data);
     if (content.length === 0) {
@@ -37,6 +41,7 @@ export default class Search extends React.Component {
           </label>
           <input type="submit" value="Search" />
         </form>
+        {/* If data i fetched, render a DocumentList with the search results */}
         {this.state.fetched &&
           <DocumentList title="Søkeresultater" docs={this.state.docs} changeView={this.props.changeView} />
         }

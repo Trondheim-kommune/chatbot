@@ -1,7 +1,9 @@
 import React from "react"
 import DocumentItem from "./DocumentItem";
 
-
+/* 
+This component lists multiple DocumentItems
+*/
 export default class DocumentList extends React.Component {
 
 
