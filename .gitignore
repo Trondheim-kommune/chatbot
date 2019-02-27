@@ -9,3 +9,6 @@ build/
 dist/
 Agent25-google.json
 agent25_project.egg-info/
+.coverage
+.envrc
+.vscode/

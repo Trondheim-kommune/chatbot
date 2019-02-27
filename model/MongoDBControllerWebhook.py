@@ -1,6 +1,7 @@
 from model.ModelFactory import ModelFactory
-import random
 import model.db_util as util
+from sklearn.metrics.pairwise import cosine_similarity
+from model.keyword_gen import get_tfidf_model
 
 
 class MongoDBControllerWebhook:
@@ -23,26 +24,35 @@ class MongoDBControllerWebhook:
 
         :return: This should just return a simple string.
         """
-        print("raw_query_text", raw_query_text)
+        print("raw_query_text:", raw_query_text)
         print("intent:", intent)
         print("entities:", entities)
         print("default_text:", default_text)
 
         # Connect to database to retrieve documents
         factory = ModelFactory.get_instance()
-        util.set_db(factory, db="test_db")
+        util.set_db(factory, db="dev_db")
 
-        if intent == "Default Fallback Intent":
-            print("we fallin back boys")
-            return "fallback"
+        docs = factory.get_document(raw_query_text, "dev")
 
-        doc = factory.get_document(" ".join(entities), "test2")
+        def get_corpus_text(doc):
+            content = ' '.join(doc['content']['texts'])
+            return doc['content']['title'] + ' ' + content
+
+        def get_answer_text(doc):
+            content = ' '.join(doc['content']['texts']) + '\n' + doc['url']
+            return doc['content']['title'] + ':\n' + content
+
+        corpus = [get_corpus_text(doc) for doc in docs]
+        vectorizer, corpus_matrix, feature_names = get_tfidf_model(corpus)
 
         try:
-            texts = doc['content']['texts']
-            return random.choice(texts)
+            scores = cosine_similarity(vectorizer.transform([raw_query_text]), corpus_matrix)[0]
+            answer = get_answer_text(docs[scores.tolist().index(max(scores))])
+            print("Answer:", answer)
+            return answer
         except KeyError:
             raise Exception("Document doesn't have content and texts. "
                             "Unable to retrieve text from document in dbcontroller webhook")
-        finally:
+        except ValueError:
             return "Jeg fant ikke informasjonen du spurte etter."

@@ -10,6 +10,6 @@ fi
 
 source venv/bin/activate
 
-pip install .
-python setup.py install
+pip install -e .
+python setup.py develop
 pip install -r requirements.txt

@@ -3,8 +3,8 @@ python:
   - '3.6'
 cache: pip
 before_install:
-  - pip install .
-  - python3 setup.py install
+  - pip install -e .
+  - python3 setup.py develop
   - openssl aes-256-cbc -K $encrypted_a4f35dc526f0_key -iv $encrypted_a4f35dc526f0_iv -in backupagent.json.enc -out backupagent.json -d
 install:
   - pip install -r requirements.txt

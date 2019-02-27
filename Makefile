@@ -1,8 +1,7 @@
 install:
-	pip install .
+	pip install -e .
 
-setup:
-	pip install .
+setup: install
 
 test: setup
 	pytest
