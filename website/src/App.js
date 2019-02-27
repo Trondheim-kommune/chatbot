@@ -1,8 +1,9 @@
 import React, { Component } from "react";
 import "./App.css";
 import Search from "./components/Search";
-import DocumentView from "./components/DocumentView"
+import DocumentView from "./components/DocumentList"
 import { fetchData } from "./utils/Util";
+import ContentView from "./components/DocumentView";
 
 class App extends Component {
   state = {
@@ -17,13 +18,9 @@ class App extends Component {
     this.setState({ conflictDocs });
   }
 
-  // changeView = async (view, id) => {
-  //   this.setState({ view, id });
-  //   const data = { "data": { "id": id } };
-  //   const content = await fetchData("http://localhost:8080/v1/get_content", data);
-
-  //   console.log(content)
-  // }
+  changeView = async (view, id) => {
+    this.setState({ view, id });
+  }
 
   render() {
     return (
@@ -33,7 +30,7 @@ class App extends Component {
           <DocumentView title="Konflikter" docs={this.state.conflictDocs} changeView={this.changeView} />
         }
         {this.state.view === "document" &&
-          <p>yehaa {this.state.id}</p>
+          <ContentView id={this.state.id} changeView={this.changeView} />
         }
       </div>
 

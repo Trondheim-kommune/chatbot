@@ -350,7 +350,7 @@ def update_content():
     Updates the manual collection with new content.
     """
     json_input_data = json.loads(request.data)
-    id = json_input_data["data"]["conflict_id"]
+    id = json_input_data["data"]["id"]
     content = json_input_data["data"]["content"]
 
     factory.get_database().get_collection("manual").update({"id": id}, {"$set": {
