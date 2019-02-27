@@ -40,9 +40,6 @@ class TrondheimSpider(scrapy.Spider):
     # If a strong tag should be seen as a sub header.
     strong_headers = None
 
-    # Enable concatenation of paragaph tags under same header to be seen as one paragraph.
-    concatenate_p = None
-
     # The links to start the crawling process on.
     start_urls = [
         'https://www.trondheim.kommune.no',
@@ -84,6 +81,7 @@ class TrondheimSpider(scrapy.Spider):
     garbage_elements = ['.footer', '.header', 'body > .container',
                         '.skip-link', '.navigation', '.nav']
 
+    # The text used for the title on 404 pages. Used to detect silent 404 error.
     not_found_text = 'Finner ikke siden'
 
     # Hierarchy for sorting categories.
@@ -103,6 +101,11 @@ class TrondheimSpider(scrapy.Spider):
         'li': {'level': 9},
         'a': {'level': 10},
     }
+
+    # If a tag is listed here, sequences of tabs belonging to one of these types
+    # will all be merged into one tag. For example, directly following paragraph
+    # tags will be merged into one big paragraph, separated with newlines.
+    concatenation_tags = ['p']
 
     def extract_metadata(self, root, soup, page_id):
         ''' Extract keywords metadata from the header of the page and add them
@@ -222,8 +225,7 @@ class TrondheimSpider(scrapy.Spider):
             elem_tag = elem.name
 
             # Do not allow tree nodes with empty text.
-            if not elem_text:
-                continue
+            if not elem_text: continue
 
             # Handle switching parent between strong and paragraph tag if
             # the flag enabling this feature is set.
@@ -242,12 +244,12 @@ class TrondheimSpider(scrapy.Spider):
             # Locate the parent element to use based on the hierarchy.
             parent = self.locate_parent(elem_tag, current_parent, root)
 
-            # Concatenate paragraph tags which directly follow each other.
-            if self.concatenate_p and elem_tag == 'p' and parent.children:
+            # Concatenate tags like paragraph tags which directly follow each other.
+            if elem_tag in self.concatenation_tags and parent.children:
                 last_child = parent.children[-1]
 
                 # Start a new paragraph if the last child already has children.
-                if last_child and last_child.tag == 'p' and not last_child.children:
+                if last_child and last_child.tag == elem_tag and not last_child.children:
                     last_child.text += '\n\n' + elem_text
                     continue
 
@@ -303,6 +305,6 @@ class TrondheimSpider(scrapy.Spider):
                 for allowed_path in self.allowed_paths:
                     # Only follow links that are in the list of allowed paths.
                     if re.match(allowed_path, next_page.url) and not \
-                            any(re.match(regex, response.url) for regex in self.visit_blacklist):
+                            any(re.match(regex, next_page.url) for regex in self.visit_blacklist):
                         yield response.follow(next_page, self.parse)
                         break
