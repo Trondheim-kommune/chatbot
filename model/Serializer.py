@@ -29,24 +29,21 @@ class Content:
     def __init__(self, title, texts, keywords=[]):
         self.__title = title
         self.__texts = texts
-        """if keywords:
+        if keywords:
             for keyword in keywords:
                 if not isinstance(keyword, KeyWord):
-                    raise TypeError("Must be KeyWord type")"""
+                    raise TypeError("Must be KeyWord type")
         self.__keywords = keywords
 
     def get_content(self):
         return {
             "title": self.__title,
-            "keywords": self.__keywords,
+            "keywords": [keyword.get_keyword() for keyword in self.__keywords],
             "texts": self.__texts,
         }
 
     def __repr__(self):
         return str(self.get_content())
-
-    def toJSON(self):
-        return json.dumps(self.get_content())
 
 
 class Serializer:
@@ -159,10 +156,8 @@ class Serializer:
                         # text here and continue
                         keywords = [KeyWord(*keyword) for keyword in get_keywords(self.vectorizer, 
                             self.feature_names, title)]
-                        keywords_real = []
-                        for k in keywords:
-                            keywords_real.append(serialize(k))
-                        content = Content(title, [child["text"]])
+
+                        content = Content(title, [child["text"]], keywords)
                         new_model = copy.deepcopy(model_template)
                         new_model["id"] = child["id"]
                         new_model["content"] = content.get_content()
@@ -175,9 +170,3 @@ class Serializer:
             self.__models += models
 
         print('Successfully serialized all contents')
-
-
-def serialize(obj):
-    if isinstance(obj, KeyWord):
-        return obj.get_keyword()
-    return obj.__dict__
