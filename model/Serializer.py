@@ -72,9 +72,9 @@ class Serializer:
 
         vectorizer, transformed_corpus, feature_names = self.get_tfidf_model()
 
-        self.transformed_corpus = transformed_corpus
-        self.feature_names = feature_names
-        self.vectorizer = vectorizer
+        self.__transformed_corpus = transformed_corpus
+        self.__feature_names = feature_names
+        self.__vectorizer = vectorizer
 
     def load_data(self):
         """ Load all JSON data from a file and sets self.__data. Mostly used
@@ -154,8 +154,8 @@ class Serializer:
                     elif child["tag"] in accepted_tags:
                         # Hit a leaf node in recursion tree. We extract the
                         # text here and continue
-                        keywords = [KeyWord(*keyword) for keyword in get_keywords(self.vectorizer,
-                                    self.feature_names, title)]
+                        keywords = [KeyWord(*keyword) for keyword in get_keywords(self.__vectorizer,
+                                    self.__feature_names, title)]
 
                         content = Content(title, [child["text"]], keywords)
                         new_model = copy.deepcopy(model_template)
