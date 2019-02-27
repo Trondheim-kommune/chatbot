@@ -49,7 +49,7 @@ class MongoDBControllerWebhook:
         try:
             scores = cosine_similarity(vectorizer.transform([raw_query_text]), corpus_matrix)[0]
             answer = get_answer_text(docs[scores.tolist().index(max(scores))])
-            print("Answer: ", answer)
+            print("Answer:", answer)
             return answer
         except KeyError:
             raise Exception("Document doesn't have content and texts. "
