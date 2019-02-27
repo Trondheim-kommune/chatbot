@@ -23,8 +23,7 @@ entities_loaded = False
 PROJECT_ID = os.getenv("PROJECT_ID")
 
 factory = ModelFactory.get_instance()
-# TODO CHANGE THIS
-util.set_db(factory, db="test_db")
+util.set_db(factory, db="dev_db")
 
 
 # Register handle for flask_exceptions error messages.

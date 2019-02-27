@@ -16,7 +16,7 @@ export default class DocumentView extends React.Component {
   async componentDidMount() {
     // Fetch content
     const data = { "data": { "id": this.props.id } };
-    const content = await fetchData("http://localhost:8080/v1/get_content", data);
+    const content = await fetchData("https://agent25.tinusf.com/v1/get_content", data);
     console.log(content.url)
     if (! "manual" in content) {
       this.setState({ manual: content.prod, automatic: content.prod, url: content.url });
@@ -29,7 +29,7 @@ export default class DocumentView extends React.Component {
     e.preventDefault();
     // Save data and delete entry in manual collection if needed
     const data = { "data": { "id": this.props.id, "content": this.state.manual } };
-    const content = await fetchData("http://localhost:8080/v1/update_content", data);
+    const content = await fetchData("https://agent25.tinusf.com/v1/update_content", data);
     this.props.changeView("main");
   }
 

@@ -14,7 +14,7 @@ class App extends Component {
   }
 
   async componentDidMount() {
-    const conflictDocs = await fetchData("http://localhost:8080/v1/get_all_conflict_ids", {});
+    const conflictDocs = await fetchData("https://agent25.tinusf.com/v1/get_all_conflict_ids", {});
     this.setState({ conflictDocs });
   }
 
