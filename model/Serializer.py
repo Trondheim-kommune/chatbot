@@ -136,7 +136,8 @@ class Serializer:
             # Extract meta keywords if they exist
             if len(child_data) > 0 and child_data[0]["tag"] == "meta":
                 # Tokenizing the keywords on comma
-                model["header_meta_keywords"] = child_data[0]["text"].split(",")
+                keywords = child_data[0]["text"].split(",")
+                model["header_meta_keywords"] = [kw.strip() for kw in keywords]
                 # Remove meta element from the list before iterating
                 # over the rest of the list
                 child_data.pop(0)
