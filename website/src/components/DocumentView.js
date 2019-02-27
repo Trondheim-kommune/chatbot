@@ -33,6 +33,21 @@ export default class DocumentView extends React.Component {
     this.props.changeView("main");
   }
 
+  createNewAnswer = (e) => {
+    e.preventDefault();
+    if (this.state.manual) {
+      this.setState(prevState => ({
+        manual: {
+          ...prevState.manual,
+          texts: [
+            ...prevState.manual.texts,
+            "",
+          ],
+        },
+      }));
+    }
+  }
+
   createNewKeyword = (e) => {
     e.preventDefault();
     if (this.state.manual) {
@@ -61,31 +76,51 @@ export default class DocumentView extends React.Component {
     }));
   }
 
+  deleteAnswer = (e, i) => {
+    e.preventDefault();
+    this.setState(prevState => ({
+      manual: {
+        ...prevState.manual,
+        texts: [
+          ...prevState.manual.texts.slice(0, i),
+          ...prevState.manual.texts.slice(i + 1),
+        ],
+      },
+    }));
+  }
+
   render() {
     let textAreasManual;
     if (this.state.manual) {
       /* map through the texts field from manual */
       textAreasManual = this.state.manual.texts.map((text, i) => (
-        <textarea
-          key={i}
-          rows="10"
-          cols="50"
-          value={text}
-          onChange={(e) => {
-            const value = e.target.value;
+        <div>
+          <div>
+            <textarea
+              key={i}
+              rows="10"
+              cols="50"
+              value={text}
+              onChange={(e) => {
+                const value = e.target.value;
 
-            this.setState(prevState => ({
-              manual: {
-                ...prevState.manual,
-                texts: [
-                  ...prevState.manual.texts.slice(0, i),
-                  value,
-                  ...prevState.manual.texts.slice(i + 1),
-                ],
-              },
-            }));
-          }
-          } />
+                this.setState(prevState => ({
+                  manual: {
+                    ...prevState.manual,
+                    texts: [
+                      ...prevState.manual.texts.slice(0, i),
+                      value,
+                      ...prevState.manual.texts.slice(i + 1),
+                    ],
+                  },
+                }));
+              }
+              } />
+          </div>
+          <button
+            onClick={(e) => this.deleteAnswer(e, i)}
+          >Slett svar</button>
+        </div>
       ));
     }
 
@@ -175,6 +210,9 @@ export default class DocumentView extends React.Component {
 
     return (
       <div>
+        <button
+          onClick={(e) => this.props.changeView("main")}
+        >Tilbake</button>
         {this.state.url &&
           <h1><a href={this.state.url}>{this.state.url}</a>
           </h1>}
@@ -184,16 +222,19 @@ export default class DocumentView extends React.Component {
             <p>
               Her kan du endre svarene til botten manuelt. Oppdater teksten og trykk på lagre
               for å oppdatere.
-              <br />
-              Man kan også oppdatere, legge til og slette nøkkelord og selvsikkerheten deres.
             </p>
             <form onSubmit={(e) => this.handleSubmit(e)}>
-              <strong>Svar:</strong><br />
+              <strong>Svar:</strong>
               {textAreasManual}
-              <br /><strong>Nøkkelord:</strong><br />
+              <button onClick={(e) => this.createNewAnswer(e)}>Nytt svar</button>
+              <p>
+                Man kan også oppdatere, legge til og slette nøkkelord og selvsikkerheten deres.
+              </p>
+              <p>Selvsikkerheten er et tall fra 0 til 1. 1 om du må ha dette søketordet for å få dette svaret.</p>
+              <p><strong>Nøkkelord:</strong></p>
               {keywordsManual}
               <button onClick={(e) => this.createNewKeyword(e)}>Nytt nøkkelord</button>
-              <br /><input type="submit" value="Lagre" />
+              <input type="submit" value="Lagre" />
             </form>
           </div>
         }
@@ -203,9 +244,9 @@ export default class DocumentView extends React.Component {
               <h2> Automatisk hentet fra <a href={this.state.url}>{this.state.url}</a>
               </h2>}
             <p>Sammenlign de manuelle endringene med informasjonen hentet fra nettsiden</p>
-            <strong>Svar:</strong><br />
+            <p><strong>Svar:</strong></p>
             {textAreasAutomatic}
-            <br /><strong>Nøkkelord:</strong><br />
+            <p><strong>Nøkkelord:</strong></p>
             {keywordsAutomatic}
           </div>
         }

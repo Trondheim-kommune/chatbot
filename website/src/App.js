@@ -20,6 +20,7 @@ class App extends Component {
 
   changeView = async (view, id) => {
     this.setState({ view, id });
+    this.componentDidMount();
   }
 
   render() {
