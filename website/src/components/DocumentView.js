@@ -1,5 +1,5 @@
-import React from "react";
-import { fetchData } from "../utils/Util";
+import React from 'react';
+import { fetchData } from '../utils/Util';
 /* 
 This component displays the content field in a document from the manual collection
 and the corresponding document in the prod collection.
@@ -8,45 +8,55 @@ You can edit the "texts" field and the "keywords" field manually.
 export default class DocumentView extends React.Component {
   constructor() {
     super();
-    this.state = {
-    }
+    this.state = {};
   }
 
   async componentDidMount() {
     // Fetch content
-    const data = { "data": { "id": this.props.id } };
-    const content = await fetchData(process.env.REACT_APP_SERVER_URL + "v1/get_content", data);
-    if (!content.hasOwnProperty("manual")) {
-      this.setState({ manual: content.prod, automatic: content.prod, url: content.url });
+    const data = { data: { id: this.props.id } };
+    const content = await fetchData(
+      process.env.REACT_APP_SERVER_URL + 'v1/get_content',
+      data,
+    );
+    if (!content.hasOwnProperty('manual')) {
+      this.setState({
+        manual: content.prod,
+        automatic: content.prod,
+        url: content.url,
+      });
     } else {
-      this.setState({ manual: content.manual, automatic: content.prod, url: content.url });
+      this.setState({
+        manual: content.manual,
+        automatic: content.prod,
+        url: content.url,
+      });
     }
   }
 
-  handleSubmit = async (e) => {
+  handleSubmit = async e => {
     e.preventDefault();
     // Save data and delete entry in manual collection if needed
-    const data = { "data": { "id": this.props.id, "content": this.state.manual } };
-    const content = await fetchData(process.env.REACT_APP_SERVER_URL + "v1/update_content", data);
-    this.props.changeView("main");
-  }
+    const data = { data: { id: this.props.id, content: this.state.manual } };
+    const content = await fetchData(
+      process.env.REACT_APP_SERVER_URL + 'v1/update_content',
+      data,
+    );
+    this.props.changeView('main');
+  };
 
-  createNewAnswer = (e) => {
+  createNewAnswer = e => {
     e.preventDefault();
     if (this.state.manual) {
       this.setState(prevState => ({
         manual: {
           ...prevState.manual,
-          texts: [
-            ...prevState.manual.texts,
-            "",
-          ],
+          texts: [...prevState.manual.texts, ''],
         },
       }));
     }
-  }
+  };
 
-  createNewKeyword = (e) => {
+  createNewKeyword = e => {
     e.preventDefault();
     if (this.state.manual) {
       this.setState(prevState => ({
@@ -54,12 +64,12 @@ export default class DocumentView extends React.Component {
           ...prevState.manual,
           keywords: [
             ...prevState.manual.keywords,
-            { "keyword": "", "confidence": 1 },
+            { keyword: '', confidence: 1 },
           ],
         },
       }));
     }
-  }
+  };
 
   deleteKeyword = (e, i) => {
     e.preventDefault();
@@ -72,7 +82,7 @@ export default class DocumentView extends React.Component {
         ],
       },
     }));
-  }
+  };
 
   deleteAnswer = (e, i) => {
     e.preventDefault();
@@ -85,7 +95,7 @@ export default class DocumentView extends React.Component {
         ],
       },
     }));
-  }
+  };
 
   render() {
     let textAreasManual;
@@ -98,7 +108,7 @@ export default class DocumentView extends React.Component {
               rows="10"
               cols="50"
               value={text}
-              onChange={(e) => {
+              onChange={e => {
                 const value = e.target.value;
 
                 this.setState(prevState => ({
@@ -111,13 +121,12 @@ export default class DocumentView extends React.Component {
                     ],
                   },
                 }));
-              }
-              } />
+              }}
+            />
           </div>
-          <button
-            className="deleteText"
-            onClick={(e) => this.deleteAnswer(e, i)}
-          >Slett svar</button>
+          <button className="deleteText" onClick={e => this.deleteAnswer(e, i)}>
+            Slett svar
+          </button>
         </div>
       ));
     }
@@ -129,49 +138,55 @@ export default class DocumentView extends React.Component {
         <div key={i + 1000} className="keyword" className="keywordManual">
           <input
             type="text"
-            value={keyword["keyword"]}
+            value={keyword['keyword']}
             className="keywordWord"
-            onChange={(e) => {
+            onChange={e => {
               const value = e.target.value;
               this.setState(prevState => ({
                 manual: {
                   ...prevState.manual,
                   keywords: [
                     ...prevState.manual.keywords.slice(0, i),
-                    { "keyword": value, "confidence": prevState.manual.keywords[i].confidence },
+                    {
+                      keyword: value,
+                      confidence: prevState.manual.keywords[i].confidence,
+                    },
                     ...prevState.manual.keywords.slice(i + 1),
                   ],
                 },
               }));
-            }
-            }
-          ></input>
+            }}
+          />
           <input
             className="confidence"
             type="number"
             min="0"
             max="1"
             step="0.000000000000000001"
-            value={keyword["confidence"]}
-            onChange={(e) => {
+            value={keyword['confidence']}
+            onChange={e => {
               const value = parseFloat(e.target.value);
               this.setState(prevState => ({
                 manual: {
                   ...prevState.manual,
                   keywords: [
                     ...prevState.manual.keywords.slice(0, i),
-                    { "keyword": prevState.manual.keywords[i].keyword, "confidence": value },
+                    {
+                      keyword: prevState.manual.keywords[i].keyword,
+                      confidence: value,
+                    },
                     ...prevState.manual.keywords.slice(i + 1),
                   ],
                 },
               }));
-            }
-            }
-          ></input>
+            }}
+          />
           <button
             className="deleteKeyword"
-            onClick={(e) => this.deleteKeyword(e, i)}
-          >Slett nøkkelord</button>
+            onClick={e => this.deleteKeyword(e, i)}
+          >
+            Slett nøkkelord
+          </button>
         </div>
       ));
     }
@@ -180,13 +195,7 @@ export default class DocumentView extends React.Component {
     if (this.state.automatic) {
       /* Map through the texts field from prod */
       textAreasAutomatic = this.state.automatic.texts.map((text, i) => (
-        <textarea
-          readOnly
-          key={i}
-          rows="10"
-          cols="50"
-          value={text}
-        />
+        <textarea readOnly key={i} rows="10" cols="50" value={text} />
       ));
     }
 
@@ -195,63 +204,82 @@ export default class DocumentView extends React.Component {
       /* Map through the keywords field from prod */
       keywordsAutomatic = this.state.automatic.keywords.map((keyword, i) => (
         <div key={i} className="keyword">
-          <input
-            readOnly
-            type="text"
-            value={keyword["keyword"]}
-          ></input>
-          <input
-            readOnly
-            type="text"
-            value={keyword["confidence"]}
-          ></input>
+          <input readOnly type="text" value={keyword['keyword']} />
+          <input readOnly type="text" value={keyword['confidence']} />
         </div>
       ));
     }
 
     return (
       <div>
-        <button
-          onClick={(e) => this.props.changeView("main")}
-        >Tilbake</button>
-        {this.state.url &&
-          <h1 className="title"><a href={this.state.url}>{this.state.url}</a>
-          </h1>}
-        {this.state.manual &&
+        <button onClick={e => this.props.changeView('main')}>Tilbake</button>
+        {this.state.url && (
+          <h1 className="title">
+            <a href={this.state.url}>{this.state.url}</a>
+          </h1>
+        )}
+        {this.state.manual && (
           <div>
             <h2>Manuelle endringer</h2>
             <p>
-              Her kan du endre svarene til botten manuelt. Oppdater teksten og trykk på lagre
-              for å oppdatere.
+              Her kan du endre svarene til botten manuelt. Oppdater teksten og
+              trykk på lagre for å oppdatere.
             </p>
-            <form onSubmit={(e) => this.handleSubmit(e)}>
+            <form onSubmit={e => this.handleSubmit(e)}>
               <strong>Svar:</strong>
               {textAreasManual}
-              <button className="newText" onClick={(e) => this.createNewAnswer(e)}>Nytt svar</button>
+              <button
+                className="newText"
+                onClick={e => this.createNewAnswer(e)}
+              >
+                Nytt svar
+              </button>
               <p>
-                Man kan også oppdatere, legge til og slette nøkkelord og selvsikkerheten deres.
+                Man kan også oppdatere, legge til og slette nøkkelord og
+                selvsikkerheten deres.
               </p>
-              <p>Selvsikkerheten er et tall fra 0 til 1. 1 om du må ha dette søketordet for å få dette svaret.</p>
-              <p><strong>Nøkkelord:</strong></p>
+              <p>
+                Selvsikkerheten er et tall fra 0 til 1. 1 om du må ha dette
+                søketordet for å få dette svaret.
+              </p>
+              <p>
+                <strong>Nøkkelord:</strong>
+              </p>
               {keywordsManual}
-              <button className="newKeyword" onClick={(e) => this.createNewKeyword(e)}>Nytt nøkkelord</button>
+              <button
+                className="newKeyword"
+                onClick={e => this.createNewKeyword(e)}
+              >
+                Nytt nøkkelord
+              </button>
               <input type="submit" value="Lagre" className="save" />
             </form>
           </div>
-        }
-        {this.state.automatic &&
+        )}
+        {this.state.automatic && (
           <div>
-            {this.state.url &&
-              <h2> Automatisk hentet fra <a href={this.state.url}>{this.state.url}</a>
-              </h2>}
-            <p>Sammenlign de manuelle endringene med informasjonen hentet fra nettsiden</p>
-            <p><strong>Svar:</strong></p>
+            {this.state.url && (
+              <h2>
+                {' '}
+                Automatisk hentet fra{' '}
+                <a href={this.state.url}>{this.state.url}</a>
+              </h2>
+            )}
+            <p>
+              Sammenlign de manuelle endringene med informasjonen hentet fra
+              nettsiden
+            </p>
+            <p>
+              <strong>Svar:</strong>
+            </p>
             {textAreasAutomatic}
-            <p><strong>Nøkkelord:</strong></p>
+            <p>
+              <strong>Nøkkelord:</strong>
+            </p>
             {keywordsAutomatic}
           </div>
-        }
-      </div >
+        )}
+      </div>
     );
   }
 }
