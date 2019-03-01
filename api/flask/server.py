@@ -23,7 +23,11 @@ entities_loaded = False
 PROJECT_ID = os.getenv("PROJECT_ID")
 
 factory = ModelFactory.get_instance()
-util.set_db(factory, db="dev_db")
+
+if os.getenv("TEST_FLAG"):
+    util.set_db(factory, db="test_db")
+else:
+    util.set_db(factory, db="dev_db")
 
 
 # Register handle for flask_exceptions error messages.
@@ -342,7 +346,7 @@ def get_content():
         output["manual"] = document_manual["content"]
 
     # Add the url
-    output["url"] = document_manual["url"]
+    output["url"] = document_prod["url"]
     return json.dumps(output)
 
 

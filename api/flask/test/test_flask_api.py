@@ -180,3 +180,62 @@ def test_add_intents(app):
     response_json = json.loads(response.data.decode())
     assert "OK" == response_json["status"]
     assert "Batch created 2 intents." == response_json["message"]
+
+
+def test_get_all_conflicts(app):
+    response = app.test_client().post('/v1/get_all_conflict_ids',
+                                      data=json.dumps({}))
+    response_json = json.loads(response.data.decode())
+    assert response_json[0]["id"] == "295cc564fe771fbb92b3278a6eee2d5cbcae2606-3"
+    assert response_json[0]["title"] == " Velkommen til Trondheim kommune"
+
+
+def test_get_content(app):
+    input_dict = {
+        "data": {
+            "id": "295cc564fe771fbb92b3278a6eee2d5cbcae2606-3"
+        }
+    }
+    response = app.test_client().post('/v1/get_content',
+                                      data=json.dumps(input_dict))
+    response_json = json.loads(response.data.decode())
+    assert response_json["url"] == "https://www.trondheim.kommune.no"
+    assert type(response_json["manual"]) is dict
+    assert type(response_json["prod"]) is dict
+
+
+def test_update_content(app):
+    input_dict = {
+        "data": {
+            "id": "295cc564fe771fbb92b3278a6eee2d5cbcae2606-3",
+            "content": {
+                "title": " Velkommen til Trondheim kommune",
+                "keywords": [
+                    {
+                        "keyword": "change_from_test",
+                        "confidence": 0.2010
+                    }
+                ],
+                "texts": [
+                    "El manual changos",
+                    "New answer"
+                ]
+            }
+        }
+    }
+    response = app.test_client().post('/v1/update_content',
+                                      data=json.dumps(input_dict))
+    assert response.status_code == 200
+
+
+def test_get_docs_from_url(app):
+    input_dict = {
+        "data": {
+            "url": "https://www.trondheim.kommune.no"
+        }
+    }
+    response = app.test_client().post('/v1/get_docs_from_url',
+                                      data=json.dumps(input_dict))
+    response_json = json.loads(response.data.decode())
+    assert response_json[0]["id"] == "295cc564fe771fbb92b3278a6eee2d5cbcae2606-3"
+    assert response_json[0]["title"] == " Velkommen til Trondheim kommune"
