@@ -18,7 +18,7 @@ export default class DocumentView extends React.Component {
     const data = { "data": { "id": this.props.id } };
     const content = await fetchData(process.env.REACT_APP_SERVER_URL + "v1/get_content", data);
     console.log(content.url)
-    if (! "manual" in content) {
+    if (!content.hasOwnProperty("manual")) {
       this.setState({ manual: content.prod, automatic: content.prod, url: content.url });
     } else {
       this.setState({ manual: content.manual, automatic: content.prod, url: content.url });
@@ -94,10 +94,9 @@ export default class DocumentView extends React.Component {
     if (this.state.manual) {
       /* map through the texts field from manual */
       textAreasManual = this.state.manual.texts.map((text, i) => (
-        <div>
+        <div key={i + 2000}>
           <div>
             <textarea
-              key={i}
               rows="10"
               cols="50"
               value={text}
@@ -128,7 +127,7 @@ export default class DocumentView extends React.Component {
     if (this.state.manual) {
       /* Map through the keywords from manual */
       keywordsManual = this.state.manual.keywords.map((keyword, i) => (
-        <div key={i} className="keyword">
+        <div key={i + 1000} className="keyword">
           <input
             type="text"
             value={keyword["keyword"]}
