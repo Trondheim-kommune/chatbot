@@ -94,8 +94,8 @@ export default class DocumentView extends React.Component {
     if (this.state.manual) {
       /* map through the texts field from manual */
       textAreasManual = this.state.manual.texts.map((text, i) => (
-        <div key={i + 2000}>
-          <div>
+        <div key={i + 2000} className="answers">
+          <div className="answer">
             <textarea
               rows="10"
               cols="50"
@@ -117,6 +117,7 @@ export default class DocumentView extends React.Component {
               } />
           </div>
           <button
+            className="deleteText"
             onClick={(e) => this.deleteAnswer(e, i)}
           >Slett svar</button>
         </div>
@@ -127,10 +128,11 @@ export default class DocumentView extends React.Component {
     if (this.state.manual) {
       /* Map through the keywords from manual */
       keywordsManual = this.state.manual.keywords.map((keyword, i) => (
-        <div key={i + 1000} className="keyword">
+        <div key={i + 1000} className="keyword" className="keywordManual">
           <input
             type="text"
             value={keyword["keyword"]}
+            className="keywordWord"
             onChange={(e) => {
               const value = e.target.value;
               this.setState(prevState => ({
@@ -147,6 +149,7 @@ export default class DocumentView extends React.Component {
             }
           ></input>
           <input
+            className="confidence"
             type="number"
             min="0"
             max="1"
@@ -168,6 +171,7 @@ export default class DocumentView extends React.Component {
             }
           ></input>
           <button
+            className="deleteKeyword"
             onClick={(e) => this.deleteKeyword(e, i)}
           >Slett nøkkelord</button>
         </div>
@@ -213,7 +217,7 @@ export default class DocumentView extends React.Component {
           onClick={(e) => this.props.changeView("main")}
         >Tilbake</button>
         {this.state.url &&
-          <h1><a href={this.state.url}>{this.state.url}</a>
+          <h1 className="title"><a href={this.state.url}>{this.state.url}</a>
           </h1>}
         {this.state.manual &&
           <div>
@@ -225,15 +229,15 @@ export default class DocumentView extends React.Component {
             <form onSubmit={(e) => this.handleSubmit(e)}>
               <strong>Svar:</strong>
               {textAreasManual}
-              <button onClick={(e) => this.createNewAnswer(e)}>Nytt svar</button>
+              <button className="newText" onClick={(e) => this.createNewAnswer(e)}>Nytt svar</button>
               <p>
                 Man kan også oppdatere, legge til og slette nøkkelord og selvsikkerheten deres.
               </p>
               <p>Selvsikkerheten er et tall fra 0 til 1. 1 om du må ha dette søketordet for å få dette svaret.</p>
               <p><strong>Nøkkelord:</strong></p>
               {keywordsManual}
-              <button onClick={(e) => this.createNewKeyword(e)}>Nytt nøkkelord</button>
-              <input type="submit" value="Lagre" />
+              <button className="newKeyword" onClick={(e) => this.createNewKeyword(e)}>Nytt nøkkelord</button>
+              <input type="submit" value="Lagre" className="save" />
             </form>
           </div>
         }

@@ -34,12 +34,13 @@ export default class Search extends React.Component {
           <label>
             URL:
             <input type="text"
+              className="searchInputField"
               value={this.state.url}
               name="url"
               placeholder="https://www.trondheim.kommune.no/"
               onChange={e => this.setState({ url: e.target.value })} />
           </label>
-          <input type="submit" value="Search" />
+          <input type="submit" value="Search" className="submitSearch" />
         </form>
         {/* If data i fetched, render a DocumentList with the search results */}
         {this.state.fetched &&
