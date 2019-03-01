@@ -25,7 +25,6 @@ export default class Search extends React.Component {
     } else if (content.length > 0) {
       this.setState({ fetched: true, docs: content })
     }
-    console.log(content)
   }
   render() {
     return (

@@ -124,8 +124,7 @@ def create_intent_object(intent_name, training_phrases, match_entity=True):
                      "alias": entity_type})
 
                 parameters.append({"display_name": entity_type,
-                                   "entity_type_display_name": "@" +
-                                                               entity_type,
+                                   "entity_type_display_name": "@" + entity_type,
                                    "value": "$" + entity_type})
 
             except KeyError:

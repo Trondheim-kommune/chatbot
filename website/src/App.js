@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import "./App.css";
 import Search from "./components/Search";
 import DocumentList from "./components/DocumentList"
 import { fetchData } from "./utils/Util";
@@ -13,14 +12,18 @@ class App extends Component {
     id: ""
   }
 
-  async componentDidMount() {
+  fetchAllConflictIDs = async () => {
     const conflictDocs = await fetchData(process.env.REACT_APP_SERVER_URL + "v1/get_all_conflict_ids", {});
     this.setState({ conflictDocs });
   }
 
+  async componentDidMount() {
+    this.fetchAllConflictIDs();
+  }
+
   changeView = async (view, id) => {
     this.setState({ view, id });
-    this.componentDidMount();
+    this.fetchAllConflictIDs();
   }
 
   render() {

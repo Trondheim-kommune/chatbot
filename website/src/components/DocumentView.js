@@ -9,7 +9,6 @@ export default class DocumentView extends React.Component {
   constructor() {
     super();
     this.state = {
-      inputValue: "hardcoded text"
     }
   }
 
@@ -17,7 +16,6 @@ export default class DocumentView extends React.Component {
     // Fetch content
     const data = { "data": { "id": this.props.id } };
     const content = await fetchData(process.env.REACT_APP_SERVER_URL + "v1/get_content", data);
-    console.log(content.url)
     if (!content.hasOwnProperty("manual")) {
       this.setState({ manual: content.prod, automatic: content.prod, url: content.url });
     } else {

@@ -1,4 +1,4 @@
-import React from "react"
+import React from "react";
 import DocumentItem from "./DocumentItem";
 
 /* 
@@ -18,7 +18,6 @@ export default class DocumentList extends React.Component {
     return (
       <div className="itemList" >
         <h1>{this.props.title}</h1>
-        {/* <h1>{this.props.header}</h1> */}
         {documentItems}
       </div>
     );
