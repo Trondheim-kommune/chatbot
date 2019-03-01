@@ -19,7 +19,7 @@ export default class Search extends React.Component {
 
     // Title and id based on url
     const data = { "data": { "url": this.state.url } };
-    const content = await fetchData("https://agent25.tinusf.com/v1/get_docs_from_url", data);
+    const content = await fetchData(process.env.REACT_APP_SERVER_URL + "v1/get_docs_from_url", data);
     if (content.length === 0) {
       alert("Vi fant ingen for den siden, sjekk om URLen stemmer.");
     } else if (content.length > 0) {
