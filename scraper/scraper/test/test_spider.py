@@ -37,17 +37,21 @@ def test_scraper_snapshot():
 
     # Crawl the html file and returns the tree structure
     tree = spider.parse(fake_response_from_file("test.html"))
+    tree_obj = next(tree)
 
     # Handle absolute path
     responses_dir = os.path.dirname(os.path.realpath(__file__))
     file_path = os.path.join(responses_dir, 'test_html.json')
 
+    # Create the JSON test file if non existing
+    with open(file_path, "w+") as f:
+        f.write(json.dumps(tree_obj))
+
     # Retrieve snapshot
     with open(file_path, "r") as data:
-        html_tree_snapshot = data.readlines()[1]
+        html_tree_snapshot = data.readlines()[0]
 
     # Sort and compare snapshots
-    t = next(tree)
     assert sorted(
-        json.loads(str(html_tree_snapshot)[:-1]).items()
-    ) == sorted(t.items())
+        json.loads(str(html_tree_snapshot)).items()
+    ) == sorted(tree_obj.items())
