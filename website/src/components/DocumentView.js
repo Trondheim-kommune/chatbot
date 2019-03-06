@@ -102,7 +102,7 @@ export default class DocumentView extends React.Component {
     if (this.state.manual) {
       /* map through the texts field from manual */
       textAreasManual = this.state.manual.texts.map((text, i) => (
-        <div key={i + 2000} className="answers">
+        <div key={i} className="answers">
           <div className="answer">
             <textarea
               rows="10"
@@ -135,7 +135,7 @@ export default class DocumentView extends React.Component {
     if (this.state.manual) {
       /* Map through the keywords from manual */
       keywordsManual = this.state.manual.keywords.map((keyword, i) => (
-        <div key={i + 1000} className="keyword" className="keywordManual">
+        <div key={i} className="keyword" className="keywordManual">
           <input
             type="text"
             value={keyword['keyword']}

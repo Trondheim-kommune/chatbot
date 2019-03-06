@@ -23,7 +23,7 @@ describe('Test search and adding new text and keyword', () => {
       .click()
       .wait(waitTime);
 
-    const title = '  Velkommen til Trondheim kommune - 295cc564fe771fbb92b3278a6eee2d5cbcae2606-3'
+    const title = ' Velkommen til Trondheim kommune - 295cc564fe771fbb92b3278a6eee2d5cbcae2606-3'
     // Get the first result after searching and check text is what we expect
     cy.get('.itemList').first().children('.itemButton').first()
       .invoke('text').then((text => {
