@@ -28,16 +28,33 @@ class ModelFactory:
                                      )
         self.database = client[db_name]
 
-    def get_document(self, query, collection):
-        """ Searches for documents using MongoDB in a given document collection. """
-        col = self.get_collection(collection)
-
-        cursor = col.find({'$text': {'$search': query}}, {'score': {'$meta': 'textScore'}})
-
+    def get_document(self, query, main_collection="prod", manual_collection="manual",
+                     number_of_docs=15):
+        """
+        Searches for documents using MongoDB in a given document collection.
+        Get 15 results from prod. Get 15 from Manual.
+        Go through every doc in prod and delete the ones with manually_changed=true.
+        Then return every remaining document, remember it's not sorted now, but for what we need
+        it for this is not necessary.
+        """
+        main_col = self.get_collection(main_collection)
+        cursor = main_col.find({'$text': {'$search': query}}, {'score': {'$meta': 'textScore'}})
         # Sort and retrieve some of the top scoring documents.
-        cursor.sort([('score', {'$meta': 'textScore'})]).limit(15)
+        cursor.sort([('score', {'$meta': 'textScore'})]).limit(number_of_docs)
 
-        return list(cursor)
+        docs = []
+        for doc in cursor:
+            if doc["manually_changed"] is False:
+                docs.append(doc)
+
+        manual_col = self.get_collection(manual_collection)
+        cursor = manual_col.find({'$text': {'$search': query}}, {'score': {'$meta': 'textScore'}})
+        # Sort and retrieve some of the top scoring documents.
+        cursor.sort([('score', {'$meta': 'textScore'})]).limit(number_of_docs)
+        for doc in cursor:
+            docs.append(doc)
+
+        return docs
 
     # TODO: some validation on response to make sure everything is posted
     def post_document(self, data, collection):

@@ -80,4 +80,5 @@ w3lib==1.20.0
 Werkzeug==0.14.1
 wrapt==1.10.11
 zope.interface==4.6.0
+flask-cors==3.0.7
 https://github.com/ohenrik/nb_dep_ud_sm/raw/master/nb_dep_ud_sm-0.0.1/dist/nb_dep_ud_sm-0.0.1.tar.gz
