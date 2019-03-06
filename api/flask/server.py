@@ -357,10 +357,20 @@ def update_content():
     json_input_data = json.loads(request.data)
     id = json_input_data["data"]["id"]
     content = json_input_data["data"]["content"]
-
-    factory.get_database().get_collection("manual").update({"id": id}, {"$set": {
+    status = factory.get_database().get_collection("manual").update({"id": id}, {"$set": {
         "content": content}})
+    if status["updatedExisting"] is False:
+        # If the document wasn't already in the manual db then we need to copy the automatic one
+        # first.
+        document = next(factory.get_collection("prod").find({"id": id}), None)
+        document["content"] = content
+        factory.get_database().get_collection("manual").insert_one(document)
 
+    # set manually_changed to true.
+    factory.get_database().get_collection("prod").update({"id": id}, {"$set": {
+        "manually_changed": True}})
+
+    # delete this document from the conflict ids collection
     factory.get_database().get_collection("conflict_ids").delete_one({"conflict_id": id})
     return create_success_response("Success")
 
