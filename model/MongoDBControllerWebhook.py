@@ -33,7 +33,7 @@ class MongoDBControllerWebhook:
         factory = ModelFactory.get_instance()
         util.set_db(factory, db="dev_db")
 
-        docs = factory.get_document(raw_query_text, "dev")
+        docs = factory.get_document(raw_query_text)
 
         def get_corpus_text(doc):
             content = ' '.join(doc['content']['texts'])

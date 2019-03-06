@@ -12,7 +12,15 @@
         "keywords": [],
         "content": {
             "title": " Velkommen til Trondheim kommune",
-            "keywords": [],
+            "keywords": [
+                {
+                    "keyword": "legevakt",
+                    "confidence": 0.1337
+                }, {
+                    "keyword": "ambulanse",
+                    "confidence": 0.5312331
+                }
+            ],
             "texts": [
                 "Info from website"
             ]
