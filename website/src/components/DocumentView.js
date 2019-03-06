@@ -33,15 +33,16 @@ export default class DocumentView extends React.Component {
     }
   }
 
-  handleSubmit = async e => {
+  handleSubmit = e => {
     e.preventDefault();
     // Save data and delete entry in manual collection if needed
     const data = { data: { id: this.props.id, content: this.state.manual } };
-    const content = await fetchData(
+    const content = fetchData(
       process.env.REACT_APP_SERVER_URL + 'v1/update_content',
       data,
-    );
-    this.props.changeView('main');
+    ).then(() => {
+      this.props.changeView('main');
+    });
   };
 
   createNewAnswer = e => {
@@ -124,7 +125,7 @@ export default class DocumentView extends React.Component {
               }}
             />
           </div>
-          <button className="deleteText" onClick={e => this.deleteAnswer(e, i)}>
+          <button type="button" className="deleteText" onClick={e => this.deleteAnswer(e, i)}>
             Slett svar
           </button>
         </div>
@@ -141,6 +142,7 @@ export default class DocumentView extends React.Component {
             value={keyword['keyword']}
             className="keywordWord"
             onChange={e => {
+              e.preventDefault();
               const value = e.target.value;
               this.setState(prevState => ({
                 manual: {
@@ -165,6 +167,7 @@ export default class DocumentView extends React.Component {
             step="0.000000000000000001"
             value={keyword['confidence']}
             onChange={e => {
+              e.preventDefault();
               const value = parseFloat(e.target.value);
               this.setState(prevState => ({
                 manual: {
@@ -183,6 +186,7 @@ export default class DocumentView extends React.Component {
           />
           <button
             className="deleteKeyword"
+            type="button"
             onClick={e => this.deleteKeyword(e, i)}
           >
             Slett nøkkelord
@@ -230,6 +234,7 @@ export default class DocumentView extends React.Component {
               {textAreasManual}
               <button
                 className="newText"
+                type="button"
                 onClick={e => this.createNewAnswer(e)}
               >
                 Nytt svar
@@ -248,11 +253,12 @@ export default class DocumentView extends React.Component {
               {keywordsManual}
               <button
                 className="newKeyword"
+                type="button"
                 onClick={e => this.createNewKeyword(e)}
               >
                 Nytt nøkkelord
               </button>
-              <input type="submit" value="Lagre" className="save" />
+              <input type="button" value="Lagre" className="save" />
             </form>
           </div>
         )}
