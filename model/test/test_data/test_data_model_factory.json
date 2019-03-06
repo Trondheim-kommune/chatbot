@@ -31,7 +31,7 @@
                 "texts": ["emner2"]
             }
         ],
-        "indexed": ""
+        "manually_changed": false
     },
     {
         "title": "",
@@ -69,6 +69,6 @@
                 ]
             }
         ],
-        "indexed": ""
+        "manually_changed": false
     }
 ]
