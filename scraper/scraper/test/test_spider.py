@@ -44,8 +44,9 @@ def test_scraper_snapshot():
     file_path = os.path.join(responses_dir, 'test_html.json')
 
     # Create the JSON test file if non existing
-    with open(file_path, "w+") as f:
-        f.write(json.dumps(tree_obj))
+    if not os.path.isfile(file_path):
+        with open(file_path, "w") as f:
+            f.write(json.dumps(tree_obj))
 
     # Retrieve snapshot
     with open(file_path, "r") as data:
