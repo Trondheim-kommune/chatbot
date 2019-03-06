@@ -36,11 +36,11 @@ def test_scraper_snapshot():
     spider.concatenation_p = "true"
 
     # Crawl the html file and returns the tree structure
-    tree = spider.parse(fake_response_from_file("huseby.html"))
+    tree = spider.parse(fake_response_from_file("test.html"))
 
     # Handle absolute path
     responses_dir = os.path.dirname(os.path.realpath(__file__))
-    file_path = os.path.join(responses_dir, 'test_huseby_html.json')
+    file_path = os.path.join(responses_dir, 'test_html.json')
 
     # Retrieve snapshot
     with open(file_path, "r") as data:
