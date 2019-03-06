@@ -20,3 +20,17 @@ Run
 `bash model/start.sh`
 then start up the server
 `bash api/flask/start_server_screen.sh`
+
+## Building the website
+Run
+`cd website`  
+`./build_web_server.sh`  
+
+## Running website locally
+Run
+`source venv/bin/activate` 
+`cd website`  
+`npm install`  
+`npm start`
+Then to run Cypress tests
+`npm run cypress open`
