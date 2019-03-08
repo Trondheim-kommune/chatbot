@@ -137,7 +137,7 @@ def create_intent_object(intent_name, training_phrases, match_entity=True):
     return intent
 
 
-@app.route("/v1/create_intent", methods=["POST"])
+@app.route("/v1/intent", methods=["PUT"])
 def create_intent_post():
     json_input_data = json.loads(request.data)
     try:
@@ -193,7 +193,7 @@ def get_entities():
     entities_loaded = True
 
 
-@app.route("/v1/batch_create_intents", methods=["POST"])
+@app.route("/v1/intents", methods=["PUT"])
 def batch_create_intents_post():
     json_input_data = json.loads(request.data)
     intents = json_input_data["data"]
@@ -242,7 +242,7 @@ def get_all_intents():
     return client.list_intents(parent)
 
 
-@app.route("/v1/batch_create_entities", methods=["POST", "GET"])
+@app.route("/v1/entities", methods=["PUT"])
 def batch_create_entities_post():
     json_input_data = json.loads(request.data)
     entity_types = json_input_data["data"]
@@ -282,7 +282,7 @@ def batch_create_entities(entity_types):
     return ID_list
 
 
-@app.route("/v1/batch_delete_entities", methods=["POST"])
+@app.route("/v1/entities", methods=["DELETE"])
 def batch_delete_entities_post():
     json_input_data = json.loads(request.data)
     entity_ids = json_input_data["data"]
@@ -316,7 +316,7 @@ def batch_delete_entities(entity_ids):
     return client.batch_delete_entity_types(parent, entity_ids_fixed_path)
 
 
-@app.route("/v1/get_all_conflict_ids", methods=["POST"])
+@app.route("/v1/conflict_ids", methods=["GET"])
 def get_all_conflict_ids():
     """
     :return: a list of {"title" "...", "id": "..."}
@@ -329,13 +329,12 @@ def get_all_conflict_ids():
     return json.dumps(conflict_ids)
 
 
-@app.route("/v1/get_content", methods=["POST"])
+@app.route("/v1/content/", methods=["GET"])
 def get_content():
     """
     :return: the content of the prod document and manual document (if we have it)
     """
-    json_input_data = json.loads(request.data)
-    id = json_input_data["data"]["id"]
+    id = request.args.get('id')
 
     document_prod = next(factory.get_collection("prod").find({"id": id}), None)
     output = {"prod": document_prod["content"]}
@@ -349,7 +348,7 @@ def get_content():
     return json.dumps(output)
 
 
-@app.route("/v1/update_content", methods=["POST"])
+@app.route("/v1/content/", methods=["POST"])
 def update_content():
     """
     Updates the manual collection with new content.
@@ -375,13 +374,12 @@ def update_content():
     return create_success_response("Success")
 
 
-@app.route("/v1/get_docs_from_url", methods=["POST"])
+@app.route("/v1/docs_from_url/", methods=["GET"])
 def get_docs_from_url():
     """
     :return: Every document for a single url with id and title.
     """
-    json_input_data = json.loads(request.data)
-    url = json_input_data["data"]["url"]
+    url = request.args.get('url')
     docs = factory.get_collection("prod").find({"url": url})
 
     out = []
