@@ -222,7 +222,7 @@ def test_update_content(app):
 
 
 def test_get_docs_from_url(app):
-    response = app.test_client().get('/v1/docs_from_url/?url=https://www.trondheim.kommune.no')
+    response = app.test_client().get('/v1/docs/?url=https://www.trondheim.kommune.no')
     response_json = json.loads(response.data.decode())
     assert response_json[0]["id"] == "295cc564fe771fbb92b3278a6eee2d5cbcae2606-3"
     assert response_json[0]["title"] == " Velkommen til Trondheim kommune"

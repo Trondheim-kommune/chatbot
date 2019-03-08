@@ -20,7 +20,7 @@ export default class Search extends React.Component {
     // Title and id based on url
     const data = { data: { url: this.state.url } };
     const content = await fetchData(
-      process.env.REACT_APP_SERVER_URL + 'v1/docs_from_url/?url=' + this.state.url,
+      process.env.REACT_APP_SERVER_URL + 'v1/docs/?url=' + this.state.url,
       "GET"
     );
     if (content.length === 0) {

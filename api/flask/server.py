@@ -374,7 +374,7 @@ def update_content():
     return create_success_response("Success")
 
 
-@app.route("/v1/docs_from_url/", methods=["GET"])
+@app.route("/v1/docs/", methods=["GET"])
 def get_docs_from_url():
     """
     :return: Every document for a single url with id and title.
