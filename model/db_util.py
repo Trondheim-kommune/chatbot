@@ -10,7 +10,7 @@ def set_index(collection, factory):
          ("header_meta_keywords", TEXT)], default_language="norwegian")
 
 
-def set_db(factory, ip="agent25.tinusf.com", db="dev_db"):
+def set_db(factory, ip=os.getenv("SERVER_URL"), db="dev_db"):
     factory.set_database(ip, db, str(os.getenv('DB_USER')), str(os.getenv("DB_PWD")))
 
 
