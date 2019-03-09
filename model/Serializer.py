@@ -1,6 +1,8 @@
 import json
 import copy
 import urllib.request
+from model.keyword_gen import get_keywords, get_tfidf_model
+from progressbar import ProgressBar
 
 
 class KeyWord:
@@ -31,20 +33,17 @@ class Content:
             for keyword in keywords:
                 if not isinstance(keyword, KeyWord):
                     raise TypeError("Must be KeyWord type")
-            self.__keywords = keywords
+        self.__keywords = keywords
 
     def get_content(self):
         return {
             "title": self.__title,
-            "keywords": self.__keywords,
+            "keywords": [keyword.get_keyword() for keyword in self.__keywords],
             "texts": self.__texts,
         }
 
     def __repr__(self):
         return str(self.get_content())
-
-    def toJSON(self):
-        return json.dumps(self.get_content())
 
 
 class Serializer:
@@ -71,6 +70,12 @@ class Serializer:
         self.url = url
         self.load_data()
 
+        vectorizer, transformed_corpus, feature_names = self.get_tfidf_model()
+
+        self.__transformed_corpus = transformed_corpus
+        self.__feature_names = feature_names
+        self.__vectorizer = vectorizer
+
     def load_data(self):
         """ Load all JSON data from a file and sets self.__data. Mostly used
         for testing-purposes: real data from scraper is a list of several JSON
@@ -93,6 +98,21 @@ class Serializer:
     def get_models(self):
         return self.__models
 
+    def get_tfidf_model(self):
+        corpus = []
+
+        for data in self.__data:
+            queue = list(data['tree'].get('children', []))
+
+            while queue:
+                node = queue.pop(0)
+
+                if 'children' in node:
+                    corpus.append(node['text'])
+                    queue.append(node['children'])
+
+        return get_tfidf_model(corpus)
+
     def serialize_data(self):
         """ Serialize a page object from the web scraper to the data model
         schema """
@@ -100,7 +120,9 @@ class Serializer:
         accepted_tags = ["p", "a", "li"]
 
         # Iterate over all pages in the JSON data from scraper
-        for data in self.__data:
+        print('Serializing {} contents'.format(len(self.__data)))
+        pbar = ProgressBar()
+        for data in pbar(self.__data):
             # TODO: add more metadata
             model = copy.deepcopy(self.__MODEL_SCHEMA)
             model["url"] = data["url"]
@@ -112,10 +134,10 @@ class Serializer:
                 continue
 
             # Extract meta keywords if they exist
-            if child_data[0]["tag"] == "meta":
+            if len(child_data) > 0 and child_data[0]["tag"] == "meta":
                 # Tokenizing the keywords on comma
-                model["header_meta_keywords"] = child_data[0]["text"].split(
-                    ",")
+                keywords = child_data[0]["text"].split(",")
+                model["header_meta_keywords"] = [kw.strip() for kw in keywords]
                 # Remove meta element from the list before iterating
                 # over the rest of the list
                 child_data.pop(0)
@@ -133,8 +155,11 @@ class Serializer:
                     elif child["tag"] in accepted_tags:
                         # Hit a leaf node in recursion tree. We extract the
                         # text here and continue
+                        keywords = [KeyWord(*keyword)
+                                    for keyword in get_keywords(self.__vectorizer,
+                                    self.__feature_names, title)]
 
-                        content = Content(title, [child["text"]])
+                        content = Content(title, [child["text"]], keywords)
                         new_model = copy.deepcopy(model_template)
                         new_model["id"] = child["id"]
                         new_model["content"] = content.get_content()
@@ -143,4 +168,7 @@ class Serializer:
                 return models
 
             models = iterator(0, child_data, model, [], "")
+
             self.__models += models
+
+        print('Successfully serialized all contents')

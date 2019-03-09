@@ -75,9 +75,19 @@ def insert_documents(data, db="dev_db"):
 
         if prod_match_doc and in_progress_doc:
             if prod_match_doc['content'] != in_progress_doc['content']:
-                conflict_ids.append(id)
+                conflict_ids.append({"conflict_id": id, "title": in_progress_doc["content"][
+                    "title"]})
 
     print("Conflict IDs are", conflict_ids)
+    # Set ID to be unique.
+    factory.get_collection("conflict_ids").create_index([("conflict_id", 1)], unique=True)
+    # Insert all the conflict ids into our collection.
+    for conflict in conflict_ids:
+        try:
+            factory.post_document(conflict, "conflict_ids")
+        except pymongo.errors.DuplicateKeyError:
+            # Then we already know this is a conflict ID and should not be added again to the list.
+            pass
 
     # Delete the backup prod and rename prod to prod2 and then rename in_progress to prod.
     factory.get_database().drop_collection("prod2")
