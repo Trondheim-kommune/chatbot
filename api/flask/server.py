@@ -4,7 +4,7 @@ import dialogflow_v2beta1
 import os
 from api.flask.flask_exceptions import InvalidDialogFlowID
 import google.api_core.exceptions as google_exceptions
-from model.MongoDBControllerWebhook import MongoDBControllerWebhook
+from model.QuerySystem import QuerySystem
 import model.db_util as util
 from model.ModelFactory import ModelFactory
 from flask_cors import CORS
@@ -12,7 +12,7 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-mongo_controller = MongoDBControllerWebhook()
+query_handler = QuerySystem()
 
 # This dictionary contains a mapping from synonyms to entity_type in order to
 # match training phrases with entities.
@@ -86,7 +86,7 @@ def get_response():
     except KeyError:
         default_fulfillment_text = None
 
-    return json.dumps({"fulfillmentText": mongo_controller.webhook_query(
+    return json.dumps({"fulfillmentText": query_handler.webhook_query(
         raw_query_text, intent, entities, default_fulfillment_text)})
 
 

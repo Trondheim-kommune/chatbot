@@ -29,8 +29,6 @@ def perform_search(query_text):
     # Perform simple query expansion on the original query.
     query = expand_query(query_text)
 
-    print(query)
-
     # Retrieve a set of documents using MongoDB. We then attempt to filter these further.
     docs = factory.get_document(query)
 
@@ -53,7 +51,7 @@ def perform_search(query_text):
         return NOT_FOUND
 
 
-class MongoDBControllerWebhook:
+class QuerySystem:
     def webhook_query(self, raw_query_text, intent, entities, default_text):
         '''
         Called when a user asks a question in DialogFLow.
