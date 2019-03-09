@@ -40,7 +40,6 @@ more-itertools==5.0.0
 msgpack==0.5.6
 msgpack-numpy==0.4.3.2
 murmurhash==1.0.2
-nb-dep-ud-sm==0.0.1
 nltk==3.4
 numpy==1.16.1
 parsel==1.5.1
