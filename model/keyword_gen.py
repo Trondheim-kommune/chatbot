@@ -43,7 +43,7 @@ class Tokenizer(object):
         # Tokenize the document.
         tokens = [self.lemmatize(token.text, token.pos_)[0] for token in nb(doc)]
         # Remove stopwords from the tokens.
-        tokens = [token for token in tokens if not token in stop_words]
+        tokens = [token for token in tokens if token not in stop_words]
         # Remove punctuation tokens.
         tokens = [token for token in tokens if token not in string.punctuation]
         # Remove tokens which contain any number.

@@ -14,15 +14,16 @@ nb = spacy.load('nb_dep_ud_sm')
 
 lemmatize = Lemmatizer(LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES)
 
+
 def expand_query(query):
     ''' Attempts to expand the given query by using synonyms from WordNet. As
     a consequnece of this process, the query is also tokenized and lemmatized. '''
 
     tokens = [
       # Store tuples of lemmatized tokens and their corresponding POS tags.
-      (lemmatize(token.text, token.pos_)[0], token.pos_) for token in nb(query) 
+      (lemmatize(token.text, token.pos_)[0], token.pos_) for token in nb(query)
       # Filter away punctuation.
-      if not token.text in string.punctuation
+      if token.text not in string.punctuation
     ]
 
     result = []
@@ -30,9 +31,9 @@ def expand_query(query):
     for token in tokens:
         # Convert POS tags from Spacy to WordNet.
         pos = getattr(wn, token[1], None)
-        
+
         # Find all synsets for the word, using the Norwegian language.
-        synsets = wn.synsets(token[0], lang='nob')
+        synsets = wn.synsets(token[0], lang='nob', pos=pos)
 
         if synsets:
             # Store synonyms in a set, as when there are multiple synsets, we
@@ -51,7 +52,7 @@ def expand_query(query):
             # the original word is already included in the synset, so this
             # avoids adding it to the result list twice.
             continue
-        
+
         result.append(token[0])
 
     return ' '.join(result)

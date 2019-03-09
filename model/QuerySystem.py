@@ -33,7 +33,8 @@ def perform_search(query_text):
     docs = factory.get_document(query)
 
     # Prevent generating an empty corpus if no documents were found.
-    if not docs: return NOT_FOUND
+    if not docs:
+        return NOT_FOUND
 
     # Create a corpus on the results from the MongoDB query.
     corpus = [get_corpus_text(doc) for doc in docs]
