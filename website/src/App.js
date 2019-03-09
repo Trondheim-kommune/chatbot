@@ -14,8 +14,8 @@ class App extends Component {
 
   fetchAllConflictIDs = async () => {
     const conflictDocs = await fetchData(
-      process.env.REACT_APP_SERVER_URL + 'v1/get_all_conflict_ids',
-      {},
+      process.env.REACT_APP_SERVER_URL + 'v1/conflict_ids',
+      "GET"
     );
     this.setState({ conflictDocs });
   };
