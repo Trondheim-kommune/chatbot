@@ -3,13 +3,13 @@ FROM alpine:3.7
 # Path to workspace in container
 WORKDIR /usr/src/app
 
-# Add requirements
-COPY ./requirements.txt .
-
 # Install dependencies
 RUN apk update && \
  apk add python3 libressl-dev musl-dev libffi-dev libxslt-dev libstdc++ && \
  apk add --virtual .build-deps gcc g++ python3-dev bash libstdc++
+
+# Add requirements
+COPY ./requirements.txt .
 
 # Install python packages step
 RUN python3 -m pip install -r requirements.txt --no-cache-dir && \
