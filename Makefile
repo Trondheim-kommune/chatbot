@@ -4,6 +4,6 @@ install:
 setup: install
 
 test: setup
-	export TEST_FLAG=TRUE && pytest
+	TEST_FLAG=TRUE && pytest
 	flake8 --exclude=venv,build,website .
 
