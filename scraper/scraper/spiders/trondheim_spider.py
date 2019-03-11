@@ -42,16 +42,15 @@ class WebScraperSpider(scrapy.Spider):
 
     # The links to start the crawling process on.
     start_urls = [
-        #'https://www.trondheim.kommune.no'
-        'https://www.trondheim.kommune.no/tema/skole/trondheimsskolen/larlinger/',
+        'https://www.trondheim.kommune.no'
     ]
 
     # Paths on the site which are allowed. Only paths which match
     # these will ever be visited.
     allowed_paths = [
-        #re.compile('https://www.trondheim.kommune.no/tema'),
-        #re.compile('https://www.trondheim.kommune.no/aktuelt'),
-        #re.compile('https://www.trondheim.kommune.no/org'),
+        re.compile('https://www.trondheim.kommune.no/tema'),
+        re.compile('https://www.trondheim.kommune.no/aktuelt'),
+        re.compile('https://www.trondheim.kommune.no/org'),
     ]
 
     # Pages in this list will be visited and links on them will
@@ -98,7 +97,7 @@ class WebScraperSpider(scrapy.Spider):
         'tbody': 6,
         # Text elements and lists.
         'strong': 8,
-        'p': 8,
+        'p': 9,
         'a': 10,
     }
 
@@ -304,8 +303,17 @@ class WebScraperSpider(scrapy.Spider):
             
             # Add the anchor's href url when finding an anchor
             if elem_tag == 'a':
+                # Get the url from anchor
                 url = elem.get('href')
-                if url is not None and url is not elem_text:
+                # If the URL is defined and not the same as the elem text
+                if url is not None and url != elem_text:
+                    # If the element and parent has the same information
+                    # Don't create a new element, but add url instead
+                    if elem_text == parent.text:
+                        parent.text += '\n' + elem.get('href')
+                        continue
+
+                    # Add the URL into the end of the elem text
                     elem_text += '\n' + elem.get('href')
 
             # Create the new element.
