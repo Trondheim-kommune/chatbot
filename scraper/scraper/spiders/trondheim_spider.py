@@ -25,7 +25,7 @@ class TreeElement(NodeMixin):
         TreeElement.counter += 1
 
 
-class TrondheimSpider(scrapy.Spider):
+class WebScraperSpider(scrapy.Spider):
     # Name of the spider. This is the name to use from the Scrapy CLI.
     name = 'trondheim'
 
@@ -42,12 +42,18 @@ class TrondheimSpider(scrapy.Spider):
 
     # The links to start the crawling process on.
     start_urls = [
+<<<<<<< Updated upstream
         'https://www.trondheim.kommune.no',
+=======
+        #'https://www.trondheim.kommune.no'
+        'https://www.trondheim.kommune.no/tema/kultur-og-fritid/lokaler/husebybadet/'
+>>>>>>> Stashed changes
     ]
 
     # Paths on the site which are allowed. Only paths which match
     # these will ever be visited.
     allowed_paths = [
+<<<<<<< Updated upstream
         re.compile('https://www.trondheim.kommune.no/tema'),
         re.compile('https://www.trondheim.kommune.no/aktuelt'),
         re.compile('https://www.trondheim.kommune.no/org'),
@@ -74,6 +80,11 @@ class TrondheimSpider(scrapy.Spider):
         re.compile('https://www.trondheim.kommune.no/tema/veg-vann-og-avlop'),
         # These pages are difficult to parse and contain little information.
         re.compile('https://www.trondheim.kommune.no/aktuelt/utvalgt/om-kommunen'),
+=======
+        #'https://www.trondheim.kommune.no/tema',
+        #'https://www.trondheim.kommune.no/aktuelt',
+        #'https://www.trondheim.kommune.no/org'
+>>>>>>> Stashed changes
     ]
 
     # These selectors will be removed from all pages, as they contain very
@@ -86,6 +97,7 @@ class TrondheimSpider(scrapy.Spider):
 
     # Hierarchy for sorting categories.
     hierarchy = {
+<<<<<<< Updated upstream
         # Header elements.
         'h1': 1,
         'h2': 2,
@@ -113,6 +125,31 @@ class TrondheimSpider(scrapy.Spider):
     def extract_metadata(self, root, soup, page_id):
         ''' Extract keywords metadata from the header of the page and add them
         as children of the tree root element. '''
+=======
+        'h1': {'level': 1},
+        'h2': {'level': 2},
+        'h3': {'level': 3},
+        'h4': {'level': 4},
+        'h5': {'level': 5},
+        'h6': {'level': 6},
+        'tbody': {'level': 6},
+        'strong': {'level': 8},
+        'p': {'level': 8},
+        'a': {'level': 10},
+    }
+
+    # Hierarchy for sorting according to html structure
+    html_hierarchy = {
+        'tr': {'level': 1},
+        'td': {'level': 2},
+        'ul': {'level': 1},
+        'li': {'level': 2}
+    }
+
+    def extract_metadata(self, root, soup):
+        """Extract keywords metadata from the header of the page and add them
+        as children of the tree root element."""
+>>>>>>> Stashed changes
 
         # Attempt finding the keywords meta tag on the page.
         keywords = soup.find('meta', attrs={'name': 'keywords'})
@@ -123,8 +160,23 @@ class TrondheimSpider(scrapy.Spider):
             TreeElement('meta', page_id, keywords.attrs['content'], parent=root)
 
     def locate_parent(self, elem_tag, current_parent, root):
+<<<<<<< Updated upstream
         ''' Locate the parent element on which we should insert the next
         node in the tree, based on our hierarchy of tags. '''
+=======
+        """Locate the parent element on which we should insert the next
+        node in the tree, based on our hierarchy of tags."""
+
+        # Data about this elements position in the hierarchy.
+        elem_in_hierarchy = None
+        if elem_tag in self.hierarchy:
+            elem_in_hierarchy = self.hierarchy[elem_tag]
+
+        # Data about this elements position in the html hierarchy
+        elem_in_html_hierarchy = None
+        if elem_tag in self.html_hierarchy:
+            elem_in_html_hierarchy = self.html_hierarchy[elem_tag]
+>>>>>>> Stashed changes
 
         # This elements position in the hierarchy.
         elem_level = self.hierarchy[elem_tag]
@@ -147,7 +199,19 @@ class TrondheimSpider(scrapy.Spider):
                 break
 
             # Whether the search parent is in the hierarchy or not.
+<<<<<<< Updated upstream
             search_parent_level = self.hierarchy[search_parent.tag]
+=======
+            search_parent_in_hierarchy = None
+            if search_parent.tag in self.hierarchy:
+                search_parent_in_hierarchy = self.hierarchy[search_parent.tag]
+
+            # Whether the search parent is in the html hierarchy or not.
+            search_parent_in_html_hierarchy = None
+            if search_parent.tag in self.html_hierarchy:
+                search_parent_in_html_hierarchy = self.html_hierarchy[search_parent.tag]
+            
+>>>>>>> Stashed changes
 
             if search_parent_level:
                 # If both tags are in the hierarchy, check their level.
@@ -157,6 +221,21 @@ class TrondheimSpider(scrapy.Spider):
                         break
 
                     if elem_level == search_parent_level:
+                        # If elements are in same level in hierarchy.
+                        parent = search_parent.parent
+                        break
+                else:
+                    # Element where hierarchy is not defined.
+                    parent = search_parent
+                    break
+            elif search_parent_in_html_hierarchy:
+                # If both tags are in the html hierarchy, check their level
+                if elem_in_html_hierarchy:
+                    if elem_level > search_parent_in_html_hierarchy['level']:
+                        parent = search_parent
+                        break
+
+                    if elem_level == search_parent_in_html_hierarchy['level']:
                         # If elements are in same level in hierarchy.
                         parent = search_parent.parent
                         break
@@ -224,6 +303,7 @@ class TrondheimSpider(scrapy.Spider):
             elem_tag = elem.name
 
             # Do not allow tree nodes with empty text.
+<<<<<<< Updated upstream
             if not elem_text: continue
 
             if self.strong_headers:
@@ -253,6 +333,28 @@ class TrondheimSpider(scrapy.Spider):
                         )
 
                         continue
+=======
+            if not elem_text:
+                continue
+
+            # Handle switching parent between strong and paragraph tag if
+            # strong tag is considered a sub header flag is enabled
+            if self.strong_headers and elem_tag == 'strong' \
+                    and previous_paragraph:
+
+                parent = previous_paragraph.parent
+                if previous_paragraph.parent.tag == 'strong':
+                    parent = previous_paragraph.parent.parent
+                    
+                current_parent = TreeElement(
+                    elem_tag,
+                    elem_text,
+                    parent,
+                    sha1(response.url.encode()).hexdigest(),
+                )
+                previous_paragraph.parent = current_parent
+                continue
+>>>>>>> Stashed changes
 
             # Locate the parent element to use based on the hierarchy.
             parent = self.locate_parent(elem_tag, current_parent, root)
@@ -261,10 +363,20 @@ class TrondheimSpider(scrapy.Spider):
             if elem_tag in self.concatenation_tags and parent.children:
                 last_child = parent.children[-1]
 
+<<<<<<< Updated upstream
                 # Start a new paragraph if the last child already has children.
                 if last_child and last_child.tag == elem_tag and not last_child.children:
                     last_child.text += '\n\n' + elem_text
                     continue
+=======
+                # Update the previous paragraph.
+                previous_paragraph = current_parent
+            
+            # Add the anchor's href url when finding an anchor
+            if elem_tag == 'a':
+                if elem.get('href') is not None:
+                    elem_text += '\n' + elem.get('href')
+>>>>>>> Stashed changes
 
             # Create the new element.
             current_parent = TreeElement(

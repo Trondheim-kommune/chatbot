@@ -29,7 +29,7 @@ def test_scraper_snapshot():
     Compares sorted Json generated from HTML mockup file and snapshot mockup.
     """
     # Instansiate the spider
-    spider = ts.TrondheimSpider()
+    spider = ts.WebScraperSpider()
 
     # The testing html uses strong tags as headers and concatenation p tags
     spider.strong_headers = "true"
