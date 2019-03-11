@@ -6,6 +6,7 @@ from model.query_expansion import expand_query
 
 
 NOT_FOUND = 'Jeg fant ikke informasjonen du spurte etter.'
+MULTIPLE_ANSWERS = 'Jeg har flere mulige svar til deg.'
 
 
 def get_corpus_text(doc):
@@ -44,14 +45,31 @@ def perform_search(query_text):
 
     try:
         # Compare the search query with all documents in our new model using cosine similarity.
-        scores = cosine_similarity(vectorizer.transform([query_text]), corpus_matrix)[0]
+        scores = cosine_similarity(vectorizer.transform([query_text]), corpus_matrix)[0].tolist()
 
-        # Approximately the mean of all possible cosine similarities
-        # minus one fourth of a standard deviation.
-        if max(scores) < 0.25:
+        sorted_scores = sorted(scores, reverse=True)
+
+        # This could be calculated using the mean of all scores and the standard deviation.
+        if sorted_scores[0] < 0.1:
             return NOT_FOUND
 
-        return get_answer_text(docs[scores.tolist().index(max(scores))])
+        # Allow returning multiple answers if they rank very similarly.
+        answers = []
+
+        for score in sorted_scores:
+            # Tolerance for similarity between scores.
+            if sorted_scores[0] - score > 0.05:
+                break
+
+            # Add this result to the list of answers.
+            answers.append(get_answer_text(docs[scores.index(score)]))
+
+        if len(answers) == 1:
+            # Return the answer straight away if there is only 1 result/
+            return answers[0]
+
+        # Join the results with a separator.
+        return '\n\n---\n\n'.join([MULTIPLE_ANSWERS] + answers)
     except KeyError:
         raise Exception('Document does not have content and texts.')
     except ValueError:
