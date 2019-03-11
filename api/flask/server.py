@@ -5,8 +5,12 @@ import os
 from api.flask.flask_exceptions import InvalidDialogFlowID
 import google.api_core.exceptions as google_exceptions
 from model.MongoDBControllerWebhook import MongoDBControllerWebhook
+import model.db_util as util
+from model.ModelFactory import ModelFactory
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 mongo_controller = MongoDBControllerWebhook()
 
@@ -17,6 +21,13 @@ entities = {}
 entities_loaded = False
 
 PROJECT_ID = os.getenv("PROJECT_ID")
+
+factory = ModelFactory.get_instance()
+
+if os.getenv("TEST_FLAG"):
+    util.set_db(factory, db="test_db")
+else:
+    util.set_db(factory, db="dev_db")
 
 
 # Register handle for flask_exceptions error messages.
@@ -113,8 +124,7 @@ def create_intent_object(intent_name, training_phrases, match_entity=True):
                      "alias": entity_type})
 
                 parameters.append({"display_name": entity_type,
-                                   "entity_type_display_name": "@" +
-                                   entity_type,
+                                   "entity_type_display_name": "@" + entity_type,
                                    "value": "$" + entity_type})
 
             except KeyError:
@@ -127,7 +137,7 @@ def create_intent_object(intent_name, training_phrases, match_entity=True):
     return intent
 
 
-@app.route("/v1/create_intent", methods=["POST"])
+@app.route("/v1/intent", methods=["PUT"])
 def create_intent_post():
     json_input_data = json.loads(request.data)
     try:
@@ -183,7 +193,7 @@ def get_entities():
     entities_loaded = True
 
 
-@app.route("/v1/batch_create_intents", methods=["POST"])
+@app.route("/v1/intents", methods=["PUT"])
 def batch_create_intents_post():
     json_input_data = json.loads(request.data)
     intents = json_input_data["data"]
@@ -232,7 +242,7 @@ def get_all_intents():
     return client.list_intents(parent)
 
 
-@app.route("/v1/batch_create_entities", methods=["POST", "GET"])
+@app.route("/v1/entities", methods=["PUT"])
 def batch_create_entities_post():
     json_input_data = json.loads(request.data)
     entity_types = json_input_data["data"]
@@ -272,7 +282,7 @@ def batch_create_entities(entity_types):
     return ID_list
 
 
-@app.route("/v1/batch_delete_entities", methods=["POST"])
+@app.route("/v1/entities", methods=["DELETE"])
 def batch_delete_entities_post():
     json_input_data = json.loads(request.data)
     entity_ids = json_input_data["data"]
@@ -304,6 +314,78 @@ def batch_delete_entities(entity_ids):
         entity_ids_fixed_path.append(parent + "/entityTypes/" + entity_id)
 
     return client.batch_delete_entity_types(parent, entity_ids_fixed_path)
+
+
+@app.route("/v1/conflict_ids", methods=["GET"])
+def get_all_conflict_ids():
+    """
+    :return: a list of {"title" "...", "id": "..."}
+    """
+    conflict_ids_docs = factory.get_collection("conflict_ids").find()
+    conflict_ids = []
+    for conflict_id_doc in conflict_ids_docs:
+        conflict_ids.append({"id": conflict_id_doc["conflict_id"],
+                             "title": conflict_id_doc["title"]})
+    return json.dumps(conflict_ids)
+
+
+@app.route("/v1/content/", methods=["GET"])
+def get_content():
+    """
+    :return: the content of the prod document and manual document (if we have it)
+    """
+    id = request.args.get('id')
+
+    document_prod = next(factory.get_collection("prod").find({"id": id}), None)
+    output = {"prod": document_prod["content"]}
+    document_manual = next(factory.get_collection("manual").find({"id": id}), None)
+
+    if document_manual:
+        output["manual"] = document_manual["content"]
+
+    # Add the url
+    output["url"] = document_prod["url"]
+    return json.dumps(output)
+
+
+@app.route("/v1/content/", methods=["POST"])
+def update_content():
+    """
+    Updates the manual collection with new content.
+    """
+    json_input_data = json.loads(request.data)
+    id = json_input_data["data"]["id"]
+    content = json_input_data["data"]["content"]
+    status = factory.get_database().get_collection("manual").update({"id": id}, {"$set": {
+        "content": content}})
+    if status["updatedExisting"] is False:
+        # If the document wasn't already in the manual db then we need to copy the automatic one
+        # first.
+        document = next(factory.get_collection("prod").find({"id": id}), None)
+        document["content"] = content
+        factory.get_database().get_collection("manual").insert_one(document)
+
+    # set manually_changed to true.
+    factory.get_database().get_collection("prod").update({"id": id}, {"$set": {
+        "manually_changed": True}})
+
+    # delete this document from the conflict ids collection
+    factory.get_database().get_collection("conflict_ids").delete_one({"conflict_id": id})
+    return create_success_response("Success")
+
+
+@app.route("/v1/docs/", methods=["GET"])
+def get_docs_from_url():
+    """
+    :return: Every document for a single url with id and title.
+    """
+    url = request.args.get('url')
+    docs = factory.get_collection("prod").find({"url": url})
+
+    out = []
+    for doc in docs:
+        out.append({"id": doc["id"], "title": doc["content"]["title"]})
+    return json.dumps(out)
 
 
 get_entities()

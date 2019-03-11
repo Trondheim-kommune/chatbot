@@ -107,17 +107,17 @@ def test_add_and_remove_entities(app):
         ]
     }
 
-    response = app.test_client().post('/v1/batch_create_entities',
-                                      data=json.dumps(input_dict))
+    response = app.test_client().put('/v1/entities',
+                                     data=json.dumps(input_dict))
     assert response.status_code == 200
     response_json = json.loads(response.data.decode())
     # Make sure you got 2 IDs back.
     assert 2 == len(response_json["data"])
 
     # Now we want to delete the 2 new entities.
-    response_2 = app.test_client().post('/v1/batch_delete_entities',
-                                        data=json.dumps(
-                                            {"data": response_json["data"]}))
+    response_2 = app.test_client().delete('/v1/entities',
+                                          data=json.dumps(
+                                              {"data": response_json["data"]}))
     assert response_2.status_code == 200
 
 
@@ -141,8 +141,8 @@ def test_add_intents_same_name_throws_exception(app):
             }
         ]
     }
-    response = app.test_client().post('/v1/batch_create_intents',
-                                      data=json.dumps(input_dict))
+    response = app.test_client().put('/v1/intents',
+                                     data=json.dumps(input_dict))
     assert response.status_code == 400
     response_json = json.loads(response.data.decode())
     assert "400 Intent with the display_name '1' already exists." in \
@@ -173,10 +173,56 @@ def test_add_intents(app):
             }
         ]
     }
-    response = app.test_client().post('/v1/batch_create_intents',
-                                      data=json.dumps(input_dict))
+    response = app.test_client().put('/v1/intents',
+                                     data=json.dumps(input_dict))
     assert response.status_code == 200
 
     response_json = json.loads(response.data.decode())
     assert "OK" == response_json["status"]
     assert "Batch created 2 intents." == response_json["message"]
+
+
+def test_get_all_conflicts(app):
+    response = app.test_client().get('/v1/conflict_ids')
+    response_json = json.loads(response.data.decode())
+    assert response_json[0]["id"] == "295cc564fe771fbb92b3278a6eee2d5cbcae2606-3"
+    assert response_json[0]["title"] == " Velkommen til Trondheim kommune"
+
+
+def test_get_content(app):
+    response = app.test_client().get('/v1/content/?id=295cc564fe771fbb92b3278a6eee2d5cbcae2606-3')
+    response_json = json.loads(response.data.decode())
+    assert response_json["url"] == "https://www.trondheim.kommune.no"
+    assert type(response_json["manual"]) is dict
+    assert type(response_json["prod"]) is dict
+
+
+def test_update_content(app):
+    input_dict = {
+        "data": {
+            "id": "295cc564fe771fbb92b3278a6eee2d5cbcae2606-3",
+            "content": {
+                "title": " Velkommen til Trondheim kommune",
+                "keywords": [
+                    {
+                        "keyword": "change_from_test",
+                        "confidence": 0.2010
+                    }
+                ],
+                "texts": [
+                    "El manual changos",
+                    "New answer"
+                ]
+            }
+        }
+    }
+    response = app.test_client().post('/v1/content/',
+                                      data=json.dumps(input_dict))
+    assert response.status_code == 200
+
+
+def test_get_docs_from_url(app):
+    response = app.test_client().get('/v1/docs/?url=https://www.trondheim.kommune.no')
+    response_json = json.loads(response.data.decode())
+    assert response_json[0]["id"] == "295cc564fe771fbb92b3278a6eee2d5cbcae2606-3"
+    assert response_json[0]["title"] == " Velkommen til Trondheim kommune"
