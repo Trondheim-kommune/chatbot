@@ -45,6 +45,12 @@ def perform_search(query_text):
     try:
         # Compare the search query with all documents in our new model using cosine similarity.
         scores = cosine_similarity(vectorizer.transform([query_text]), corpus_matrix)[0]
+
+        # Approximately the mean of all possible cosine similarities
+        # minus one fourth of a standard deviation.
+        if max(scores) < 0.25:
+            return NOT_FOUND
+
         return get_answer_text(docs[scores.tolist().index(max(scores))])
     except KeyError:
         raise Exception('Document does not have content and texts.')
