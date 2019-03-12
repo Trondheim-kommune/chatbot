@@ -69,7 +69,7 @@ def perform_search(query_text):
             return answers[0]
 
         # Join the results with a separator.
-        return '\n\n---\n\n'.join([MULTIPLE_ANSWERS] + answers)
+        return '\n\n---\n\n'.join([MULTIPLE_ANSWERS] + answers[0:3])
     except KeyError:
         raise Exception('Document does not have content and texts.')
     except ValueError:
