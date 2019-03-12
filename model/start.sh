@@ -1,8 +1,8 @@
 #!/bin/bash
 
-if ! [ -f "scraper/trondheim.json" ]; then
+if ! [ -f "scraper/scraped.json" ]; then
 	cd scraper
-	scrapy crawl trondheim -o trondheim.json
+	scrapy crawl info_gathering -o scraped.json
 	cd ..
 fi
-python model/start.py scraper/trondheim.json
+python model/start.py scraper/scraped.json

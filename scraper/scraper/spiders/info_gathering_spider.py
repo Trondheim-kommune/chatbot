@@ -25,9 +25,9 @@ class TreeElement(NodeMixin):
         TreeElement.counter += 1
 
 
-class WebScraperSpider(scrapy.Spider):
+class InfoGatheringSpider(scrapy.Spider):
     # Name of the spider. This is the name to use from the Scrapy CLI.
-    name = 'trondheim'
+    name = 'info_gathering'
 
     # The following few lines contain command line flags.
     # All flags default to false, so do not explicitly set them as so.
@@ -93,20 +93,22 @@ class WebScraperSpider(scrapy.Spider):
         'h4': 4,
         'h5': 5,
         'h6': 6,
+
         # Table elements.
         'tbody': 6,
+
         # Text elements and lists.
         'strong': 8,
         'p': 9,
         'a': 10,
     }
 
-    # Hierarchy for sorting according to html structure
+    # Hierarchy for sorting according to HTML structure.
     html_hierarchy = {
         'tr': 1,
         'td': 2,
         'ul': 1,
-        'li': 2
+        'li': 2,
     }
 
     # If a tag is listed here, sequences of tabs belonging to one of these types
@@ -127,8 +129,8 @@ class WebScraperSpider(scrapy.Spider):
             TreeElement('meta', page_id, keywords.attrs['content'], parent=root)
 
     def locate_parent(self, elem_tag, current_parent, root):
-        """Locate the parent element on which we should insert the next
-        node in the tree, based on our hierarchy of tags."""
+        ''' Locate the parent element on which we should insert the next
+        node in the tree, based on our hierarchy of tags. '''
 
         # Data about this elements position in the hierarchy.
         elem_level = None
@@ -183,7 +185,7 @@ class WebScraperSpider(scrapy.Spider):
                     parent = search_parent
                     break
             elif search_parent_html_level:
-                # If both tags are in the html hierarchy, check their level
+                # If both tags are in the hierarchy, check their level.
                 if elem_html_level:
                     if elem_level > search_parent_html_level['level']:
                         parent = search_parent
@@ -298,6 +300,7 @@ class WebScraperSpider(scrapy.Spider):
                 if last_child and last_child.tag == elem_tag and not last_child.children:
                     last_child.text += '\n\n' + elem_text
                     continue
+
                 # Update the previous paragraph.
                 previous_paragraph = current_parent
             
@@ -305,6 +308,7 @@ class WebScraperSpider(scrapy.Spider):
             if elem_tag == 'a':
                 # Get the url from anchor
                 url = elem.get('href')
+
                 # If the URL is defined and not the same as the elem text
                 if url is not None and url != elem_text:
                     # If the element and parent has the same information
