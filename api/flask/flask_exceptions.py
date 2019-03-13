@@ -1,7 +1,7 @@
 class InvalidDialogFlowID(Exception):
     """
-    This exception is thrown when you try to create entities/ intents that
-    already exists, or when you try to delete something that does not exist.
+    This exception is thrown when you try to create entities/intents which
+    already exist, or when you try to delete something that does not exist.
     """
     status_code = 400
 

@@ -1,14 +1,22 @@
+# Python build files
 venv/
-.idea/
 __pycache__/
 *.pyc
 .pytest_cache
 backupagent.json
 *scraped.json
+*.egg-info/
 build/
 dist/
+
+# Editor-related files
+.idea/
+.vscode/
+
+# Miscellaneous
+backupagent.json
+*trondheim.json
 Agent25-google.json
-agent25_project.egg-info/
 .coverage
 .envrc
-.vscode/
+
