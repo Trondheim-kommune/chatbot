@@ -79,11 +79,11 @@ class InfoGatheringSpider(scrapy.Spider):
     # These selectors will be removed from all pages, as they contain very
     # little actual information, and are equal on all pages.
     garbage_elements = ['.footer', '.header', 'body > .container',
-                        '.skip-link', '.navigation', '.nav']
+                        '.skip-link', '.navigation', '.nav', '#ssp_fantdu']
 
     # Elements containing text equal to one of these sentences will be
     # removed from all pages.
-    garbage_text = ['Fant du det du lette etter?']
+    garbage_text = ['Sist oppdatert:']
 
     # The text used for the title on 404 pages. Used to detect silent 404 error.
     not_found_text = 'Finner ikke siden'
