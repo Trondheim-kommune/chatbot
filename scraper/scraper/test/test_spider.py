@@ -1,7 +1,7 @@
 from scrapy.http import Request, HtmlResponse
 import os
 import json
-from scraper.scraper.spiders import trondheim_spider as ts
+from scraper.scraper.spiders import info_gathering_spider as igs
 
 HB = 'https://www.trondheim.kommune.no/tema/kultur-og-fritid/lokaler/husebybadet/'
 
@@ -29,7 +29,7 @@ def test_scraper_snapshot():
     Compares sorted Json generated from HTML mockup file and snapshot mockup.
     """
     # Instansiate the spider
-    spider = ts.WebScraperSpider()
+    spider = igs.InfoGatheringSpider()
 
     # The testing html uses strong tags as headers and concatenation p tags
     spider.strong_headers = "true"

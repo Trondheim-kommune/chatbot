@@ -42,17 +42,15 @@ class InfoGatheringSpider(scrapy.Spider):
 
     # The links to start the crawling process on.
     start_urls = [
-        #'https://www.trondheim.kommune.no'
-        'https://www.trondheim.kommune.no/boxopner/'
+        'https://www.trondheim.kommune.no'
     ]
 
     # Paths on the site which are allowed. Only paths which match
     # these will ever be visited.
     allowed_paths = [
-        #re.compile('https://www.trondheim.kommune.no/tema'),
-        #re.compile('https://www.trondheim.kommune.no/aktuelt'),
-        #re.compile('https://www.trondheim.kommune.no/org'),
-        'https://www.trondheim.kommune.no/boxopner/'
+        re.compile('https://www.trondheim.kommune.no/tema'),
+        re.compile('https://www.trondheim.kommune.no/aktuelt'),
+        re.compile('https://www.trondheim.kommune.no/org'),
     ]
 
     # Pages in this list will be visited and links on them will
