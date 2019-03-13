@@ -42,15 +42,17 @@ class InfoGatheringSpider(scrapy.Spider):
 
     # The links to start the crawling process on.
     start_urls = [
-        'https://www.trondheim.kommune.no'
+        #'https://www.trondheim.kommune.no'
+        'https://www.trondheim.kommune.no/boxopner/'
     ]
 
     # Paths on the site which are allowed. Only paths which match
     # these will ever be visited.
     allowed_paths = [
-        re.compile('https://www.trondheim.kommune.no/tema'),
-        re.compile('https://www.trondheim.kommune.no/aktuelt'),
-        re.compile('https://www.trondheim.kommune.no/org'),
+        #re.compile('https://www.trondheim.kommune.no/tema'),
+        #re.compile('https://www.trondheim.kommune.no/aktuelt'),
+        #re.compile('https://www.trondheim.kommune.no/org'),
+        'https://www.trondheim.kommune.no/boxopner/'
     ]
 
     # Pages in this list will be visited and links on them will
@@ -80,6 +82,10 @@ class InfoGatheringSpider(scrapy.Spider):
     # little actual information, and are equal on all pages.
     garbage_elements = ['.footer', '.header', 'body > .container',
                         '.skip-link', '.navigation', '.nav']
+
+    # Elements containing text equal to one of these sentences will be 
+    # removed from all pages. 
+    garbage_text = ['Fant du det du lette etter?']
 
     # The text used for the title on 404 pages. Used to detect silent 404 error.
     not_found_text = 'Finner ikke siden'
@@ -261,6 +267,11 @@ class InfoGatheringSpider(scrapy.Spider):
             # Do not allow tree nodes with empty text.
             if not elem_text: continue
 
+            # Do not include elements with element text containing
+            # blacklisted sentences
+            if elem_text in self.garbage_text:
+                continue
+
             if self.strong_headers:
                 # If a paragraph contains a strong tag, and the correct lag is set, we
                 # treat that combination as a header. This check avoids adding the strong
@@ -319,15 +330,14 @@ class InfoGatheringSpider(scrapy.Spider):
 
                     # Add the URL into the end of the elem text
                     elem_text += '\n' + elem.get('href')
-
-            # Create the new element.
-            current_parent = TreeElement(
-                elem_tag,
-                page_id,
-                elem_text,
-                parent,
-            )
-
+            else:
+                # Create the new element.
+                current_parent = TreeElement(
+                    elem_tag,
+                    page_id,
+                    elem_text,
+                    parent,
+                )
         return root
 
     def pretty_print_tree(self, root):
