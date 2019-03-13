@@ -25,9 +25,9 @@ class TreeElement(NodeMixin):
         TreeElement.counter += 1
 
 
-class TrondheimSpider(scrapy.Spider):
+class InfoGatheringSpider(scrapy.Spider):
     # Name of the spider. This is the name to use from the Scrapy CLI.
-    name = 'trondheim'
+    name = 'info_gathering'
 
     # The following few lines contain command line flags.
     # All flags default to false, so do not explicitly set them as so.
@@ -42,7 +42,7 @@ class TrondheimSpider(scrapy.Spider):
 
     # The links to start the crawling process on.
     start_urls = [
-        'https://www.trondheim.kommune.no',
+        'https://www.trondheim.kommune.no'
     ]
 
     # Paths on the site which are allowed. Only paths which match
@@ -81,6 +81,10 @@ class TrondheimSpider(scrapy.Spider):
     garbage_elements = ['.footer', '.header', 'body > .container',
                         '.skip-link', '.navigation', '.nav']
 
+    # Elements containing text equal to one of these sentences will be
+    # removed from all pages.
+    garbage_text = ['Fant du det du lette etter?']
+
     # The text used for the title on 404 pages. Used to detect silent 404 error.
     not_found_text = 'Finner ikke siden'
 
@@ -93,16 +97,22 @@ class TrondheimSpider(scrapy.Spider):
         'h4': 4,
         'h5': 5,
         'h6': 6,
+
         # Table elements.
         'tbody': 6,
-        'tr': 7,
-        'th': 8,
+
         # Text elements and lists.
         'strong': 8,
-        'p': 8,
-        'ul': 8,
-        'li': 9,
+        'p': 9,
         'a': 10,
+    }
+
+    # Hierarchy for sorting according to HTML structure.
+    html_hierarchy = {
+        'tr': 1,
+        'td': 2,
+        'ul': 1,
+        'li': 2,
     }
 
     # If a tag is listed here, sequences of tabs belonging to one of these types
@@ -126,8 +136,15 @@ class TrondheimSpider(scrapy.Spider):
         ''' Locate the parent element on which we should insert the next
         node in the tree, based on our hierarchy of tags. '''
 
-        # This elements position in the hierarchy.
-        elem_level = self.hierarchy[elem_tag]
+        # Data about this elements position in the hierarchy.
+        elem_level = None
+        if elem_tag in self.hierarchy:
+            elem_level = self.hierarchy[elem_tag]
+
+        # Data about this elements position in the html hierarchy
+        elem_html_level = None
+        if elem_tag in self.html_hierarchy:
+            elem_html_level = self.html_hierarchy[elem_tag]
 
         # The parent which will be used for the next node in the tree.
         parent = None
@@ -147,7 +164,14 @@ class TrondheimSpider(scrapy.Spider):
                 break
 
             # Whether the search parent is in the hierarchy or not.
-            search_parent_level = self.hierarchy[search_parent.tag]
+            search_parent_level = None
+            if search_parent.tag in self.hierarchy:
+                search_parent_level = self.hierarchy[search_parent.tag]
+
+            # Whether the search parent is in the html hierarchy or not.
+            search_parent_html_level = None
+            if search_parent.tag in self.html_hierarchy:
+                search_parent_html_level = self.html_hierarchy[search_parent.tag]
 
             if search_parent_level:
                 # If both tags are in the hierarchy, check their level.
@@ -157,6 +181,21 @@ class TrondheimSpider(scrapy.Spider):
                         break
 
                     if elem_level == search_parent_level:
+                        # If elements are in same level in hierarchy.
+                        parent = search_parent.parent
+                        break
+                else:
+                    # Element where hierarchy is not defined.
+                    parent = search_parent
+                    break
+            elif search_parent_html_level:
+                # If both tags are in the hierarchy, check their level.
+                if elem_html_level:
+                    if elem_level > search_parent_html_level['level']:
+                        parent = search_parent
+                        break
+
+                    if elem_level == search_parent_html_level['level']:
                         # If elements are in same level in hierarchy.
                         parent = search_parent.parent
                         break
@@ -225,6 +264,11 @@ class TrondheimSpider(scrapy.Spider):
             if not elem_text:
                 continue
 
+            # Do not include elements with element text containing
+            # blacklisted sentences
+            if elem_text in self.garbage_text:
+                continue
+
             if self.strong_headers:
                 # If a paragraph contains a strong tag, and the correct lag is set, we
                 # treat that combination as a header. This check avoids adding the strong
@@ -265,14 +309,29 @@ class TrondheimSpider(scrapy.Spider):
                     last_child.text += '\n\n' + elem_text
                     continue
 
-            # Create the new element.
-            current_parent = TreeElement(
-                elem_tag,
-                page_id,
-                elem_text,
-                parent,
-            )
+            # Add the anchor's href url when finding an anchor
+            if elem_tag == 'a':
+                # Get the url from anchor
+                url = elem.get('href')
 
+                # If the URL is defined and not the same as the elem text
+                if url is not None and url != elem_text:
+                    # If the element and parent has the same information
+                    # Don't create a new element, but add url instead
+                    if elem_text == parent.text:
+                        parent.text += '\n' + elem.get('href')
+                        continue
+
+                    # Add the URL into the end of the elem text
+                    elem_text += '\n' + elem.get('href')
+            else:
+                # Create the new element.
+                current_parent = TreeElement(
+                    elem_tag,
+                    page_id,
+                    elem_text,
+                    parent,
+                )
         return root
 
     def pretty_print_tree(self, root):
