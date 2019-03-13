@@ -32,7 +32,7 @@ class InfoGatheringSpider(scrapy.Spider):
     # The following few lines contain command line flags.
     # All flags default to false, so do not explicitly set them as so.
     # See the GitHub Wiki for information about how these are used.
-    
+
     # Enable to display additional debugging information to output when the crawler is run.
     # In practice, this will pretty print the exported tree when a page is scraped.
     debug = None
@@ -237,7 +237,8 @@ class InfoGatheringSpider(scrapy.Spider):
         title = soup.find('title').text
 
         # Do not continue with this page if we detect it as a silent 404.
-        if self.not_found_text in title: return
+        if self.not_found_text in title:
+            return
 
         # Use the title as the tree root.
         root = TreeElement('title', page_id, soup.find('title').text)
@@ -248,13 +249,10 @@ class InfoGatheringSpider(scrapy.Spider):
         # Current position in the hierarchy.
         current_parent = root
 
-        # Keep track of paragraph tag to be able to switch
-        # position with strong tags.
-        previous_paragraph = None
-
         for elem in elements:
             # Replace BR tags with newlines.
-            for br in elem.find_all('br'): br.replace_with('\n')
+            for br in elem.find_all('br'):
+                br.replace_with('\n')
 
             # Remove trailing and tailing spaces from the node contents.
             elem_text = elem.text.strip()
@@ -263,7 +261,8 @@ class InfoGatheringSpider(scrapy.Spider):
             elem_tag = elem.name
 
             # Do not allow tree nodes with empty text.
-            if not elem_text: continue
+            if not elem_text:
+                continue
 
             # Do not include elements with element text containing
             # blacklisted sentences
@@ -362,7 +361,8 @@ class InfoGatheringSpider(scrapy.Spider):
                 # detect that the page is a 404 page. In that case, skip the page.
                 if root:
                     # Pretty print the node tree if the DEBUG flag is set.
-                    if self.debug: self.pretty_print_tree(root)
+                    if self.debug:
+                        self.pretty_print_tree(root)
 
                     # Export the tree using the DictExporter. Scrapy will then convert
                     # this dictionary to a JSON structure for us, automatically.
