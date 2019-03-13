@@ -265,9 +265,9 @@ class InfoGatheringSpider(scrapy.Spider):
                 continue
 
             # Do not include elements with element text containing
-            # blacklisted sentences
-            if elem_text in self.garbage_text:
-                continue
+            # blacklisted sentences.
+            if any(sentence in elem_text for sentence in self.garbage_text):
+                break
 
             if self.strong_headers:
                 # If a paragraph contains a strong tag, and the correct lag is set, we
