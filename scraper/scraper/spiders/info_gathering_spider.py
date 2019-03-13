@@ -81,8 +81,8 @@ class InfoGatheringSpider(scrapy.Spider):
     garbage_elements = ['.footer', '.header', 'body > .container',
                         '.skip-link', '.navigation', '.nav']
 
-    # Elements containing text equal to one of these sentences will be 
-    # removed from all pages. 
+    # Elements containing text equal to one of these sentences will be
+    # removed from all pages.
     garbage_text = ['Fant du det du lette etter?']
 
     # The text used for the title on 404 pages. Used to detect silent 404 error.
@@ -172,7 +172,7 @@ class InfoGatheringSpider(scrapy.Spider):
             search_parent_html_level = None
             if search_parent.tag in self.html_hierarchy:
                 search_parent_html_level = self.html_hierarchy[search_parent.tag]
-            
+
             if search_parent_level:
                 # If both tags are in the hierarchy, check their level.
                 if elem_level:
@@ -309,9 +309,6 @@ class InfoGatheringSpider(scrapy.Spider):
                     last_child.text += '\n\n' + elem_text
                     continue
 
-                # Update the previous paragraph.
-                previous_paragraph = current_parent
-            
             # Add the anchor's href url when finding an anchor
             if elem_tag == 'a':
                 # Get the url from anchor
