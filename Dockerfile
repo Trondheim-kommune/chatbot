@@ -1,19 +1,18 @@
-FROM alpine:3.7
+FROM python:3
 
 # Path to workspace in container
 WORKDIR /usr/src/app
 
 # Install dependencies
-RUN apk update && \
- apk add python3 libressl-dev musl-dev libffi-dev libxslt-dev libstdc++ && \
- apk add --virtual .build-deps gcc g++ python3-dev bash libstdc++
+RUN apt-get update
+RUN apt-get install libssl-dev musl-dev libffi-dev libxslt-dev libstdc++ -y
+RUN apt-get install gcc g++ bash libstdc++ -y
 
 # Add requirements
 COPY ./requirements.txt .
 
 # Install python packages step
-RUN python3 -m pip install -r requirements.txt --no-cache-dir && \
- apk --purge del .build-deps
+RUN python3 -m pip install -r requirements.txt --no-cache-dir
 
 # Copy all code
 COPY . .
@@ -22,7 +21,9 @@ COPY . .
 EXPOSE 8080
 
 # Install extra package
-RUN ["pip3", "install", "."]
+RUN ["pip3", "install", "-e", "."]
+
+RUN ["python3", "setup.py", "develop"]
 
 # Start server
-cmd ["./start_server_docker.sh"]
+cmd ["./api/flask/start_server.sh"]

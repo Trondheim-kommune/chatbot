@@ -1,0 +1,12 @@
+.git
+venv/
+build/
+coverage/
+dist/
+.pytest_cache
+.vscode
+pytest.ini
+README
+.travis.yml
+.coverage
+.coveragerc
