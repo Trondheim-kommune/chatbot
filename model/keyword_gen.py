@@ -42,6 +42,8 @@ class Tokenizer(object):
         ''' Tokenize a given document. '''
         # Tokenize the document.
         tokens = [self.lemmatize(token.text, token.pos_)[0] for token in nb(doc)]
+        # Remove stopwords from the tokens.
+        tokens = [token for token in tokens if token not in stop_words]
         # Remove punctuation tokens.
         tokens = [token for token in tokens if token not in string.punctuation]
         # Remove tokens which contain any number.
@@ -55,7 +57,7 @@ def get_tfidf_model(corpus):
     using cosine similarity as well as keyword generation. '''
     # Create a vectorizer which will turn documents into vectors.
     # We use a custom list of stopwords and a custom tokenizer.
-    vectorizer = TfidfVectorizer(stop_words=stop_words, tokenizer=Tokenizer())
+    vectorizer = TfidfVectorizer(tokenizer=Tokenizer())
     # Create a simple index on the corpus.
     corpus_matrix = vectorizer.fit_transform(corpus)
     # Retrieve the names of the features. Need this to find which
