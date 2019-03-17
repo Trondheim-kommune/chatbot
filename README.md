@@ -27,13 +27,29 @@ the container.
 
 To build
 ```bash
-docker build .
+docker build -t agent25:<version number> .
+```
+
+To find container id
+```bash
+docker image ls
 ```
 
 To run, exposing port 8080
 ```bash
 docker run -e PROJECT_ID=$PROJECT_ID -e GOOGLE_APPLICATION_CREDENTIALS="/usr/src/app/backupagent.json" -e DB_USER=$DB_USER -e DB_PWD=$DB_PWD -d -p 8080:8080 <container_id>
 ```
+
+To stop, first find the id of the running container
+```bash
+docker ps 
+```
+
+Then stop the running container using
+```bash
+docker stop <container_id>
+```
+
 
 ## Building the website
 Run
