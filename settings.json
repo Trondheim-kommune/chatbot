@@ -5,19 +5,42 @@
         "db": "dev_db",
         "testing_db": "test_db"
     },
-    "flask": {
-        "url": "agent25.tinusf.com",
-        "port": 8080
-    },
-    "server_url": "",
-    
-    "website": {
-        "url": "https://agent25.tinusf.com/"
-    },
     "model": {
-        "accepted_tags": ["p", "a", "li"]
+        "accepted_tags": ["p", "a", "li", "strong"]
     },
     "scraper": {
+        "name": "info_gathering",
+        "debug": false,
+        "strong_headers": false,
+        "concatenation_tags": [],
         
+        "url": {
+            "root_url": "https://www.trondheim.kommune.no",
+            "allowed_paths": [],
+            "scrape_blacklist": []            
+        },
+
+        "blacklist": {
+            "elements": [],
+            "visit": [],
+            "texts": [],
+            "start_url": [],
+            "end_url": [],
+            "404_text": "Finner ikke siden"
+        },
+        "hierarchy": {
+            "h1": 1,
+            "h2": 2,
+            "h3": 3,
+            "h4": 4,
+            "h5": 5,
+            "h6": 6,
+            "strong": 8,
+            "p": 9,
+            "a": 10,
+            "ul": 9,
+            "ol": 9,
+            "li": 10
+        }
     }
 }

@@ -6,6 +6,7 @@ from anytree import RenderTree, NodeMixin
 from anytree.exporter import DictExporter
 from hashlib import sha1
 import re
+from util.config_util import Config
 
 
 class TreeElement(NodeMixin):
@@ -27,7 +28,7 @@ class TreeElement(NodeMixin):
 
 class InfoGatheringSpider(scrapy.Spider):
     # Name of the spider. This is the name to use from the Scrapy CLI.
-    name = 'info_gathering'
+    name = Config.get_value(["scraper", "name"])
 
     # The following few lines contain command line flags.
     # All flags default to false, so do not explicitly set them as so.
