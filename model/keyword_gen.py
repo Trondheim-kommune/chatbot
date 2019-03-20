@@ -67,7 +67,7 @@ def get_tfidf_model(corpus):
     return vectorizer, corpus_matrix, feature_names
 
 
-def get_keywords(vectorizer, feature_names, document, n=10):
+def get_keywords(vectorizer, feature_names, document):
     ''' Returns the top keywords and their scores for a given document. '''
     tfidf_vector = vectorizer.transform([document])
     sorted_items = sort_coo(tfidf_vector.tocoo())
