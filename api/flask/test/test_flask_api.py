@@ -3,13 +3,14 @@ import json
 import time
 
 from api.flask import server
+from api.flask import dialogflow_api
 
 
 # Just see if we can create an intent object that is correct.
 def test_create_intent_object():
     # match_entitity = False because entities might change in future and I
     # don't want this test to break in the future.
-    intent = server.create_intent_object(
+    intent = dialogflow_api.create_intent_object(
         "Husbybadet", [
             "Når åpner husbybadet?", "husbybadet åpningstid"],
         match_entity=False)
@@ -63,11 +64,12 @@ def test_get_homepage(app):
 
 
 def test_add_and_remove_entities(app):
+    epoch_time = str(int(time.time()))
     input_dict = {
         "type": "batch_create_entities",
         "data": [
             {
-                "entity_type_name": "automatic_test00",
+                "entity_type_name": "automatic_test" + epoch_time + "_1",
                 "entities": [
                     {
                         "value": "Bmw",
@@ -86,7 +88,7 @@ def test_add_and_remove_entities(app):
                 ]
             },
             {
-                "entity_type_name": "automatic_test01",
+                "entity_type_name": "automatic_test" + epoch_time + "_2",
                 "entities": [
                     {
                         "value": "Bmw",
