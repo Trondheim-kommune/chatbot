@@ -40,9 +40,12 @@ class InfoGatheringSpider(scrapy.Spider):
     # If a strong tag should be seen as a sub header.
     strong_headers = None
 
+    # Root url for all web pages. Must not end with '/'.
+    root_url = 'https://www.trondheim.kommune.no'
+
     # The links to start the crawling process on.
     start_urls = [
-        'https://www.trondheim.kommune.no'
+        root_url
     ]
 
     # Paths on the site which are allowed. Only paths which match
@@ -85,6 +88,10 @@ class InfoGatheringSpider(scrapy.Spider):
     # removed from all pages.
     garbage_text = ['Sist oppdatert:']
 
+    # Elements containing a url in href that redirects to resource files ending 
+    # with one of these will be removed
+    garbage_resource_files = ['.aspx']
+
     # The text used for the title on 404 pages. Used to detect silent 404 error.
     not_found_text = 'Finner ikke siden'
 
@@ -98,9 +105,6 @@ class InfoGatheringSpider(scrapy.Spider):
         'h5': 5,
         'h6': 6,
 
-        # Table elements.
-        'tbody': 6,
-
         # Text elements and lists.
         'strong': 8,
         'p': 9,
@@ -109,9 +113,14 @@ class InfoGatheringSpider(scrapy.Spider):
 
     # Hierarchy for sorting according to HTML structure.
     html_hierarchy = {
-        'tr': 1,
-        'td': 2,
+        # Table elements
+        'tbody': 1,
+        'tr': 2,
+        'td': 3,
+
+        # List elements
         'ul': 1,
+        'ol': 1,
         'li': 2,
     }
 
@@ -317,6 +326,18 @@ class InfoGatheringSpider(scrapy.Spider):
                 # If the URL is defined and not the same as the elem text
                 if url is not None and url != elem_text:
                     # If the element and parent has the same information
+
+                    # Handle the different url types:
+                    # Check if blacklisted file or url 
+                    for resource in self.garbage_resource_files:
+                        if url.endswith(resource):
+                            # This url is blacklisted, ignore this element
+                            continue
+
+                    # If the url is partial or a valid resource link
+                    if url[0] == "/":
+                        url = self.root_url + url
+
                     # Don't create a new element, but add url instead
                     if elem_text == parent.text:
                         parent.text += '\n' + url
@@ -340,7 +361,7 @@ class InfoGatheringSpider(scrapy.Spider):
         for pre, fill, node in RenderTree(root):
             # We remove newlines from the text with spaces to preserve
             # the shape of the tree when printing in the terminal.
-            print('%s%s: %s' % (pre, node.tag, node.text.replace('\n', ' ')))
+            print('{}{}: {}'.format(pre, node.tag, node.text.replace('\n', ' ')))
 
         # Also add a new line before the next tree.
         print()
