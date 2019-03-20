@@ -21,7 +21,7 @@ class TreeElement(NodeMixin):
 
         # We hash the URL of all pages and add a counter for the element
         # after it. This is used to diff new and stored HTML pages.
-        self.id = '%s-%s'.format(page_id, TreeElement.counter)
+        self.id = '{}-{}'.format(page_id, TreeElement.counter)
         TreeElement.counter += 1
 
 
@@ -319,11 +319,11 @@ class InfoGatheringSpider(scrapy.Spider):
                     # If the element and parent has the same information
                     # Don't create a new element, but add url instead
                     if elem_text == parent.text:
-                        parent.text += '\n' + elem.get('href')
+                        parent.text += '\n' + url
                         continue
 
-                    # Add the URL into the end of the elem text
-                    elem_text += '\n' + elem.get('href')
+                    # Add the URL and elem_text into the end of the parent's text
+                    parent.text += '\n' + elem_text + '\n' + url
             else:
                 # Create the new element.
                 current_parent = TreeElement(
