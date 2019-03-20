@@ -15,7 +15,7 @@ export default class DocumentView extends React.Component {
     // Fetch content
     const data = { data: { id: this.props.id } };
     const content = await fetchData(
-      process.env.REACT_APP_SERVER_URL + 'v1/content/?id=' + this.props.id,
+      process.env.REACT_APP_SERVER_URL + 'v1/web/content/?id=' + this.props.id,
       "GET"
     );
     if (!content.hasOwnProperty('manual')) {
@@ -38,7 +38,7 @@ export default class DocumentView extends React.Component {
     // Save data and delete entry in manual collection if needed
     const data = { data: { id: this.props.id, content: this.state.manual } };
     const content = fetchData(
-      process.env.REACT_APP_SERVER_URL + 'v1/content/',
+      process.env.REACT_APP_SERVER_URL + 'v1/web/content/',
       "POST",
       data
     ).then(() => {
