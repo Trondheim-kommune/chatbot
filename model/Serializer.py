@@ -157,7 +157,7 @@ class Serializer:
                         # text here and continue
                         keywords = [KeyWord(*keyword)
                                     for keyword in get_keywords(self.__vectorizer,
-                                    self.__feature_names, title)]
+                                    self.__feature_names, title+' '+child["text"])]
 
                         content = Content(title, [child["text"]], keywords)
                         new_model = copy.deepcopy(model_template)
