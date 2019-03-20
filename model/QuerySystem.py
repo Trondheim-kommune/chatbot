@@ -25,7 +25,7 @@ def perform_search(query_text):
     ''' Takes a query string and finds the best matching document in the database. '''
     # Connect to the database to enable retrieving of documents.
     factory = ModelFactory.get_instance()
-    util.set_db(factory, db='dev_db')
+    util.set_db(factory)
 
     # Perform simple query expansion on the original query.
     query = expand_query(query_text)

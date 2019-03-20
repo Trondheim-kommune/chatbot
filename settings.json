@@ -1,0 +1,23 @@
+{
+    "mongo": {
+        "url": "agent25.tinusf.com",
+        "port": 27017,
+        "db": "dev_db",
+        "testing_db": "test_db"
+    },
+    "flask": {
+        "url": "agent25.tinusf.com",
+        "port": 8080
+    },
+    "server_url": "",
+    
+    "website": {
+        "url": "https://agent25.tinusf.com/"
+    },
+    "model": {
+        "accepted_tags": ["p", "a", "li"]
+    },
+    "scraper": {
+        
+    }
+}

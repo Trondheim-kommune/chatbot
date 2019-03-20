@@ -1,5 +1,6 @@
 from pymongo import TEXT
 import os
+from util.config_util import Config
 
 
 # Create indexing based on three different keyword fields
@@ -10,8 +11,12 @@ def set_index(collection, factory):
          ("header_meta_keywords", TEXT)], default_language="norwegian")
 
 
-def set_db(factory, ip=os.getenv("SERVER_URL"), db="dev_db"):
-    factory.set_database(ip, db, str(os.getenv('DB_USER')), str(os.getenv("DB_PWD")))
+def set_db(factory):
+    url = Config.get_value(["mongo", "url"])
+    port = Config.get_value(["mongo", "port"])
+    db = Config.get_mongo_db()
+
+    factory.set_database(url, db, str(os.getenv('DB_USER')), str(os.getenv("DB_PWD")), port=port)
 
 
 # If the document with the same ID is previously manually changed, return the manually changed
