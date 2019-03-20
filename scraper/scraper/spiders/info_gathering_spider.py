@@ -45,15 +45,17 @@ class InfoGatheringSpider(scrapy.Spider):
 
     # The links to start the crawling process on.
     start_urls = [
-        root_url
+        #root_url
+        'https://www.trondheim.kommune.no/tema/skole/trondheimsskolen/skolehelsetjenesten/'
     ]
 
     # Paths on the site which are allowed. Only paths which match
     # these will ever be visited.
     allowed_paths = [
-        re.compile('https://www.trondheim.kommune.no/tema'),
-        re.compile('https://www.trondheim.kommune.no/aktuelt'),
-        re.compile('https://www.trondheim.kommune.no/org'),
+        'https://www.trondheim.kommune.no/tema/skole/trondheimsskolen/skolehelsetjenesten/'
+        #re.compile('https://www.trondheim.kommune.no/tema'),
+        #re.compile('https://www.trondheim.kommune.no/aktuelt'),
+        #re.compile('https://www.trondheim.kommune.no/org'),
     ]
 
     # Pages in this list will be visited and links on them will
@@ -88,14 +90,19 @@ class InfoGatheringSpider(scrapy.Spider):
     # removed from all pages.
     garbage_text = ['Sist oppdatert:']
 
-    # Elements containing a url in href that redirects to resource files ending 
-    # with one of these will be removed
-    garbage_resource_files = ['.aspx']
+    # Elements containing a url in href that starts with the following
+    # will be removed
+    garbage_start_url = ['#', '.', '~']
+
+    # Elements containing a url in href that ends with the following 
+    # will be removed
+    garbage_end_url = ['.aspx']
 
     # The text used for the title on 404 pages. Used to detect silent 404 error.
     not_found_text = 'Finner ikke siden'
 
     # Hierarchy for sorting categories.
+    # Elements with level=None will follow normal html hierarchy
     hierarchy = {
         # Header elements.
         'h1': 1,
@@ -109,25 +116,15 @@ class InfoGatheringSpider(scrapy.Spider):
         'strong': 8,
         'p': 9,
         'a': 10,
-    }
 
-    # Hierarchy for sorting according to HTML structure.
-    html_hierarchy = {
         # Table elements
-        'tbody': 1,
-        'tr': 2,
-        'td': 3,
-
-        # List elements
-        'ul': 1,
-        'ol': 1,
-        'li': 2,
+        'li': 9,
     }
 
     # If a tag is listed here, sequences of tabs belonging to one of these types
     # will all be merged into one tag. For example, directly following paragraph
     # tags will be merged into one big paragraph, separated with newlines.
-    concatenation_tags = ['p']
+    concatenation_tags = ['p', 'li']
 
     def extract_metadata(self, root, soup, page_id):
         ''' Extract keywords metadata from the header of the page and add them
@@ -149,11 +146,6 @@ class InfoGatheringSpider(scrapy.Spider):
         elem_level = None
         if elem_tag in self.hierarchy:
             elem_level = self.hierarchy[elem_tag]
-
-        # Data about this elements position in the html hierarchy
-        elem_html_level = None
-        if elem_tag in self.html_hierarchy:
-            elem_html_level = self.html_hierarchy[elem_tag]
 
         # The parent which will be used for the next node in the tree.
         parent = None
@@ -177,11 +169,6 @@ class InfoGatheringSpider(scrapy.Spider):
             if search_parent.tag in self.hierarchy:
                 search_parent_level = self.hierarchy[search_parent.tag]
 
-            # Whether the search parent is in the html hierarchy or not.
-            search_parent_html_level = None
-            if search_parent.tag in self.html_hierarchy:
-                search_parent_html_level = self.html_hierarchy[search_parent.tag]
-
             if search_parent_level:
                 # If both tags are in the hierarchy, check their level.
                 if elem_level:
@@ -190,21 +177,6 @@ class InfoGatheringSpider(scrapy.Spider):
                         break
 
                     if elem_level == search_parent_level:
-                        # If elements are in same level in hierarchy.
-                        parent = search_parent.parent
-                        break
-                else:
-                    # Element where hierarchy is not defined.
-                    parent = search_parent
-                    break
-            elif search_parent_html_level:
-                # If both tags are in the hierarchy, check their level.
-                if elem_html_level:
-                    if elem_level > search_parent_html_level['level']:
-                        parent = search_parent
-                        break
-
-                    if elem_level == search_parent_html_level['level']:
                         # If elements are in same level in hierarchy.
                         parent = search_parent.parent
                         break
@@ -273,6 +245,10 @@ class InfoGatheringSpider(scrapy.Spider):
             if not elem_text:
                 continue
 
+            # Set list for list point element
+            if elem_tag == 'li':
+                elem_text = '- ' + elem_text
+
             # Do not include elements with element text containing
             # blacklisted sentences.
             if any(sentence in elem_text for sentence in self.garbage_text):
@@ -315,36 +291,34 @@ class InfoGatheringSpider(scrapy.Spider):
 
                 # Start a new paragraph if the last child already has children.
                 if last_child and last_child.tag == elem_tag and not last_child.children:
-                    last_child.text += '\n\n' + elem_text
+                    # Want to list elements without extra new line
+                    if elem_tag == 'li':
+                        last_child.text += '\n' + elem_text
+                    else:
+                        # Want to separate concatenated paragraphs
+                        last_child.text += '\n\n' + elem_text
                     continue
 
             # Add the anchor's href url when finding an anchor
+            # If anchor, don't create a new element, but add url instead to parent
             if elem_tag == 'a':
-                # Get the url from anchor
-                url = elem.get('href')
+                # Create a valid url from the href url if any
+                url = self.create_valid_url(elem.get('href'))
 
-                # If the URL is defined and not the same as the elem text
-                if url is not None and url != elem_text:
-                    # If the element and parent has the same information
+                # If the url from href is invalid, ignore anchor tag
+                if url is None:
+                    continue
 
-                    # Handle the different url types:
-                    # Check if blacklisted file or url 
-                    for resource in self.garbage_resource_files:
-                        if url.endswith(resource):
-                            # This url is blacklisted, ignore this element
-                            continue
-
-                    # If the url is partial or a valid resource link
-                    if url[0] == "/":
-                        url = self.root_url + url
-
-                    # Don't create a new element, but add url instead
+                # If the URL is unequal to the elem text
+                if url != elem_text:
+                    # Add the element text to parent instead of creating a 
+                    # new element
                     if elem_text == parent.text:
                         parent.text += '\n' + url
                         continue
 
                     # Add the URL and elem_text into the end of the parent's text
-                    parent.text += '\n' + elem_text + '\n' + url
+                    parent.text += ' ' + elem_text + '\n' + url
             else:
                 # Create the new element.
                 current_parent = TreeElement(
@@ -353,7 +327,36 @@ class InfoGatheringSpider(scrapy.Spider):
                     elem_text,
                     parent,
                 )
+
         return root
+
+    # Returns a sanitized url based on blacklisting and type
+    def create_valid_url(self, url):
+        ''' Takes in an url from an anchor tag's href.
+        Returns None if the url is None, blacklisted or invalid.
+        Returns an absolute url otherwise. '''
+
+        # If the url isn't defined
+        if url is None:
+            return None
+
+        # Check if the url stars with blacklisted characters
+        for start_url in self.garbage_start_url:
+            if url.startswith(start_url):
+                break
+
+        # Check if the url is a blacklisted resource or file type
+        for end_url in self.garbage_end_url:
+            if url.endswith(end_url):
+                # This url is blacklisted, ignore this element
+                break
+
+        # If the url is partial or a valid resource link
+        if url[0] == "/":
+            url = self.root_url + url
+
+        return url
+
 
     def pretty_print_tree(self, root):
         ''' Print a scraped tree for debugging. '''
