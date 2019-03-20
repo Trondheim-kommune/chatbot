@@ -1,6 +1,6 @@
-export async function fetchData(url, body) {
+export async function fetchData(url, method, body) {
   const response = await fetch(url, {
-    method: 'POST',
+    method: method,
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/json',

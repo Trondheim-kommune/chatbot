@@ -15,8 +15,8 @@ export default class DocumentView extends React.Component {
     // Fetch content
     const data = { data: { id: this.props.id } };
     const content = await fetchData(
-      process.env.REACT_APP_SERVER_URL + 'v1/get_content',
-      data,
+      process.env.REACT_APP_SERVER_URL + 'v1/web/content/?id=' + this.props.id,
+      "GET"
     );
     if (!content.hasOwnProperty('manual')) {
       this.setState({
@@ -38,8 +38,9 @@ export default class DocumentView extends React.Component {
     // Save data and delete entry in manual collection if needed
     const data = { data: { id: this.props.id, content: this.state.manual } };
     const content = fetchData(
-      process.env.REACT_APP_SERVER_URL + 'v1/update_content',
-      data,
+      process.env.REACT_APP_SERVER_URL + 'v1/web/content/',
+      "POST",
+      data
     ).then(() => {
       this.props.changeView('main');
     });
@@ -229,7 +230,7 @@ export default class DocumentView extends React.Component {
               Her kan du endre svarene til botten manuelt. Oppdater teksten og
               trykk på lagre for å oppdatere.
             </p>
-            <form onSubmit={e => this.handleSubmit(e)}>
+            <form>
               <strong>Svar:</strong>
               {textAreasManual}
               <button
@@ -258,7 +259,7 @@ export default class DocumentView extends React.Component {
               >
                 Nytt nøkkelord
               </button>
-              <input type="button" value="Lagre" className="save" />
+              <input type="button" value="Lagre" className="save" onClick={e => this.handleSubmit(e)} />
             </form>
           </div>
         )}
