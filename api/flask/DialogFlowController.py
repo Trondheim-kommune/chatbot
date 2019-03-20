@@ -1,7 +1,7 @@
 import server
 
 
-class MongoDBControllerDialogFlowAPI:
+class DialogFlowController:
     """
     This class should be between the dialogflow API and the MongoDB (model).
     It should be able to handle: get and create both entities and intents.
