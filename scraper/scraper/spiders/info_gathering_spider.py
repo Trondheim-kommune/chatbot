@@ -46,13 +46,13 @@ class InfoGatheringSpider(scrapy.Spider):
     # The links to start the crawling process on.
     start_urls = [
         #root_url
-        'https://www.trondheim.kommune.no/tema/skole/trondheimsskolen/skolehelsetjenesten/'
+        'https://www.trondheim.kommune.no/tema/politikk-og-planer/styrer-rad-og-utvalg/trondheim-kommunerevisjon/revisjonsrapporter'
     ]
 
     # Paths on the site which are allowed. Only paths which match
     # these will ever be visited.
     allowed_paths = [
-        'https://www.trondheim.kommune.no/tema/skole/trondheimsskolen/skolehelsetjenesten/'
+        'https://www.trondheim.kommune.no/tema/politikk-og-planer/styrer-rad-og-utvalg/trondheim-kommunerevisjon/revisjonsrapporter/1'
         #re.compile('https://www.trondheim.kommune.no/tema'),
         #re.compile('https://www.trondheim.kommune.no/aktuelt'),
         #re.compile('https://www.trondheim.kommune.no/org'),
@@ -118,6 +118,9 @@ class InfoGatheringSpider(scrapy.Spider):
         'a': 10,
 
         # Table elements
+        'td': 9,
+
+        # List elements
         'li': 9,
     }
 
@@ -291,7 +294,7 @@ class InfoGatheringSpider(scrapy.Spider):
 
                 # Start a new paragraph if the last child already has children.
                 if last_child and last_child.tag == elem_tag and not last_child.children:
-                    # Want to list elements without extra new line
+                    # Want to list elements without extra newline
                     if elem_tag == 'li':
                         last_child.text += '\n' + elem_text
                     else:
@@ -330,7 +333,7 @@ class InfoGatheringSpider(scrapy.Spider):
 
         return root
 
-    # Returns a sanitized url based on blacklisting and type
+    # Returns a valid url based on blacklisting and type
     def create_valid_url(self, url):
         ''' Takes in an url from an anchor tag's href.
         Returns None if the url is None, blacklisted or invalid.
@@ -343,13 +346,13 @@ class InfoGatheringSpider(scrapy.Spider):
         # Check if the url stars with blacklisted characters
         for start_url in self.garbage_start_url:
             if url.startswith(start_url):
-                break
+                return None
 
         # Check if the url is a blacklisted resource or file type
         for end_url in self.garbage_end_url:
             if url.endswith(end_url):
                 # This url is blacklisted, ignore this element
-                break
+                return None
 
         # If the url is partial or a valid resource link
         if url[0] == "/":
