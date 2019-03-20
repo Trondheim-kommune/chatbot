@@ -46,13 +46,13 @@ class InfoGatheringSpider(scrapy.Spider):
     # The links to start the crawling process on.
     start_urls = [
         #root_url
-        'https://www.trondheim.kommune.no/tema/politikk-og-planer/styrer-rad-og-utvalg/trondheim-kommunerevisjon/revisjonsrapporter'
+        'https://www.trondheim.kommune.no/tema/politikk-og-planer/styrer-rad-og-utvalg/trondheim-kommunerevisjon/revisjonsrapporter/miljoledelse-iso-14001---med-fokus-pa-energimal/'
     ]
 
     # Paths on the site which are allowed. Only paths which match
     # these will ever be visited.
     allowed_paths = [
-        'https://www.trondheim.kommune.no/tema/politikk-og-planer/styrer-rad-og-utvalg/trondheim-kommunerevisjon/revisjonsrapporter/1'
+        'https://www.trondheim.kommune.no/tema/politikk-og-planer/styrer-rad-og-utvalg/trondheim-kommunerevisjon/revisjonsrapporter/miljoledelse-iso-14001---med-fokus-pa-energimal/'
         #re.compile('https://www.trondheim.kommune.no/tema'),
         #re.compile('https://www.trondheim.kommune.no/aktuelt'),
         #re.compile('https://www.trondheim.kommune.no/org'),
@@ -127,7 +127,7 @@ class InfoGatheringSpider(scrapy.Spider):
     # If a tag is listed here, sequences of tabs belonging to one of these types
     # will all be merged into one tag. For example, directly following paragraph
     # tags will be merged into one big paragraph, separated with newlines.
-    concatenation_tags = ['p', 'li']
+    concatenation_tags = ['li']
 
     def extract_metadata(self, root, soup, page_id):
         ''' Extract keywords metadata from the header of the page and add them
@@ -294,12 +294,7 @@ class InfoGatheringSpider(scrapy.Spider):
 
                 # Start a new paragraph if the last child already has children.
                 if last_child and last_child.tag == elem_tag and not last_child.children:
-                    # Want to list elements without extra newline
-                    if elem_tag == 'li':
-                        last_child.text += '\n' + elem_text
-                    else:
-                        # Want to separate concatenated paragraphs
-                        last_child.text += '\n\n' + elem_text
+                    last_child.text += '\n' + elem_text
                     continue
 
             # Add the anchor's href url when finding an anchor
