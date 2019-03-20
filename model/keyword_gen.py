@@ -71,4 +71,8 @@ def get_keywords(vectorizer, feature_names, document, n=10):
     ''' Returns the top keywords and their scores for a given document. '''
     tfidf_vector = vectorizer.transform([document])
     sorted_items = sort_coo(tfidf_vector.tocoo())
+
+    # Get maximum number of keywords
+    n = len(sorted_items)
+
     return extract_top(feature_names, sorted_items, n)
