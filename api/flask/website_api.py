@@ -15,7 +15,7 @@ else:
     db_util.set_db(factory, db="dev_db")
 
 
-@web_api.route("/v1/conflict_ids", methods=["GET"])
+@web_api.route("/v1/web/conflict_ids", methods=["GET"])
 def get_all_conflict_ids():
     """
     :return: a list of {"title" "...", "id": "..."}
@@ -28,7 +28,7 @@ def get_all_conflict_ids():
     return json.dumps(conflict_ids)
 
 
-@web_api.route("/v1/content/", methods=["GET"])
+@web_api.route("/v1/web/content/", methods=["GET"])
 def get_content():
     """
     :return: the content of the prod document and manual document (if we have it)
@@ -47,7 +47,7 @@ def get_content():
     return json.dumps(output)
 
 
-@web_api.route("/v1/content/", methods=["POST"])
+@web_api.route("/v1/web/content/", methods=["POST"])
 def update_content():
     """
     Updates the manual collection with new content.
@@ -73,7 +73,7 @@ def update_content():
     return flask_util.create_success_response("Success")
 
 
-@web_api.route("/v1/docs/", methods=["GET"])
+@web_api.route("/v1/web/docs/", methods=["GET"])
 def get_docs_from_url():
     """
     :return: Every document for a single url with id and title.

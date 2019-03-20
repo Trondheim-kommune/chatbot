@@ -27,7 +27,7 @@ def handle_invalid_usage(error):
     return response
 
 
-@dialog_api.route("/v1/webhook", methods=["POST"])
+@dialog_api.route("/v1/dialogflow/response", methods=["POST"])
 def get_response():
     """
     Read the data sent using POST.
@@ -106,7 +106,7 @@ def create_intent_object(intent_name, training_phrases, match_entity=True):
     return intent
 
 
-@dialog_api.route("/v1/intent", methods=["PUT"])
+@dialog_api.route("/v1/dialogflow/intent", methods=["PUT"])
 def create_intent_post():
     json_input_data = json.loads(request.data)
     try:
@@ -162,7 +162,7 @@ def get_entities():
     entities_loaded = True
 
 
-@dialog_api.route("/v1/intents", methods=["PUT"])
+@dialog_api.route("/v1/dialogflow/intents", methods=["PUT"])
 def batch_create_intents_post():
     json_input_data = json.loads(request.data)
     intents = json_input_data["data"]
@@ -211,7 +211,7 @@ def get_all_intents():
     return client.list_intents(parent)
 
 
-@dialog_api.route("/v1/entities", methods=["PUT"])
+@dialog_api.route("/v1/dialogflow/entities", methods=["PUT"])
 def batch_create_entities_post():
     json_input_data = json.loads(request.data)
     entity_types = json_input_data["data"]
@@ -251,7 +251,7 @@ def batch_create_entities(entity_types):
     return ID_list
 
 
-@dialog_api.route("/v1/entities", methods=["DELETE"])
+@dialog_api.route("/v1/dialogflow/entities", methods=["DELETE"])
 def batch_delete_entities_post():
     json_input_data = json.loads(request.data)
     entity_ids = json_input_data["data"]
