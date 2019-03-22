@@ -1,5 +1,7 @@
 {
     "mongo": {
+        "username": "agent25",
+        "password": "agent25",
         "url": "agent25.tinusf.com",
         "port": 27017,
         "db": "dev_db",
@@ -9,20 +11,27 @@
         "accepted_tags": ["p", "a", "li", "strong"]
     },
     "scraper": {
-        "name": "info_gathering",
         "debug": false,
-        "strong_headers": false,
-        "concatenation_tags": [],
-        
+        "strong_headers": true,
+
+        "concatenation": [
+            {
+                "element": "p",
+                "max_limit": 40
+            }, {
+                "element": "li",
+                "max_limit": 100
+            }
+        ],
         "url": {
             "root_url": "https://www.trondheim.kommune.no",
             "allowed_paths": [],
-            "scrape_blacklist": []            
+            "scrape_blacklist": []
         },
 
         "blacklist": {
             "elements": [],
-            "visit": [],
+            "visits": [],
             "texts": [],
             "start_url": [],
             "end_url": [],

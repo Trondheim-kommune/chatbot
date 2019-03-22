@@ -1,5 +1,4 @@
 from pymongo import TEXT
-import os
 from util.config_util import Config
 
 
@@ -14,9 +13,11 @@ def set_index(collection, factory):
 def set_db(factory):
     url = Config.get_value(["mongo", "url"])
     port = Config.get_value(["mongo", "port"])
+    user = Config.get_value(["mongo", "username"])
+    password = Config.get_value(["mongo", "password"])
     db = Config.get_mongo_db()
 
-    factory.set_database(url, db, str(os.getenv('DB_USER')), str(os.getenv("DB_PWD")), port=port)
+    factory.set_database(url, db, user, password, port)
 
 
 # If the document with the same ID is previously manually changed, return the manually changed
