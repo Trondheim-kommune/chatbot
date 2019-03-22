@@ -3,10 +3,33 @@ import model.db_util as util
 from sklearn.metrics.pairwise import cosine_similarity
 from model.keyword_gen import get_tfidf_model
 from model.query_expansion import expand_query
-
+import pymongo
 
 NOT_FOUND = 'Jeg fant ikke informasjonen du spurte etter.'
 MULTIPLE_ANSWERS = 'Jeg har flere mulige svar til deg.'
+
+factory = ModelFactory.get_instance()
+
+
+def not_found_text(query_text):
+    '''
+    Inserts this specific query text into the unknown queries collection aswell as returning a
+    fallback string.
+    '''
+    try:
+        factory.get_database().get_collection("unknown_queries").insert_one(
+            {"query_text": query_text})
+    except pymongo.errors.DuplicateKeyError:
+        # If we already have this specific query in our unknown_queries collection we don't need
+        # to add it again.
+        pass
+
+    # TODO: this should probably be moved somewhere else, however it seems the collection needs
+    # some content before an index can be created.
+    # Set query_text to be unique.
+    factory.get_collection("unknown_queries").create_index([("query_text", 1)], unique=True)
+
+    return NOT_FOUND
 
 
 def get_corpus_text(doc):
@@ -35,7 +58,7 @@ def perform_search(query_text):
 
     # Prevent generating an empty corpus if no documents were found.
     if not docs:
-        return NOT_FOUND
+        return not_found_text(query_text)
 
     # Create a corpus on the results from the MongoDB query.
     corpus = [get_corpus_text(doc) for doc in docs]
@@ -51,7 +74,7 @@ def perform_search(query_text):
 
         # This could be calculated using the mean of all scores and the standard deviation.
         if sorted_scores[0] < 0.1:
-            return NOT_FOUND
+            return not_found_text(query_text)
 
         # Allow returning multiple answers if they rank very similarly.
         answers = []
@@ -73,7 +96,7 @@ def perform_search(query_text):
     except KeyError:
         raise Exception('Document does not have content and texts.')
     except ValueError:
-        return NOT_FOUND
+        return not_found_text(query_text)
 
 
 class QuerySystem:
