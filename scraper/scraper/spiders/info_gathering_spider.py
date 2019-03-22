@@ -45,17 +45,15 @@ class InfoGatheringSpider(scrapy.Spider):
 
     # The links to start the crawling process on.
     start_urls = [
-        # root_url
-        'https://www.trondheim.kommune.no/tema/politikk-og-planer/styrer-rad-og-utvalg/trondheim-kommunerevisjon/revisjonsrapporter/'
+        root_url
     ]
 
     # Paths on the site which are allowed. Only paths which match
     # these will ever be visited.
     allowed_paths = [
-        re.compile('https://www.trondheim.kommune.no/tema/politikk-og-planer/styrer-rad-og-utvalg/trondheim-kommunerevisjon/revisjonsrapporter/1')
-        # re.compile('https://www.trondheim.kommune.no/tema'),
-        # re.compile('https://www.trondheim.kommune.no/aktuelt'),
-        # re.compile('https://www.trondheim.kommune.no/org'),
+        re.compile('https://www.trondheim.kommune.no/tema'),
+        re.compile('https://www.trondheim.kommune.no/aktuelt'),
+        re.compile('https://www.trondheim.kommune.no/org'),
     ]
 
     # Pages in this list will be visited and links on them will
