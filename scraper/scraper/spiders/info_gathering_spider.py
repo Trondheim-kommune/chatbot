@@ -45,15 +45,17 @@ class InfoGatheringSpider(scrapy.Spider):
 
     # The links to start the crawling process on.
     start_urls = [
-        root_url
+        #root_url
+        'https://trondheim.kommune.no/tema/kultur-og-fritid/lokaler/husebybadet'
     ]
 
     # Paths on the site which are allowed. Only paths which match
     # these will ever be visited.
     allowed_paths = [
-        re.compile('https://www.trondheim.kommune.no/tema'),
-        re.compile('https://www.trondheim.kommune.no/aktuelt'),
-        re.compile('https://www.trondheim.kommune.no/org'),
+        re.compile('https://trondheim.kommune.no/tema/kultur-og-fritid/lokaler/husebybadet')
+        #re.compile('https://www.trondheim.kommune.no/tema'),
+        #re.compile('https://www.trondheim.kommune.no/aktuelt'),
+        #re.compile('https://www.trondheim.kommune.no/org'),
     ]
 
     # Pages in this list will be visited and links on them will
@@ -126,6 +128,7 @@ class InfoGatheringSpider(scrapy.Spider):
     # the following tag can be merged together
     concatenation_tags_word_limit = {
         'li': 100,
+        'p': 7,
     }
 
     # Of the elements in the hierarchy, these tags will not be created as nodes if
@@ -300,7 +303,7 @@ class InfoGatheringSpider(scrapy.Spider):
                 # Start a new paragraph if the last child already has children.
                 if last_child and last_child.tag == elem_tag and not last_child.children:
                     # Concatenate the texts until limit reached
-                    if len(elem_text.split() + last_child.text.split()) \
+                    if len(elem_text.split()) \
                     <= self.concatenation_tags_word_limit[elem_tag]:
                         last_child.text += '\n' + elem_text
                         continue
@@ -319,17 +322,17 @@ class InfoGatheringSpider(scrapy.Spider):
                 if url != elem_text:
                     # Add the element text to parent instead of creating a
                     # new element
-                    if elem_text == parent.text:
+                    if elem_text in parent.text:
                         parent.text += '\n' + url
                         continue
 
                     # Add the URL and elem_text into the end of the parent's text
                     parent.text += ' ' + elem_text + '\n' + url
             elif elem_tag in self.ignored_children_tags_for_parents \
-                and current_parent.tag in \
-                self.ignored_children_tags_for_parents[elem_tag]:
-                # If the parent's text includes this element's text, 
-                # don't create a node for this element. 
+            and current_parent.tag in \
+            self.ignored_children_tags_for_parents[elem_tag]:
+                # If the parent's text includes this element's text,
+                # don't create a node for this element.
                 continue
             else:
                 # Create the new element.
