@@ -111,7 +111,7 @@ class InfoGatheringSpider(scrapy.Spider):
         'h6': 6,
 
         # Text elements and lists.
-        'strong': 8,
+        'strong': 9,
         'p': 9,
         'a': 10,
 
@@ -127,7 +127,6 @@ class InfoGatheringSpider(scrapy.Spider):
     # tags will be merged into one big paragraph, separated with newlines.
     # The value corresponding to each key is the word limit for the tag
     concatenation_tags_word_limit = {
-        'p': 40,
         'li': 100,
     }
 
@@ -266,6 +265,8 @@ class InfoGatheringSpider(scrapy.Spider):
                 if elem_tag == 'strong' and current_parent.tag == 'h6' and \
                         current_parent.text == elem_text:
                     continue
+                elif elem_tag == 'strong' and current_parent.tag == 'p':
+                    continue
 
                 if elem_tag == 'p':
                     # Find all strong tags inside this paragraph.
@@ -284,7 +285,6 @@ class InfoGatheringSpider(scrapy.Spider):
                             elem_text,
                             parent,
                         )
-
                         continue
 
             # Locate the parent element to use based on the hierarchy.
@@ -296,7 +296,7 @@ class InfoGatheringSpider(scrapy.Spider):
 
                 # Start a new paragraph if the last child already has children.
                 if last_child and last_child.tag == elem_tag and not last_child.children:
-                    # Concatenate the texts until limit reached if any
+                    # Concatenate the texts until limit reached
                     if len(elem_text.split() + last_child.text.split()) \
                         <= self.concatenation_tags_word_limit[elem_tag]:
                         last_child.text += '\n' + elem_text
