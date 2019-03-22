@@ -45,17 +45,15 @@ class InfoGatheringSpider(scrapy.Spider):
 
     # The links to start the crawling process on.
     start_urls = [
-        #root_url
-        'https://www.trondheim.kommune.no/tema/politikk-og-planer/styrer-rad-og-utvalg/trondheim-kommunerevisjon/revisjonsrapporter/miljoledelse-iso-14001---med-fokus-pa-energimal/'
+        root_url
     ]
 
     # Paths on the site which are allowed. Only paths which match
     # these will ever be visited.
     allowed_paths = [
-        'https://www.trondheim.kommune.no/tema/politikk-og-planer/styrer-rad-og-utvalg/trondheim-kommunerevisjon/revisjonsrapporter/miljoledelse-iso-14001---med-fokus-pa-energimal/'
-        #re.compile('https://www.trondheim.kommune.no/tema'),
-        #re.compile('https://www.trondheim.kommune.no/aktuelt'),
-        #re.compile('https://www.trondheim.kommune.no/org'),
+        re.compile('https://www.trondheim.kommune.no/tema'),
+        re.compile('https://www.trondheim.kommune.no/aktuelt'),
+        re.compile('https://www.trondheim.kommune.no/org'),
     ]
 
     # Pages in this list will be visited and links on them will
@@ -127,7 +125,11 @@ class InfoGatheringSpider(scrapy.Spider):
     # If a tag is listed here, sequences of tabs belonging to one of these types
     # will all be merged into one tag. For example, directly following paragraph
     # tags will be merged into one big paragraph, separated with newlines.
-    concatenation_tags = ['li']
+    # The value corresponding to each key is the word limit for the tag
+    concatenation_tags_word_limit = {
+        'p': 40,
+        'li': 100,
+    }
 
     def extract_metadata(self, root, soup, page_id):
         ''' Extract keywords metadata from the header of the page and add them
@@ -289,13 +291,16 @@ class InfoGatheringSpider(scrapy.Spider):
             parent = self.locate_parent(elem_tag, current_parent, root)
 
             # Concatenate tags like paragraph tags which directly follow each other.
-            if elem_tag in self.concatenation_tags and parent.children:
+            if elem_tag in self.concatenation_tags_word_limit and parent.children:
                 last_child = parent.children[-1]
 
                 # Start a new paragraph if the last child already has children.
                 if last_child and last_child.tag == elem_tag and not last_child.children:
-                    last_child.text += '\n' + elem_text
-                    continue
+                    # Concatenate the texts until limit reached if any
+                    if len(elem_text.split() + last_child.text.split()) \
+                        <= self.concatenation_tags_word_limit[elem_tag]:
+                        last_child.text += '\n' + elem_text
+                        continue
 
             # Add the anchor's href url when finding an anchor
             # If anchor, don't create a new element, but add url instead to parent
