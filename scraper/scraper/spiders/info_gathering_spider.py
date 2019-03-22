@@ -45,15 +45,17 @@ class InfoGatheringSpider(scrapy.Spider):
 
     # The links to start the crawling process on.
     start_urls = [
-        root_url
+        # root_url
+        'https://www.trondheim.kommune.no/tema/politikk-og-planer/styrer-rad-og-utvalg/trondheim-kommunerevisjon/revisjonsrapporter/'
     ]
 
     # Paths on the site which are allowed. Only paths which match
     # these will ever be visited.
     allowed_paths = [
-        re.compile('https://www.trondheim.kommune.no/tema'),
-        re.compile('https://www.trondheim.kommune.no/aktuelt'),
-        re.compile('https://www.trondheim.kommune.no/org'),
+        re.compile('https://www.trondheim.kommune.no/tema/politikk-og-planer/styrer-rad-og-utvalg/trondheim-kommunerevisjon/revisjonsrapporter/1')
+        # re.compile('https://www.trondheim.kommune.no/tema'),
+        # re.compile('https://www.trondheim.kommune.no/aktuelt'),
+        # re.compile('https://www.trondheim.kommune.no/org'),
     ]
 
     # Pages in this list will be visited and links on them will
@@ -86,7 +88,7 @@ class InfoGatheringSpider(scrapy.Spider):
 
     # Elements containing text equal to one of these sentences will be
     # removed from all pages.
-    garbage_text = ['Sist oppdatert:', 'Se kart']
+    garbage_text = ['Sist oppdatert:', 'Se kart', '_______________']
 
     # Elements containing a url in href that starts with the following
     # will be removed
@@ -115,6 +117,9 @@ class InfoGatheringSpider(scrapy.Spider):
         'p': 11,
         'a': 15,
 
+        # Table elements
+        'tr': 8,
+
         # List elements
         'li': 9,
     }
@@ -132,7 +137,7 @@ class InfoGatheringSpider(scrapy.Spider):
     # Of the elements in the hierarchy, these tags will not be created as nodes if
     # their parent is in the set of parents.
     ignored_children_tags_for_parents = {
-        'strong': {'p', 'li', 'h1', 'h2', 'h3', 'h4', 'h5'},
+        'strong': {'p', 'li', 'tr', 'h1', 'h2', 'h3', 'h4', 'h5'},
         'p': {'li'},
     }
 
