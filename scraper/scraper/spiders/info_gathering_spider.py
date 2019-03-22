@@ -45,17 +45,15 @@ class InfoGatheringSpider(scrapy.Spider):
 
     # The links to start the crawling process on.
     start_urls = [
-        #root_url
-        'https://trondheim.kommune.no/tema/kultur-og-fritid/lokaler/husebybadet'
+        root_url
     ]
 
     # Paths on the site which are allowed. Only paths which match
     # these will ever be visited.
     allowed_paths = [
-        re.compile('https://trondheim.kommune.no/tema/kultur-og-fritid/lokaler/husebybadet')
-        #re.compile('https://www.trondheim.kommune.no/tema'),
-        #re.compile('https://www.trondheim.kommune.no/aktuelt'),
-        #re.compile('https://www.trondheim.kommune.no/org'),
+        re.compile('https://www.trondheim.kommune.no/tema'),
+        re.compile('https://www.trondheim.kommune.no/aktuelt'),
+        re.compile('https://www.trondheim.kommune.no/org'),
     ]
 
     # Pages in this list will be visited and links on them will
@@ -304,7 +302,7 @@ class InfoGatheringSpider(scrapy.Spider):
                 if last_child and last_child.tag == elem_tag and not last_child.children:
                     # Concatenate the texts until limit reached
                     if len(elem_text.split()) \
-                    <= self.concatenation_tags_word_limit[elem_tag]:
+                            <= self.concatenation_tags_word_limit[elem_tag]:
                         last_child.text += '\n' + elem_text
                         continue
 
@@ -329,8 +327,8 @@ class InfoGatheringSpider(scrapy.Spider):
                     # Add the URL and elem_text into the end of the parent's text
                     parent.text += ' ' + elem_text + '\n' + url
             elif elem_tag in self.ignored_children_tags_for_parents \
-            and current_parent.tag in \
-            self.ignored_children_tags_for_parents[elem_tag]:
+                    and current_parent.tag \
+                    in self.ignored_children_tags_for_parents[elem_tag]:
                 # If the parent's text includes this element's text,
                 # don't create a node for this element.
                 continue
