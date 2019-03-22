@@ -86,13 +86,13 @@ class InfoGatheringSpider(scrapy.Spider):
 
     # Elements containing text equal to one of these sentences will be
     # removed from all pages.
-    garbage_text = ['Sist oppdatert:']
+    garbage_text = ['Sist oppdatert:', 'Se kart']
 
     # Elements containing a url in href that starts with the following
     # will be removed
     garbage_start_url = ['#', '.', '~']
 
-    # Elements containing a url in href that ends with the following 
+    # Elements containing a url in href that ends with the following
     # will be removed
     garbage_end_url = ['.aspx']
 
@@ -110,13 +110,10 @@ class InfoGatheringSpider(scrapy.Spider):
         'h5': 5,
         'h6': 6,
 
-        # Text elements and lists.
-        'strong': 9,
-        'p': 9,
-        'a': 10,
-
-        # Table elements
-        'td': 9,
+        # Text elements
+        'strong': 10,
+        'p': 11,
+        'a': 15,
 
         # List elements
         'li': 9,
@@ -125,9 +122,17 @@ class InfoGatheringSpider(scrapy.Spider):
     # If a tag is listed here, sequences of tabs belonging to one of these types
     # will all be merged into one tag. For example, directly following paragraph
     # tags will be merged into one big paragraph, separated with newlines.
-    # The value corresponding to each key is the word limit for the tag
+    # The value corresponding to each key is the word limit for when
+    # the following tag can be merged together
     concatenation_tags_word_limit = {
         'li': 100,
+    }
+
+    # Of the elements in the hierarchy, these tags will not be created as nodes if
+    # their parent is in the set of parents.
+    ignored_children_tags_for_parents = {
+        'strong': {'p', 'li', 'h1', 'h2', 'h3', 'h4', 'h5'},
+        'p': {'li'},
     }
 
     def extract_metadata(self, root, soup, page_id):
@@ -265,8 +270,6 @@ class InfoGatheringSpider(scrapy.Spider):
                 if elem_tag == 'strong' and current_parent.tag == 'h6' and \
                         current_parent.text == elem_text:
                     continue
-                elif elem_tag == 'strong' and current_parent.tag == 'p':
-                    continue
 
                 if elem_tag == 'p':
                     # Find all strong tags inside this paragraph.
@@ -298,7 +301,7 @@ class InfoGatheringSpider(scrapy.Spider):
                 if last_child and last_child.tag == elem_tag and not last_child.children:
                     # Concatenate the texts until limit reached
                     if len(elem_text.split() + last_child.text.split()) \
-                        <= self.concatenation_tags_word_limit[elem_tag]:
+                    <= self.concatenation_tags_word_limit[elem_tag]:
                         last_child.text += '\n' + elem_text
                         continue
 
@@ -314,7 +317,7 @@ class InfoGatheringSpider(scrapy.Spider):
 
                 # If the URL is unequal to the elem text
                 if url != elem_text:
-                    # Add the element text to parent instead of creating a 
+                    # Add the element text to parent instead of creating a
                     # new element
                     if elem_text == parent.text:
                         parent.text += '\n' + url
@@ -322,6 +325,12 @@ class InfoGatheringSpider(scrapy.Spider):
 
                     # Add the URL and elem_text into the end of the parent's text
                     parent.text += ' ' + elem_text + '\n' + url
+            elif elem_tag in self.ignored_children_tags_for_parents \
+                and current_parent.tag in \
+                self.ignored_children_tags_for_parents[elem_tag]:
+                # If the parent's text includes this element's text, 
+                # don't create a node for this element. 
+                continue
             else:
                 # Create the new element.
                 current_parent = TreeElement(
@@ -359,7 +368,6 @@ class InfoGatheringSpider(scrapy.Spider):
             url = self.root_url + url
 
         return url
-
 
     def pretty_print_tree(self, root):
         ''' Print a scraped tree for debugging. '''
