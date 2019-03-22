@@ -61,3 +61,6 @@ multiple things you could change. Every change needed to make this project work 
         * not_found_text: The text used for the title on 404 pages. Used to detect silent 404 error.
     * hierarchy:
         * How the different HTML elements should be sorted.
+* query_system
+    * not_found: Text that the bot should response with if the bot did not find what you asked for.
+    * multiple_answers: Text when multiple answers are found.

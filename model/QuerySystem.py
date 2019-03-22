@@ -3,10 +3,10 @@ import model.db_util as util
 from sklearn.metrics.pairwise import cosine_similarity
 from model.keyword_gen import get_tfidf_model
 from model.query_expansion import expand_query
+from util.config_util import Config
 
-
-NOT_FOUND = 'Jeg fant ikke informasjonen du spurte etter.'
-MULTIPLE_ANSWERS = 'Jeg har flere mulige svar til deg.'
+NOT_FOUND = Config.get_value(['query_system', 'not_found'])
+MULTIPLE_ANSWERS = Config.get_value(['query_system', 'multiple_answers'])
 
 
 def get_corpus_text(doc):

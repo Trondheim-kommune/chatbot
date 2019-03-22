@@ -51,5 +51,9 @@
             "ol": 9,
             "li": 10
         }
+    },
+    "query_system": {
+        "not_found": "Jeg fant ikke informasjonen du spurte etter.",
+        "multiple_answers": "Jeg har flere mulige svar til deg."
     }
 }
