@@ -64,7 +64,8 @@ def expand_query(query):
         result.append(token[0])
 
         # Add custom synset
-        custom_synset = SynsetWrapper().get_synset(token[0])
+        custom_synset_wrapper = SynsetWrapper().get_instance()
+        custom_synset = custom_synset_wrapper.get_synset(token[0])
         if custom_synset:
             result += custom_synset
 

@@ -1,14 +1,32 @@
 class SynsetWrapper():
     ''' Wrapper for a custom synset list. Interfaces with a text file where
     each line consists of synonyms split by comma '''
+    __instance = None
+
+    @staticmethod
+    def get_instance():
+        ''' Static access method '''
+        if SynsetWrapper.__instance is None:
+            SynsetWrapper()
+        return SynsetWrapper.__instance
 
     def __init__(self):
-        self.__read_synset_file()
+        ''' Virtually private constrcutor '''
+        if SynsetWrapper.__instance is not None:
+            raise Exception('This class is a singleton!')
+        else:
+            self.__read_synset_file()
+            SynsetWrapper.__instance = self
     
     def get_synset(self, token):
         ''' Return a synset for a given token '''
         for synset in self.synset_list:
             if token in synset: return synset
+
+    @staticmethod
+    def synset_file_updated():
+        ''' Updates the cached synset list whenever the textfile is updated '''
+        wrapper = SynsetWrapper.get_instance().__read_synset_file()
 
     def __read_synset_file(self):
         ''' Read the contents of the synset file and add them to the
