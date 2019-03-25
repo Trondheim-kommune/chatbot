@@ -83,20 +83,20 @@ class InfoGatheringSpider(scrapy.Spider):
 
     # These selectors will be removed from all pages, as they contain very
     # little actual information, and are equal on all pages.
-    garbage_elements = ['.footer', '.header', 'body > .container',
-                        '.skip-link', '.navigation', '.nav', '#ssp_fantdu']
+    garbage_elements = {'.footer', '.header', 'body > .container',
+                        '.skip-link', '.navigation', '.nav', '#ssp_fantdu'}
 
     # Elements containing text equal to one of these sentences will be
     # removed from all pages.
-    garbage_text = ['Sist oppdatert:', 'Se kart', '_______________']
+    garbage_text = {'Sist oppdatert:', 'Se kart', '_______________'}
 
     # Elements containing an url in href that starts with the following
     # will be removed
-    garbage_start_urls = ['#', '.', '~']
+    garbage_start_urls = {'#', '.', '~'}
 
     # Elements containing an url in href that ends with the following
     # will be removed.
-    garbage_resources = ['.aspx']
+    garbage_resources = {'.aspx'}
 
     # The text used for the title on 404 pages. Used to detect silent 404 error.
     not_found_text = 'Finner ikke siden'
