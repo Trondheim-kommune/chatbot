@@ -33,12 +33,24 @@ services:
     mongoClientTemp:
         image: mongo:latest
         container_name: mongoClientTemp
+        volumes:
+            - ./deployment_scripts:/deployment_scripts
+        command: 
+            - /deployment_scripts/entrypoint_db.sh
         environment:
-          - MONGODB_USER=${DB_USER}
-          - MONGODB_PASS=${DB_PWD}
-          - MONGO_INITDB_DATABASE=dev_db
+          - DB_USER=${DB_USER}
+          - DB_PWD=${DB_PWD}
+          - DB_NAME=dev_db
         links:
             - mongodb:mongodb
-        command: mongo --host mongodb --eval  "db.getSiblingDB('dev_db').createUser({user:'"$${DB_USER}"', pwd:'$$DB_PWD', roles:[{role:'readWrite',db:'dev_db'}]});"
+        #command: mongo --host mongodb --eval  "db.getSiblingDB('dev_db').createUser({user:'agent25', pwd:'agent25', roles:[{role:'readWrite',db:'dev_db'}]});"
         depends_on:
             - mongodb
+
+    web:
+        build: website
+        ports:
+            - 8000:80
+        volumes:
+            - .:/srv/agent25-web
+        working_dir: /usr/src/app
