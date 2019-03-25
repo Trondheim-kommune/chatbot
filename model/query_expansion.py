@@ -5,6 +5,8 @@ from spacy.lemmatizer import Lemmatizer
 from spacy.lang.nb import LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES
 import string
 from model.SynsetWrapper import SynsetWrapper
+from model.keyword_gen import get_stopwords
+
 
 nltk.download('wordnet')
 nltk.download('omw')
@@ -12,8 +14,9 @@ nltk.download('omw')
 # Load a Norwegian language model for Spacy.
 nb = spacy.load('nb_dep_ud_sm')
 
-
 lemmatize = Lemmatizer(LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES)
+
+stopwords = get_stopwords()
 
 
 def expand_query(query):
@@ -27,6 +30,10 @@ def expand_query(query):
       if token.text not in string.punctuation
     ]
 
+    # Filter away stopwords as we do not want to expand them.
+    tokens = [token for token in tokens if token not in stopwords]
+
+    # The tokens in the expanded query.
     result = []
 
     for token in tokens:

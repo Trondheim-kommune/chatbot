@@ -100,6 +100,8 @@ def insert_documents(data, db="dev_db"):
     util.set_index("in_progress", factory)
     util.set_index("prod", factory)
     util.set_index("manual", factory)
+    # Set query_text to be unique.
+    factory.get_collection("unknown_queries").create_index([("query_text", 1)], unique=True)
 
     return conflict_ids
 

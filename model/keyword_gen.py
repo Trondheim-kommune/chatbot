@@ -25,9 +25,9 @@ def sort_coo(coo_matrix):
     return sorted(tuples, key=lambda x: (x[1], x[0]), reverse=True)
 
 
-def extract_top(feature_names, sorted_items, n=10):
+def extract_top(feature_names, sorted_items):
     ''' Extracts the top scoring keywords from a sorted list of scores. '''
-    return [(feature_names[i], score) for i, score in sorted_items[:n]]
+    return [(feature_names[i], score) for i, score in sorted_items]
 
 
 class Tokenizer(object):
@@ -67,8 +67,9 @@ def get_tfidf_model(corpus):
     return vectorizer, corpus_matrix, feature_names
 
 
-def get_keywords(vectorizer, feature_names, document, n=10):
+def get_keywords(vectorizer, feature_names, document):
     ''' Returns the top keywords and their scores for a given document. '''
     tfidf_vector = vectorizer.transform([document])
     sorted_items = sort_coo(tfidf_vector.tocoo())
-    return extract_top(feature_names, sorted_items, n)
+
+    return extract_top(feature_names, sorted_items)
