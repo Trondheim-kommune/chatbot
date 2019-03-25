@@ -6,6 +6,8 @@ from anytree import RenderTree, NodeMixin
 from anytree.exporter import DictExporter
 from hashlib import sha1
 import re
+from urllib.parse import urlparse
+from urllib.parse import urljoin
 
 
 class TreeElement(NodeMixin):
@@ -88,13 +90,13 @@ class InfoGatheringSpider(scrapy.Spider):
     # removed from all pages.
     garbage_text = ['Sist oppdatert:', 'Se kart', '_______________']
 
-    # Elements containing a url in href that starts with the following
+    # Elements containing an url in href that starts with the following
     # will be removed
-    garbage_start_url = ['#', '.', '~']
+    garbage_start_urls = ['#', '.', '~']
 
-    # Elements containing a url in href that ends with the following
-    # will be removed
-    garbage_end_url = ['.aspx']
+    # Elements containing an url in href that ends with the following
+    # will be removed.
+    garbage_resources = ['.aspx']
 
     # The text used for the title on 404 pages. Used to detect silent 404 error.
     not_found_text = 'Finner ikke siden'
@@ -357,19 +359,20 @@ class InfoGatheringSpider(scrapy.Spider):
             return None
 
         # Check if the url stars with blacklisted characters
-        for start_url in self.garbage_start_url:
+        for start_url in self.garbage_start_urls:
             if url.startswith(start_url):
                 return None
 
         # Check if the url is a blacklisted resource or file type
-        for end_url in self.garbage_end_url:
+        for end_url in self.garbage_resources:
             if url.endswith(end_url):
                 # This url is blacklisted, ignore this element
                 return None
 
-        # If the url is partial or a valid resource link
-        if url[0] == "/":
-            url = self.root_url + url
+        # If the url is relative or a valid resource link
+        if not bool(urlparse(url).netloc):
+            # Concatenate the root and relative url
+            url = urljoin(self.root_url, url)
 
         return url
 
