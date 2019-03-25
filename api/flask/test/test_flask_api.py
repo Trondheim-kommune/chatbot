@@ -239,7 +239,7 @@ def test_unknown_query(app):
     epoch_time = str(int(time.time()))
 
     # pretends epoch_time is an unknown query string, then we insert it into the collection here
-    QuerySystem.not_found_text(epoch_time)
+    QuerySystem.handle_not_found(epoch_time)
 
     response = app.test_client().get('/v1/web/unknown_queries',
                                      data=json.dumps({}))

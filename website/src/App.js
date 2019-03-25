@@ -16,7 +16,7 @@ class App extends Component {
   fetchAllConflictIDs = async () => {
     const conflictDocs = await fetchData(
       process.env.REACT_APP_SERVER_URL + 'v1/web/conflict_ids',
-      "GET"
+      'GET'
     );
     this.setState({ conflictDocs });
   };
@@ -24,7 +24,7 @@ class App extends Component {
   fetchAllUnknownQueries = async () => {
     const queries = await fetchData(
       process.env.REACT_APP_SERVER_URL + 'v1/web/unknown_queries',
-      "GET"
+      'GET'
     );
     this.setState({ queries });
   };

@@ -10,7 +10,7 @@ export default class UnknownQueries extends React.Component {
     const data = { data: { query_text: this.props.queries[i].query_text } };
     fetchData(
       process.env.REACT_APP_SERVER_URL + 'v1/web/unknown_query',
-      "DELETE",
+      'DELETE',
       data
     ).then(() => {
       this.props.changeView('main');

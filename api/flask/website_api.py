@@ -105,8 +105,6 @@ def get_all_unknown_queries():
     :return: a list of unknown queries.
     """
     unknown_queries_docs = factory.get_collection("unknown_queries").find()
-    unknown_queries = []
-
-    for unknown_query_doc in unknown_queries_docs:
-        unknown_queries.append({"query_text": unknown_query_doc["query_text"]})
+    unknown_queries = [{"query_text": unknown_query_doc["query_text"]} for unknown_query_doc in
+                       unknown_queries_docs]
     return json.dumps(unknown_queries)
