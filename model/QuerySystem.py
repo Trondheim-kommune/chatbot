@@ -46,7 +46,9 @@ def perform_search(query_text):
     util.set_db(factory, db='dev_db')
 
     # Perform simple query expansion on the original query.
+    print('Pre expansion: ', query_text)
     query = expand_query(query_text)
+    print('Post expansion: ', query)
 
     # Retrieve a set of documents using MongoDB. We then attempt to filter these further.
     docs = factory.get_document(query)
