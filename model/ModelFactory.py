@@ -29,7 +29,7 @@ class ModelFactory:
         self.database = client[db_name]
 
     def get_document(self, query, main_collection="prod", manual_collection="manual",
-                     number_of_docs=15):
+                     number_of_docs=30):
         """
         Searches for documents using MongoDB in a given document collection.
         Get 15 results from prod. Get 15 from Manual.
