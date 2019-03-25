@@ -4,6 +4,7 @@ import spacy
 from spacy.lemmatizer import Lemmatizer
 from spacy.lang.nb import LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES
 import string
+from model.SynsetWrapper import SynsetWrapper
 
 nltk.download('wordnet')
 nltk.download('omw')
@@ -54,5 +55,10 @@ def expand_query(query):
             continue
 
         result.append(token[0])
+
+        # Add custom synset
+        custom_synset = SynsetWrapper().get_synset(token[0])
+        if custom_synset:
+            result += custom_synset
 
     return ' '.join(result)
