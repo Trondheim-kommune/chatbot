@@ -17,16 +17,17 @@ class SynsetWrapper():
         else:
             self.__read_synset_file()
             SynsetWrapper.__instance = self
-    
+
     def get_synset(self, token):
         ''' Return a synset for a given token '''
         for synset in self.synset_list:
-            if token in synset: return synset
+            if token in synset:
+                return synset
 
     @staticmethod
     def synset_file_updated():
         ''' Updates the cached synset list whenever the textfile is updated '''
-        wrapper = SynsetWrapper.get_instance().__read_synset_file()
+        SynsetWrapper.get_instance().__read_synset_file()
 
     def __read_synset_file(self):
         ''' Read the contents of the synset file and add them to the
@@ -35,5 +36,4 @@ class SynsetWrapper():
         path = 'model/synset'
 
         with open(path) as synset_file:
-            self.synset_list = [line.replace(' ','').strip().split(',') for line in synset_file]
-
+            self.synset_list = [line.replace(' ', '').strip().split(',') for line in synset_file]
