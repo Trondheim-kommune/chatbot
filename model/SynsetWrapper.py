@@ -20,9 +20,7 @@ class SynsetWrapper():
 
     def get_synset(self, token):
         ''' Return a synset for a given token '''
-        for synset in self.synset_list:
-            if token in synset:
-                return synset
+        return next((synset for synset in self.synset_list if token in synset), None)
 
     @staticmethod
     def synset_file_updated():
