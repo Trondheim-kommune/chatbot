@@ -33,6 +33,9 @@ def expand_query(query):
     # Filter away stopwords as we do not want to expand them.
     tokens = [token for token in tokens if token not in stopwords]
 
+    # Custom synset tokens
+    custom_synset = set()
+
     # The tokens in the expanded query.
     result = []
 
@@ -65,10 +68,7 @@ def expand_query(query):
 
         # Add custom synset
         custom_synset_wrapper = SynsetWrapper.get_instance()
-        custom_synset = custom_synset_wrapper.get_synset(token[0])
-        if custom_synset:
-            result += custom_synset
-        # Remove synset duplicats
-        result = list(set(result))
+        custom_synset.update(custom_synset_wrapper.get_synset(token[0]))
 
+    result += custom_synset
     return ' '.join(result)
