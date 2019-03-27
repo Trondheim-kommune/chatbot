@@ -46,6 +46,15 @@ def expand_query(query):
         # Find all synsets for the word, using the Norwegian language.
         synsets = wn.synsets(token[0], lang='nob', pos=pos)
 
+        # Get a custom synset wrapper
+        custom_synset_wrapper = SynsetWrapper.get_instance()
+        # Get the synset for this token
+        new_synset = custom_synset_wrapper.get_synset(token[0])
+        if new_synset:
+            # Remove the token itself to avoid duplication
+            new_synset.remove(token[0])
+            custom_synset.update(new_synset)
+
         if synsets:
             # Store synonyms in a set, as when there are multiple synsets, we
             # might end up getting the same lemma names multiple times.
@@ -66,9 +75,6 @@ def expand_query(query):
 
         result.append(token[0])
 
-        # Add custom synset
-        custom_synset_wrapper = SynsetWrapper.get_instance()
-        custom_synset.update(custom_synset_wrapper.get_synset(token[0]))
-
+    # Add custom synset to the query
     result += custom_synset
     return ' '.join(result)

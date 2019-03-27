@@ -1,3 +1,5 @@
+import copy
+
 class SynsetWrapper():
     ''' Wrapper for a custom synset list. Interfaces with a text file where
     each line consists of synonyms split by comma '''
@@ -20,7 +22,7 @@ class SynsetWrapper():
 
     def get_synset(self, token):
         ''' Return a synset for a given token '''
-        return next((synset for synset in self.synset_list if token in synset), None)
+        return next((copy.deepcopy(synset) for synset in self.synset_list if token in synset), None)
 
     @staticmethod
     def synset_file_updated():
