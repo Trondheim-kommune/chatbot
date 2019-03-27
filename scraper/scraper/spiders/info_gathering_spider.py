@@ -41,16 +41,12 @@ class InfoGatheringSpider(scrapy.Spider):
     # Enable to display additional debugging information to output when the crawler is run.
     # In practice, this will pretty print the exported tree when a page is scraped.
 
-    debug = None
-    if config['debug']:
-        debug = 'debug'
+    debug = 'debug' if config['debug'] else None
 
     # If a strong tag should be seen as a sub header.
-    strong_headers = None
-    if config['strong_headers']:
-        strong_headers = 'strong'
+    strong_headers = 'strong' if config['strong_headers'] else None
 
-    # Root url for all web pages. Must not end with '/'.
+    # Root url for all web pages
     root_url = config['url']['root_url']
 
     # The links to start the crawling process on.
@@ -60,22 +56,14 @@ class InfoGatheringSpider(scrapy.Spider):
 
     # Paths on the site which are allowed. Only paths which match
     # these will ever be visited.
-    allowed_paths = map(re.compile, config['url']['allowed_paths'])
+    allowed_paths = list(map(re.compile, config['url']['allowed_paths']))
 
     # Pages in this list will be visited and links on them will
-    # be visited, however the data will not be scrapaed.
-    # Do not add data from the home page, it ranks highly but is completely useless.
-
-    scrape_blacklist = map(re.compile, config['url']['scrape_blacklist'])
+    # be visited, however the data will not be scraped.
+    scrape_blacklist = list(map(re.compile, config['blacklist']['scrape']))
 
     # These links will never be visited, even if the path is allowed above.
-    visit_blacklist = map(re.compile, config['blacklist']['visits'])
-    # News articles.
-    # Avoid misinformation about health and safety.
-    # These pages are pretty boring and contain an awful lot of maps.
-    # These pages contain large blocks of text.
-    # These pages are quite technical in their nature.
-    # These pages are difficult to parse and contain little information.
+    visit_blacklist = list(map(re.compile, config['blacklist']['visit']))
 
     # These selectors will be removed from all pages, as they contain very
     # little actual information, and are equal on all pages.
@@ -95,7 +83,7 @@ class InfoGatheringSpider(scrapy.Spider):
     garbage_resources = set(config['blacklist']['resources'])
 
     # The text used for the title on 404 pages. Used to detect silent 404 error.
-    not_found_text = config['blacklist']['404_text']
+    not_found_text = config['blacklist']['not_found_text']
 
     # Hierarchy for sorting categories.
     # Elements with level=None will follow normal html hierarchy
@@ -297,11 +285,11 @@ class InfoGatheringSpider(scrapy.Spider):
                     # Add the element text to parent instead of creating a
                     # new element
                     if elem_text in parent.text:
-                        parent.text += ' ' + url
+                        parent.text += '\n' + url
                         continue
 
                     # Add the URL and elem_text into the end of the parent's text
-                    parent.text += ' ' + elem_text + ' ' + url
+                    parent.text += '\n' + elem_text + ' ' + url
             elif elem_tag in self.ignored_children_tags_for_parents \
                     and current_parent.tag \
                     in self.ignored_children_tags_for_parents[elem_tag]:

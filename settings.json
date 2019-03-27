@@ -23,14 +23,11 @@
             "p": 7
         },
         "url": {
-            "root_url": "https://www.trondheim.kommune.no",
+            "root_url": "https://www.trondheim.kommune.no/",
             "allowed_paths": [
                 "https://www.trondheim.kommune.no/tema",
                 "https://www.trondheim.kommune.no/aktuelt",
                 "https://www.trondheim.kommune.no/org"
-            ],
-            "scrape_blacklist": [
-                "https://www.trondheim.kommune.no/?$"
             ]
         },
         "blacklist": {
@@ -43,7 +40,10 @@
                 ".nav",
                 "#ssp_fantdu"
             ],
-            "visits": [
+            "scrape": [
+                "https://www.trondheim.kommune.no/?$"
+            ],
+            "visit": [
                 "https://www.trondheim.kommune.no/aktuelt",
                 "https://www.trondheim.kommune.no/tema/helse-og-omsorg",
                 "https://www.trondheim.kommune.no/tema/bygg-kart-og-eiendom",
@@ -61,7 +61,7 @@
                 "~"
             ],
             "resources": [],
-            "404_text": "Finner ikke siden",
+            "not_found_text": "Finner ikke siden",
             "ignored_children_tags_for_parents": {
                 "strong": [
                     "p",
