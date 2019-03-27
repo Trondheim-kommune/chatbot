@@ -1,0 +1,14 @@
+[
+    {
+        "question": "Hvem er ordfører?",
+        "answers": [
+            {
+                "point": 1,
+                "text": "Rita Ottervik"
+            }, {
+                "point": 0.5,
+                "text": "Ola Lund Renolen"
+            }
+        ]
+    }
+]
