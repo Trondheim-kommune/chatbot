@@ -1,7 +1,7 @@
 from model.ModelFactory import ModelFactory
 import model.db_util as util
 from sklearn.metrics.pairwise import cosine_similarity
-from model.keyword_gen import get_tfidf_model
+from model.nlp import get_tfidf_model
 from model.query_expansion import expand_query
 from util.config_util import Config
 import pymongo
@@ -47,7 +47,9 @@ def perform_search(query_text):
     util.set_db(factory)
 
     # Perform simple query expansion on the original query.
+    print('Pre expansion: ', query_text)
     query = expand_query(query_text)
+    print('Post expansion: ', query)
 
     # Retrieve a set of documents using MongoDB. We then attempt to filter these further.
     docs = factory.get_document(query)
