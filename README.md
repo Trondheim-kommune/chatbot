@@ -90,7 +90,7 @@ multiple things you could change. Every change needed to make this project work 
     * The only thing you can change here is accepted_tags. This changes which HTML element are allowed to be made into a leaf node.
 * scraper
     * debug: If you want more logging to stdout whilst running the scraper.
-    * strong_headers: If a strong tag should be seen as a sub header.
+    * alternative_headers: If elements such as strong tags should be seen as a sub header.
     * concatenation: This is a list of elements that you may want to concatenate with other siblings of the same element. Also a value for the maximum amount of words allowed after concatenation.
     * url:
         * root_url: Which url should the scraper start on.

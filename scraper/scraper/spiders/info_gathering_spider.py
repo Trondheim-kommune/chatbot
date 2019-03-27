@@ -43,8 +43,8 @@ class InfoGatheringSpider(scrapy.Spider):
 
     debug = 'debug' if config['debug'] else None
 
-    # If a strong tag should be seen as a sub header.
-    strong_headers = 'strong' if config['strong_headers'] else None
+    # Elements which sometimes are used to indicate a header.
+    alternative_headers = config['alternative_headers']
 
     # Root url for all web pages
     root_url = config['url']['root_url']
@@ -228,25 +228,25 @@ class InfoGatheringSpider(scrapy.Spider):
             if any(sentence in elem_text for sentence in self.garbage_text):
                 break
 
-            if self.strong_headers:
-                # If a paragraph contains a strong tag, and the correct lag is set, we
-                # treat that combination as a header. This check avoids adding the strong
-                # tag in addition to the custom header.
-                if elem_tag == 'strong' and current_parent.tag == 'h6' and \
+            if self.alternative_headers:
+                # If a paragraph contains for example a strong tag, we can
+                # treat that combination as a header. This check avoids adding
+                # the strong tag in addition to the custom header.
+                if elem_tag in self.alternative_headers and current_parent.tag == 'h6' and \
                         current_parent.text == elem_text:
                     continue
 
                 if elem_tag == 'p':
-                    # Find all strong tags inside this paragraph.
-                    strongs = elem.find_all('strong')
+                    # Find all alternative header tags inside this paragraph.
+                    headers = elem.find_all(self.alternative_headers)
 
-                    # Check if there is only 1 strong tag, and check if it contains
+                    # Check if there is only 1 alternative header tag, and check if it contains
                     # all of the text inside the paragraph.
-                    if len(strongs) == 1 and elem_text == strongs[0].text.strip():
+                    if len(headers) == 1 and elem_text == headers[0].text.strip():
                         # Locate the parent in which a H6 tag would be inserted.
                         parent = self.locate_parent('h6', current_parent, root)
 
-                        # Add a custom H6 element instead of a paragraph or strong element
+                        # Add a custom H6 element.
                         current_parent = TreeElement(
                             'h6',
                             page_id,

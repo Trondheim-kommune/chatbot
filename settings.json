@@ -17,7 +17,7 @@
     },
     "scraper": {
         "debug": false,
-        "strong_headers": true,
+        "alternative_headers": ["strong"],
         "concatenation": {
             "li": 100,
             "p": 7
