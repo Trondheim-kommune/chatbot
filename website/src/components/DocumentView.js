@@ -223,69 +223,71 @@ export default class DocumentView extends React.Component {
             <a href={this.state.url}>{this.state.url}</a>
           </h1>
         )}
-        {this.state.manual && (
-          <div>
-            <h2>Manuelle endringer</h2>
-            <p>
-              Her kan du endre svarene til botten manuelt. Oppdater teksten og
-              trykk på lagre for å oppdatere.
+        <div className="flex">
+          {this.state.manual && (
+            <div className="sub-container">
+              <h2>Manuelle endringer</h2>
+              <p>
+                Her kan du endre svarene til botten manuelt. Oppdater teksten og
+                trykk på lagre for å oppdatere.
             </p>
-            <form>
-              <strong>Svar:</strong>
-              {textAreasManual}
-              <button
-                className="newText"
-                type="button"
-                onClick={e => this.createNewAnswer(e)}
-              >
-                Nytt svar
+              <form>
+                <strong>Svar:</strong>
+                {textAreasManual}
+                <button
+                  className="newText"
+                  type="button"
+                  onClick={e => this.createNewAnswer(e)}
+                >
+                  Nytt svar
               </button>
-              <p>
-                Man kan også oppdatere, legge til og slette nøkkelord og
-                selvsikkerheten deres.
+                <p>
+                  Man kan også oppdatere, legge til og slette nøkkelord og
+                  selvsikkerheten deres.
               </p>
-              <p>
-                Selvsikkerheten er et tall fra 0 til 1. 1 om du må ha dette
-                søketordet for å få dette svaret.
+                <p>
+                  Selvsikkerheten er et tall fra 0 til 1. 1 om du må ha dette
+                  søketordet for å få dette svaret.
               </p>
+                <p>
+                  <strong>Nøkkelord:</strong>
+                </p>
+                {keywordsManual}
+                <button
+                  className="newKeyword"
+                  type="button"
+                  onClick={e => this.createNewKeyword(e)}
+                >
+                  Nytt nøkkelord
+              </button>
+                <input type="button" value="Lagre" className="save" onClick={e => this.handleSubmit(e)} />
+              </form>
+            </div>
+          )}
+          {this.state.automatic && (
+            <div className="sub-container">
+              {this.state.url && (
+                <h2>
+                  {' '}
+                  Automatisk hentet fra{' '}
+                  <a href={this.state.url}>{this.state.url}</a>
+                </h2>
+              )}
+              <p>
+                Sammenlign de manuelle endringene med informasjonen hentet fra
+                nettsiden
+            </p>
+              <p>
+                <strong>Svar:</strong>
+              </p>
+              {textAreasAutomatic}
               <p>
                 <strong>Nøkkelord:</strong>
               </p>
-              {keywordsManual}
-              <button
-                className="newKeyword"
-                type="button"
-                onClick={e => this.createNewKeyword(e)}
-              >
-                Nytt nøkkelord
-              </button>
-              <input type="button" value="Lagre" className="save" onClick={e => this.handleSubmit(e)} />
-            </form>
-          </div>
-        )}
-        {this.state.automatic && (
-          <div>
-            {this.state.url && (
-              <h2>
-                {' '}
-                Automatisk hentet fra{' '}
-                <a href={this.state.url}>{this.state.url}</a>
-              </h2>
-            )}
-            <p>
-              Sammenlign de manuelle endringene med informasjonen hentet fra
-              nettsiden
-            </p>
-            <p>
-              <strong>Svar:</strong>
-            </p>
-            {textAreasAutomatic}
-            <p>
-              <strong>Nøkkelord:</strong>
-            </p>
-            {keywordsAutomatic}
-          </div>
-        )}
+              {keywordsAutomatic}
+            </div>
+          )}
+        </div>
       </div>
     );
   }
