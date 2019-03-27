@@ -95,14 +95,14 @@ multiple things you could change. Every change needed to make this project work 
     * url:
         * root_url: Which url should the scraper start on.
         * allowed_paths: Which paths should the scraper be allowed to scrape. (list)
-        * scrape_blacklist: Pages in this list will be visited and links on them will be visited, however the data will not be scrapaed.
     * blacklist:
         * elements: These selectors will be removed from all pages, as they contain very little actual information, and are equal on all pages.
-        * visits: Sites that should never be visited by the scraper.
+        * scrape: Pages in this list will be visited and links on them will be visited, however the data will not be scraped.
+        * visit: Sites that should never be visited by the scraper.
         * texts: Elements containing text equal to one of these sentences will be removed from all pages.
         * start_url: Ignore the url if it starts with this.
         * resources: Elements containing an url in href that ends with the following will be removed.
-        * 404_text: The text used for the title on 404 pages. Used to detect silent 404 error.
+        * not_found_text: The text used for the title on 404 pages. Used to detect silent 404 errors.
     * hierarchy:
         * How the different HTML elements should be sorted.
 * query_system
