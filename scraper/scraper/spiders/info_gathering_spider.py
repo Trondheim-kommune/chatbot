@@ -32,8 +32,7 @@ class InfoGatheringSpider(scrapy.Spider):
     # Name of the spider. This is the name to use from the Scrapy CLI.
     name = 'info_gathering'
 
-    config = Config.get_value(["scraper"])
-    print(config)
+    config = Config.get_value(['scraper'])
 
     # The following few lines contain command line flags.
     # All flags default to false, so do not explicitly set them as so.
@@ -43,16 +42,16 @@ class InfoGatheringSpider(scrapy.Spider):
     # In practice, this will pretty print the exported tree when a page is scraped.
 
     debug = None
-    if config["debug"]:
-        debug = "debug"
+    if config['debug']:
+        debug = 'debug'
 
     # If a strong tag should be seen as a sub header.
     strong_headers = None
-    if config["strong_headers"]:
-        strong_headers = "strong"
+    if config['strong_headers']:
+        strong_headers = 'strong'
 
     # Root url for all web pages. Must not end with '/'.
-    root_url = config["url"]["root_url"]
+    root_url = config['url']['root_url']
 
     # The links to start the crawling process on.
     start_urls = [
@@ -61,62 +60,57 @@ class InfoGatheringSpider(scrapy.Spider):
 
     # Paths on the site which are allowed. Only paths which match
     # these will ever be visited.
-    allowed_paths = []
-    for allowed_path in config["url"]["allowed_paths"]:
-        allowed_paths.append(re.compile(allowed_path))
+    allowed_paths = map(re.compile, config['url']['allowed_paths'])
 
     # Pages in this list will be visited and links on them will
     # be visited, however the data will not be scrapaed.
     # Do not add data from the home page, it ranks highly but is completely useless.
-    scrape_blacklist = []
-    for blacklist in config["url"]["scrape_blacklist"]:
-        scrape_blacklist.append(re.compile(blacklist))
+
+    scrape_blacklist = map(re.compile, config['url']['scrape_blacklist'])
 
     # These links will never be visited, even if the path is allowed above.
-    visit_blacklist = []
-    for blacklist in config["blacklist"]["visits"]:
-        visit_blacklist.append(re.compile(blacklist))
-        # News articles.
-        # Avoid misinformation about health and safety.
-        # These pages are pretty boring and contain an awful lot of maps.
-        # These pages contain large blocks of text.
-        # These pages are quite technical in their nature.
-        # These pages are difficult to parse and contain little information.
+    visit_blacklist = map(re.compile, config['blacklist']['visits'])
+    # News articles.
+    # Avoid misinformation about health and safety.
+    # These pages are pretty boring and contain an awful lot of maps.
+    # These pages contain large blocks of text.
+    # These pages are quite technical in their nature.
+    # These pages are difficult to parse and contain little information.
 
     # These selectors will be removed from all pages, as they contain very
     # little actual information, and are equal on all pages.
-    garbage_elements = set(config["blacklist"]["elements"])
+    garbage_elements = set(config['blacklist']['elements'])
 
     # Elements containing text equal to one of these sentences will be
     # removed from all pages.
 
-    garbage_text = set(config["blacklist"]["texts"])
+    garbage_text = set(config['blacklist']['texts'])
 
     # Elements containing an url in href that starts with the following
     # will be removed
-    garbage_start_urls = set(config["blacklist"]["start_url"])
+    garbage_start_urls = set(config['blacklist']['garbage_start_urls'])
 
     # Elements containing an url in href that ends with the following
     # will be removed.
-    garbage_resources = set(config["blacklist"]["resources"])
+    garbage_resources = set(config['blacklist']['resources'])
 
     # The text used for the title on 404 pages. Used to detect silent 404 error.
-    not_found_text = config["blacklist"]["404_text"]
+    not_found_text = config['blacklist']['404_text']
 
     # Hierarchy for sorting categories.
     # Elements with level=None will follow normal html hierarchy
-    hierarchy = config["hierarchy"]
+    hierarchy = config['hierarchy']
 
     # If a tag is listed here, sequences of tabs belonging to one of these types
     # will all be merged into one tag. For example, directly following paragraph
     # tags will be merged into one big paragraph, separated with newlines.
     # The value corresponding to each key is the word limit for when
     # the following tag can be merged together
-    concatenation_tags_word_limit = config["concatenation"]
+    concatenation_tags_word_limit = config['concatenation']
 
     # Of the elements in the hierarchy, these tags will not be created as nodes if
     # their parent is in the set of parents.
-    ignored_children_tags_for_parents = config["blacklist"]["ignored_children_tags_for_parents"]
+    ignored_children_tags_for_parents = config['blacklist']['ignored_children_tags_for_parents']
 
     def extract_metadata(self, root, soup, page_id):
         ''' Extract keywords metadata from the header of the page and add them

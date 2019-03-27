@@ -56,7 +56,7 @@
                 "Se kart",
                 "_______________"
             ],
-            "start_url": [
+            "garbage_start_urls": [
                 "#",
                 "~"
             ],
