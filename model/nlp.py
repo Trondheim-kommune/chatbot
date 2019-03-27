@@ -35,6 +35,7 @@ def stem_token(token):
     ''' Stem a token using the NLTK SnowballStemmer. '''
     return stemmer.stem(token)
 
+
 class Tokenizer(object):
     def has_digits(self, token):
         ''' Returns true if the given string contains any digits. '''

@@ -36,7 +36,7 @@ class SynsetWrapper():
         ''' Read the contents of the synset file and add them to the
         synset_list'''
         # Put this in the global config
-        path = 'model/synset'
+        path = 'model/synset.txt'
 
         with open(path) as synset_file:
             self.synset_list = [
