@@ -38,7 +38,7 @@ class SynsetWrapper():
 
     def __read_synset_file(self):
         ''' Read the contents of the synset file and add them to the
-        synset_list'''
+        synset_list '''
         with open(SYNSET_FILE) as synset_file:
             self.synset_list = [
                 [stem_token(word.strip()) for word in line.split(',')]
