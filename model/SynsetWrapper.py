@@ -1,3 +1,8 @@
+from nltk.stem.snowball import SnowballStemmer
+
+stemmer = SnowballStemmer('norwegian')
+
+
 class SynsetWrapper():
     ''' Wrapper for a custom synset list. Interfaces with a text file where
     each line consists of synonyms split by comma '''
@@ -34,4 +39,7 @@ class SynsetWrapper():
         path = 'model/synset'
 
         with open(path) as synset_file:
-            self.synset_list = [line.replace(' ', '').strip().split(',') for line in synset_file]
+            self.synset_list = [
+                stemmer.stem(word.strip())
+                for line in synset_file for word in line.split(',')
+            ]
