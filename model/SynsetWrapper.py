@@ -1,3 +1,4 @@
+from model.nlp import stem_token
 import copy
 
 
@@ -35,7 +36,10 @@ class SynsetWrapper():
         ''' Read the contents of the synset file and add them to the
         synset_list'''
         # Put this in the global config
-        path = 'model/synset'
+        path = 'model/synset.txt'
 
         with open(path) as synset_file:
-            self.synset_list = [line.replace(' ', '').strip().split(',') for line in synset_file]
+            self.synset_list = [
+                [stem_token(word.strip()) for word in line.split(',')]
+                for line in synset_file
+            ]
