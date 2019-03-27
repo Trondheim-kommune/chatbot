@@ -1,12 +1,13 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
 import spacy
-from spacy.lemmatizer import Lemmatizer
-from spacy.lang.nb import LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES
+from nltk.stem.snowball import SnowballStemmer
 import string
 
 
 # Load a Norwegian language model for Spacy.
 nb = spacy.load('nb_dep_ud_sm')
+
+stemmer = SnowballStemmer('norwegian')
 
 
 def get_stopwords():
@@ -30,10 +31,12 @@ def extract_top(feature_names, sorted_items):
     return [(feature_names[i], score) for i, score in sorted_items]
 
 
-class Tokenizer(object):
-    def __init__(self):
-        self.lemmatize = Lemmatizer(LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES)
+def stem_token(token):
+    ''' Stem a token using the NLTK SnowballStemmer. '''
+    return stemmer.stem(token)
 
+
+class Tokenizer(object):
     def has_digits(self, token):
         ''' Returns true if the given string contains any digits. '''
         return any(char.isdigit() for char in token)
@@ -41,13 +44,20 @@ class Tokenizer(object):
     def __call__(self, doc):
         ''' Tokenize a given document. '''
         # Tokenize the document.
-        tokens = [self.lemmatize(token.text, token.pos_)[0] for token in nb(doc)]
-        # Remove stopwords from the tokens.
-        tokens = [token for token in tokens if token not in stop_words]
+        tokens = [token.text for token in nb(doc)]
+
         # Remove punctuation tokens.
         tokens = [token for token in tokens if token not in string.punctuation]
+
         # Remove tokens which contain any number.
         tokens = [token for token in tokens if not self.has_digits(token)]
+
+        # Remove stopwords from the tokens.
+        tokens = [token for token in tokens if token not in stop_words]
+
+        # Stem all tokens.
+        tokens = [stem_token(token) for token in tokens]
+
         # Return the finished list of tokens.
         return tokens
 

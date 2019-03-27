@@ -3,5 +3,13 @@ coverage:
     project:
       default:
         target: 20%
+    patch:
+      default:
+        enabled: no
+        if_not_found: success
+    changes:
+      default:
+        enabled: no
+        if_not_found: success
 
 comment: off
