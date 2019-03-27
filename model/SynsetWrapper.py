@@ -39,6 +39,6 @@ class SynsetWrapper():
 
         with open(path) as synset_file:
             self.synset_list = [
-                stem_token(word.strip())
-                for line in synset_file for word in line.split(',')
+                [stem_token(word.strip()) for word in line.split(',')]
+                for line in synset_file
             ]
