@@ -6,6 +6,8 @@ from anytree import RenderTree, NodeMixin
 from anytree.exporter import DictExporter
 from hashlib import sha1
 import re
+from urllib.parse import urlparse
+from urllib.parse import urljoin
 
 
 class TreeElement(NodeMixin):
@@ -21,7 +23,7 @@ class TreeElement(NodeMixin):
 
         # We hash the URL of all pages and add a counter for the element
         # after it. This is used to diff new and stored HTML pages.
-        self.id = '%s-%s'.format(page_id, TreeElement.counter)
+        self.id = '{}-{}'.format(page_id, TreeElement.counter)
         TreeElement.counter += 1
 
 
@@ -40,9 +42,12 @@ class InfoGatheringSpider(scrapy.Spider):
     # If a strong tag should be seen as a sub header.
     strong_headers = None
 
+    # Root url for all web pages. Must not end with '/'.
+    root_url = 'https://www.trondheim.kommune.no'
+
     # The links to start the crawling process on.
     start_urls = [
-        'https://www.trondheim.kommune.no'
+        root_url
     ]
 
     # Paths on the site which are allowed. Only paths which match
@@ -78,17 +83,26 @@ class InfoGatheringSpider(scrapy.Spider):
 
     # These selectors will be removed from all pages, as they contain very
     # little actual information, and are equal on all pages.
-    garbage_elements = ['.footer', '.header', 'body > .container',
-                        '.skip-link', '.navigation', '.nav', '#ssp_fantdu']
+    garbage_elements = {'.footer', '.header', 'body > .container',
+                        '.skip-link', '.navigation', '.nav', '#ssp_fantdu'}
 
     # Elements containing text equal to one of these sentences will be
     # removed from all pages.
-    garbage_text = ['Sist oppdatert:']
+    garbage_text = {'Sist oppdatert:', 'Se kart', '_______________'}
+
+    # Elements containing an url in href that starts with the following
+    # will be removed
+    garbage_start_urls = {'#', '~'}
+
+    # Elements containing an url in href that ends with the following
+    # will be removed.
+    garbage_resources = {}
 
     # The text used for the title on 404 pages. Used to detect silent 404 error.
     not_found_text = 'Finner ikke siden'
 
     # Hierarchy for sorting categories.
+    # Elements with level=None will follow normal html hierarchy
     hierarchy = {
         # Header elements.
         'h1': 1,
@@ -98,27 +112,34 @@ class InfoGatheringSpider(scrapy.Spider):
         'h5': 5,
         'h6': 6,
 
-        # Table elements.
-        'tbody': 6,
+        # Text elements
+        'strong': 10,
+        'p': 11,
+        'a': 15,
 
-        # Text elements and lists.
-        'strong': 8,
-        'p': 9,
-        'a': 10,
-    }
+        # Table elements
+        'tr': 8,
 
-    # Hierarchy for sorting according to HTML structure.
-    html_hierarchy = {
-        'tr': 1,
-        'td': 2,
-        'ul': 1,
-        'li': 2,
+        # List elements
+        'li': 9,
     }
 
     # If a tag is listed here, sequences of tabs belonging to one of these types
     # will all be merged into one tag. For example, directly following paragraph
     # tags will be merged into one big paragraph, separated with newlines.
-    concatenation_tags = ['p']
+    # The value corresponding to each key is the word limit for when
+    # the following tag can be merged together
+    concatenation_tags_word_limit = {
+        'li': 100,
+        'p': 7,
+    }
+
+    # Of the elements in the hierarchy, these tags will not be created as nodes if
+    # their parent is in the set of parents.
+    ignored_children_tags_for_parents = {
+        'strong': {'p', 'li', 'tr', 'h1', 'h2', 'h3', 'h4', 'h5'},
+        'p': {'li'},
+    }
 
     def extract_metadata(self, root, soup, page_id):
         ''' Extract keywords metadata from the header of the page and add them
@@ -140,11 +161,6 @@ class InfoGatheringSpider(scrapy.Spider):
         elem_level = None
         if elem_tag in self.hierarchy:
             elem_level = self.hierarchy[elem_tag]
-
-        # Data about this elements position in the html hierarchy
-        elem_html_level = None
-        if elem_tag in self.html_hierarchy:
-            elem_html_level = self.html_hierarchy[elem_tag]
 
         # The parent which will be used for the next node in the tree.
         parent = None
@@ -168,11 +184,6 @@ class InfoGatheringSpider(scrapy.Spider):
             if search_parent.tag in self.hierarchy:
                 search_parent_level = self.hierarchy[search_parent.tag]
 
-            # Whether the search parent is in the html hierarchy or not.
-            search_parent_html_level = None
-            if search_parent.tag in self.html_hierarchy:
-                search_parent_html_level = self.html_hierarchy[search_parent.tag]
-
             if search_parent_level:
                 # If both tags are in the hierarchy, check their level.
                 if elem_level:
@@ -181,21 +192,6 @@ class InfoGatheringSpider(scrapy.Spider):
                         break
 
                     if elem_level == search_parent_level:
-                        # If elements are in same level in hierarchy.
-                        parent = search_parent.parent
-                        break
-                else:
-                    # Element where hierarchy is not defined.
-                    parent = search_parent
-                    break
-            elif search_parent_html_level:
-                # If both tags are in the hierarchy, check their level.
-                if elem_html_level:
-                    if elem_level > search_parent_html_level['level']:
-                        parent = search_parent
-                        break
-
-                    if elem_level == search_parent_html_level['level']:
                         # If elements are in same level in hierarchy.
                         parent = search_parent.parent
                         break
@@ -264,6 +260,10 @@ class InfoGatheringSpider(scrapy.Spider):
             if not elem_text:
                 continue
 
+            # Set list for list point element
+            if elem_tag == 'li':
+                elem_text = '- ' + elem_text
+
             # Do not include elements with element text containing
             # blacklisted sentences.
             if any(sentence in elem_text for sentence in self.garbage_text):
@@ -294,36 +294,49 @@ class InfoGatheringSpider(scrapy.Spider):
                             elem_text,
                             parent,
                         )
-
                         continue
 
             # Locate the parent element to use based on the hierarchy.
             parent = self.locate_parent(elem_tag, current_parent, root)
 
             # Concatenate tags like paragraph tags which directly follow each other.
-            if elem_tag in self.concatenation_tags and parent.children:
+            if elem_tag in self.concatenation_tags_word_limit and parent.children:
                 last_child = parent.children[-1]
 
                 # Start a new paragraph if the last child already has children.
                 if last_child and last_child.tag == elem_tag and not last_child.children:
-                    last_child.text += '\n\n' + elem_text
-                    continue
-
-            # Add the anchor's href url when finding an anchor
-            if elem_tag == 'a':
-                # Get the url from anchor
-                url = elem.get('href')
-
-                # If the URL is defined and not the same as the elem text
-                if url is not None and url != elem_text:
-                    # If the element and parent has the same information
-                    # Don't create a new element, but add url instead
-                    if elem_text == parent.text:
-                        parent.text += '\n' + elem.get('href')
+                    # Concatenate the texts until limit reached
+                    if len(elem_text.split()) \
+                            <= self.concatenation_tags_word_limit[elem_tag]:
+                        last_child.text += '\n' + elem_text
                         continue
 
-                    # Add the URL into the end of the elem text
-                    elem_text += '\n' + elem.get('href')
+            # Add the anchor's href url when finding an anchor
+            # If anchor, don't create a new element, but add url instead to parent
+            if elem_tag == 'a':
+                # Create a valid url from the href url if any
+                url = self.create_valid_url(elem.get('href'))
+
+                # If the url from href is invalid, ignore anchor tag
+                if url is None:
+                    continue
+
+                # If the URL is unequal to the elem text
+                if url != elem_text:
+                    # Add the element text to parent instead of creating a
+                    # new element
+                    if elem_text in parent.text:
+                        parent.text += ' ' + url
+                        continue
+
+                    # Add the URL and elem_text into the end of the parent's text
+                    parent.text += ' ' + elem_text + ' ' + url
+            elif elem_tag in self.ignored_children_tags_for_parents \
+                    and current_parent.tag \
+                    in self.ignored_children_tags_for_parents[elem_tag]:
+                # If the parent's text includes this element's text,
+                # don't create a node for this element.
+                continue
             else:
                 # Create the new element.
                 current_parent = TreeElement(
@@ -332,7 +345,36 @@ class InfoGatheringSpider(scrapy.Spider):
                     elem_text,
                     parent,
                 )
+
         return root
+
+    # Returns a valid url based on blacklisting and type
+    def create_valid_url(self, url):
+        ''' Takes in an url from an anchor tag's href.
+        Returns None if the url is None, blacklisted or invalid.
+        Returns an absolute url otherwise. '''
+
+        # If the url isn't defined
+        if url is None:
+            return None
+
+        # Check if the url stars with blacklisted characters
+        for start_url in self.garbage_start_urls:
+            if url.startswith(start_url):
+                return None
+
+        # Check if the url is a blacklisted resource or file type
+        for end_url in self.garbage_resources:
+            if url.endswith(end_url):
+                # This url is blacklisted, ignore this element
+                return None
+
+        # If the url is relative or a valid resource link
+        if not bool(urlparse(url).netloc):
+            # Concatenate the root and relative url
+            url = urljoin(self.root_url, url)
+
+        return url
 
     def pretty_print_tree(self, root):
         ''' Print a scraped tree for debugging. '''
@@ -340,7 +382,7 @@ class InfoGatheringSpider(scrapy.Spider):
         for pre, fill, node in RenderTree(root):
             # We remove newlines from the text with spaces to preserve
             # the shape of the tree when printing in the terminal.
-            print('%s%s: %s' % (pre, node.tag, node.text.replace('\n', ' ')))
+            print('{}{}: {}'.format(pre, node.tag, node.text.replace('\n', ' ')))
 
         # Also add a new line before the next tree.
         print()
