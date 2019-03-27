@@ -330,7 +330,7 @@ class InfoGatheringSpider(scrapy.Spider):
                         continue
 
                     # Add the URL and elem_text into the end of the parent's text
-                    parent.text += ' ' + elem_text + '\n' + url
+                    parent.text += ' ' + elem_text + ' ' + url
             elif elem_tag in self.ignored_children_tags_for_parents \
                     and current_parent.tag \
                     in self.ignored_children_tags_for_parents[elem_tag]:
