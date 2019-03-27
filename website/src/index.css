@@ -28,3 +28,11 @@ button, input {
   margin: 15px;
   padding: 5px;
 }
+
+.flex {
+  display: flex;
+}
+
+.sub-container {
+  flex: 1;
+}
