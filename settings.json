@@ -94,6 +94,7 @@
     },
     "query_system": {
         "not_found": "Jeg fant ikke informasjonen du spurte etter.",
-        "multiple_answers": "Jeg har flere mulige svar til deg."
+        "multiple_answers": "Jeg har flere mulige svar til deg.",
+        "custom_synset_file": "model/synset.txt"
     }
 }
