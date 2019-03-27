@@ -92,11 +92,11 @@ class InfoGatheringSpider(scrapy.Spider):
 
     # Elements containing an url in href that starts with the following
     # will be removed
-    garbage_start_urls = {'#', '.', '~'}
+    garbage_start_urls = {'#', '~'}
 
     # Elements containing an url in href that ends with the following
     # will be removed.
-    garbage_resources = {'.aspx'}
+    garbage_resources = {}
 
     # The text used for the title on 404 pages. Used to detect silent 404 error.
     not_found_text = 'Finner ikke siden'
@@ -326,7 +326,7 @@ class InfoGatheringSpider(scrapy.Spider):
                     # Add the element text to parent instead of creating a
                     # new element
                     if elem_text in parent.text:
-                        parent.text += '\n' + url
+                        parent.text += ' ' + url
                         continue
 
                     # Add the URL and elem_text into the end of the parent's text
