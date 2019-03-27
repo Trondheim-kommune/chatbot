@@ -40,7 +40,7 @@ services:
         environment:
           - DB_USER=${DB_USER}
           - DB_PWD=${DB_PWD}
-          - DB_NAME=dev_db
+          - DB_NAME=test_db
         links:
             - mongodb:mongodb
         #command: mongo --host mongodb --eval  "db.getSiblingDB('dev_db').createUser({user:'agent25', pwd:'agent25', roles:[{role:'readWrite',db:'dev_db'}]});"
