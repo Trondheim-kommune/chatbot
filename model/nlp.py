@@ -7,6 +7,8 @@ import string
 # Load a Norwegian language model for Spacy.
 nb = spacy.load('nb_dep_ud_sm')
 
+stemmer = SnowballStemmer('norwegian')
+
 
 def get_stopwords():
     ''' Retrieves stopwords from the stopwords file. '''
@@ -29,10 +31,11 @@ def extract_top(feature_names, sorted_items):
     return [(feature_names[i], score) for i, score in sorted_items]
 
 
-class Tokenizer(object):
-    def __init__(self):
-        self.stemmer = SnowballStemmer('norwegian')
+def stem_token(token):
+    ''' Stem a token using the NLTK SnowballStemmer. '''
+    return stemmer.stem(token)
 
+class Tokenizer(object):
     def has_digits(self, token):
         ''' Returns true if the given string contains any digits. '''
         return any(char.isdigit() for char in token)
@@ -52,7 +55,7 @@ class Tokenizer(object):
         tokens = [token for token in tokens if token not in stop_words]
 
         # Stem all tokens.
-        tokens = [self.stemmer.stem('token') for token in tokens]
+        tokens = [stem_token(token) for token in tokens]
 
         # Return the finished list of tokens.
         return tokens

@@ -1,10 +1,9 @@
 import nltk
 from nltk.corpus import wordnet as wn
 import spacy
-from nltk.stem.snowball import SnowballStemmer
+from model.nlp import stem_token, get_stopwords
 import string
 from model.SynsetWrapper import SynsetWrapper
-from model.keyword_gen import get_stopwords
 
 
 nltk.download('wordnet')
@@ -12,8 +11,6 @@ nltk.download('omw')
 
 # Load a Norwegian language model for Spacy.
 nb = spacy.load('nb_dep_ud_sm')
-
-stemmer = SnowballStemmer('norwegian')
 
 stopwords = get_stopwords()
 
@@ -24,7 +21,7 @@ def expand_query(query):
 
     tokens = [
       # Store tuples of stemmed tokens and their corresponding POS tags.
-      (stemmer.stem(token.text), token.pos_) for token in nb(query)
+      (stem_token(token.text), token.pos_) for token in nb(query)
       # Filter away punctuation.
       if token.text not in string.punctuation
     ]

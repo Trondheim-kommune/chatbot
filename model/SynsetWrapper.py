@@ -1,7 +1,5 @@
-from nltk.stem.snowball import SnowballStemmer
+from model.nlp import stem_token
 import copy
-
-stemmer = SnowballStemmer('norwegian')
 
 
 class SynsetWrapper():
@@ -41,6 +39,6 @@ class SynsetWrapper():
 
         with open(path) as synset_file:
             self.synset_list = [
-                stemmer.stem(word.strip())
+                stem_token(word.strip())
                 for line in synset_file for word in line.split(',')
             ]
