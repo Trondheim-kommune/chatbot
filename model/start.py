@@ -19,15 +19,14 @@ def main():
     insert_documents(data)
 
 
-def insert_documents(data, db="dev_db"):
+def insert_documents(data):
     """
     :param data: Is a list of serialized documents that should be inserted.
-    :param db: To which db the documents should be inserted.
     :return: a list of conflict document ids.
     """
     factory = ModelFactory.get_instance()
 
-    util.set_db(factory, db=db)
+    util.set_db(factory)
 
     """
     How we use MongoDB:

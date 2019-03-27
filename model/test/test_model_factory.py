@@ -9,7 +9,7 @@ fact = ModelFactory.get_instance()
 
 def test_get_document():
     global fact
-    util.set_db(fact, db="test_db")
+    util.set_db(fact)
     with open("model/test/test_data/test_data_model_factory.json", 'r') as f:
         data = json.load(f)
 
@@ -39,7 +39,7 @@ def test_get_document():
 def test_update_document():
     global fact
     data = '{"name": "testname", "manually_changed": false }'
-    util.set_db(fact, db="test_db")
+    util.set_db(fact)
 
     fact.post_document(data, "test")
     fact.get_collection("test").create_index(

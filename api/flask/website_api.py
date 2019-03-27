@@ -3,17 +3,13 @@ import api.flask.flask_util as flask_util
 from model.ModelFactory import ModelFactory
 from model.nlp import stem_token
 import json
-import os
 from flask import request, Blueprint
 
 web_api = Blueprint('Website API', __name__, template_folder='templates')
 
 factory = ModelFactory.get_instance()
 
-if os.getenv("TEST_FLAG"):
-    db_util.set_db(factory, db="test_db")
-else:
-    db_util.set_db(factory, db="dev_db")
+db_util.set_db(factory)
 
 
 @web_api.route("/v1/web/conflict_ids", methods=["GET"])
