@@ -3,11 +3,24 @@
         "question": "Hvem er ordfører?",
         "answers": [
             {
-                "point": 1,
+                "score": 1,
                 "text": "Rita Ottervik"
             }, {
-                "point": 0.5,
+                "score": 0.5,
                 "text": "Ola Lund Renolen"
+            }
+        ]
+    },
+    {
+        "question": "Hvem er varaordfører?",
+        "answers": [
+            {
+                "score": 1,
+                "text": "Ola Lund Renolen"
+            },
+            {
+                "score": 0.5,
+                "text": "Rita Ottervik"
             }
         ]
     }

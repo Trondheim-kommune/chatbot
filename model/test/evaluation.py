@@ -10,11 +10,12 @@ def evaluate_test(test):
     question = test["question"]
     our_answer = perform_search(question)
     correct_answers = test["answers"]
+    score = 0
     for correct_answer in correct_answers:
         if correct_answer["text"] in our_answer:
-            return correct_answer["point"]
+            score = max(score, correct_answer["score"])
 
-    return 0
+    return score
 
 
 def main():
@@ -31,9 +32,9 @@ def main():
     print("Number of questions: ", n_questions, "score:", score)
 
     if score == 0:
-        print("Average scores: 0")
+        print("Average score: 0")
     else:
-        print("Average scores:", n_questions / score)
+        print("Average score:", score / n_questions)
 
 
 if __name__ == '__main__':
