@@ -1,7 +1,7 @@
 import json
 import copy
 import urllib.request
-from model.keyword_gen import get_keywords, get_tfidf_model
+from model.nlp import get_keywords, get_tfidf_model
 from progressbar import ProgressBar
 
 
