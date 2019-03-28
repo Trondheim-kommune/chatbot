@@ -30,7 +30,7 @@ RUN ["pip3", "install", "-e", "."]
 RUN ["python3", "setup.py", "develop"]
 
 COPY nginx.conf /etc/nginx
-CMD ["./start_server_docker.sh"]
+#CMD ["./start_server_docker.sh"]
 
 # Start server
-#cmd ["./api/flask/start_server.sh"]
+cmd ["./api/flask/start_server.sh"]

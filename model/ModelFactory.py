@@ -22,10 +22,15 @@ class ModelFactory:
 
     def set_database(self, ip, db_name, username, password, port):
         """ Sets up conncetion to given database"""
-        client = pymongo.MongoClient("mongodb://{}:{}@{}:{}/{}"
-                                     .format(username, password,
-                                             ip, port, db_name)
-                                     )
+
+        # Seperate url for mongodb in dopcker container
+        if os.getenv("DOCKER"):
+            client = pymongo.MongoClient('mongodb://mongodb:27017')
+        else:
+            client = pymongo.MongoClient("mongodb://{}:{}@{}:{}/{}"
+                                        .format(username, password,
+                                                ip, port, db_name))
+                                     
         self.database = client[db_name]
 
     def get_document(self, query, main_collection="prod", manual_collection="manual",

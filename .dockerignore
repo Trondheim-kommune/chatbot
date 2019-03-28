@@ -10,3 +10,6 @@ README
 .travis.yml
 .coverage
 .coveragerc
+data/
+website/
+

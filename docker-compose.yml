@@ -8,6 +8,7 @@ services:
             - GOOGLE_APPLICATION_CREDENTIALS=/usr/src/app/backupagent.json
             - DB_USER=${DB_USER}
             - DB_PWD=${DB_PWD}
+            - TEST_FLAG=TRUE
             - SERVER_URL=mongodb
         ports:
             - 8080:8080
@@ -23,7 +24,6 @@ services:
           - MONGO_LOG_DIR=/dev/null
           - MONGODB_USER=${DB_USER}
           - MONGODB_PASS=${DB_PWD}
-          - MONGO_INITDB_DATABASE=dev_db
         volumes:
           - ./data/db:/data/db
         ports:
@@ -40,7 +40,7 @@ services:
         environment:
           - DB_USER=${DB_USER}
           - DB_PWD=${DB_PWD}
-          - DB_NAME=test_db
+          - DB_NAME=testing_db
         links:
             - mongodb:mongodb
         #command: mongo --host mongodb --eval  "db.getSiblingDB('dev_db').createUser({user:'agent25', pwd:'agent25', roles:[{role:'readWrite',db:'dev_db'}]});"
