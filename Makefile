@@ -1,9 +1,7 @@
 install:
-	pip install -e .
+	pip install .
 
-setup: install
-
-test: setup
+test: install
 	TEST_FLAG=TRUE pytest
 	flake8 --exclude=venv,build,website .
 

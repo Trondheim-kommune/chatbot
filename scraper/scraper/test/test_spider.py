@@ -32,8 +32,6 @@ def test_scraper_snapshot():
     spider = igs.InfoGatheringSpider()
 
     # The testing html uses strong tags as headers and concatenation p tags
-    spider.strong_headers = "true"
-    spider.concatenation_p = "true"
 
     # Crawl the html file and returns the tree structure
     tree = spider.parse(fake_response_from_file("test.html"))
