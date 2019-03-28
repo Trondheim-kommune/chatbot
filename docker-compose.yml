@@ -10,6 +10,7 @@ services:
             - DB_PWD=${DB_PWD}
             - TEST_FLAG=TRUE
             - SERVER_URL=mongodb
+            - DOCKER=TRUE
         ports:
             - 8080:8080
         links:
