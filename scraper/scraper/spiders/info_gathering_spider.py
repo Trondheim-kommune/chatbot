@@ -9,6 +9,7 @@ import re
 from urllib.parse import urlparse
 from urllib.parse import urljoin
 from util.config_util import Config
+import unicodedata
 
 
 class TreeElement(NodeMixin):
@@ -100,6 +101,9 @@ class InfoGatheringSpider(scrapy.Spider):
     # their parent is in the set of parents.
     ignored_children_tags_for_parents = config['blacklist']['ignored_children_tags_for_parents']
 
+    def normalize(self, text):
+        return unicodedata.normalize('NFKD', text)
+
     def extract_metadata(self, root, soup, page_id):
         ''' Extract keywords metadata from the header of the page and add them
         as children of the tree root element. '''
@@ -189,14 +193,14 @@ class InfoGatheringSpider(scrapy.Spider):
                 garbage_element.decompose()
 
         # Locate the title element. It might be used for the tree root.
-        title = soup.find('title').text
+        title = self.normalize(soup.find('title').text)
 
         # Do not continue with this page if we detect it as a silent 404.
         if self.not_found_text in title:
             return
 
         # Use the title as the tree root.
-        root = TreeElement('title', page_id, soup.find('title').text)
+        root = TreeElement('title', page_id, title)
 
         # Attempt extracting the keywords and adding them to the tree.
         self.extract_metadata(root, soup, page_id)
@@ -210,7 +214,7 @@ class InfoGatheringSpider(scrapy.Spider):
                 br.replace_with('\n')
 
             # Remove trailing and tailing spaces from the node contents.
-            elem_text = elem.text.strip()
+            elem_text = self.normalize(elem.text.strip())
 
             # Find the type of this element.
             elem_tag = elem.name
@@ -233,7 +237,7 @@ class InfoGatheringSpider(scrapy.Spider):
                 # treat that combination as a header. This check avoids adding
                 # the strong tag in addition to the custom header.
                 if elem_tag in self.alternative_headers and current_parent.tag == 'h6' and \
-                        current_parent.text == elem_text:
+                        self.normalize(current_parent.text) == elem_text:
                     continue
 
                 if elem_tag == 'p':
@@ -242,7 +246,7 @@ class InfoGatheringSpider(scrapy.Spider):
 
                     # Check if there is only 1 alternative header tag, and check if it contains
                     # all of the text inside the paragraph.
-                    if len(headers) == 1 and elem_text == headers[0].text.strip():
+                    if len(headers) == 1 and elem_text == self.normalize(headers[0].text.strip()):
                         # Locate the parent in which a H6 tag would be inserted.
                         parent = self.locate_parent('h6', current_parent, root)
 
@@ -284,7 +288,7 @@ class InfoGatheringSpider(scrapy.Spider):
                 if url != elem_text:
                     # Add the element text to parent instead of creating a
                     # new element
-                    if elem_text in parent.text:
+                    if elem_text in self.normalize(parent.text):
                         parent.text += '\n' + url
                         continue
 

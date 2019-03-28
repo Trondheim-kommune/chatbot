@@ -2,12 +2,16 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 import spacy
 from nltk.stem.snowball import SnowballStemmer
 import string
+import re
 
 
 # Load a Norwegian language model for Spacy.
 nb = spacy.load('nb_dep_ud_sm')
 
 stemmer = SnowballStemmer('norwegian')
+
+START_SPECIAL_CHARS = re.compile('^[{}]+'.format(re.escape(string.punctuation)))
+END_SPECIAL_CHARS = re.compile('[{}]+$'.format(re.escape(string.punctuation)))
 
 
 def get_stopwords():
@@ -51,6 +55,15 @@ class Tokenizer(object):
 
         # Remove tokens which contain any number.
         tokens = [token for token in tokens if not self.has_digits(token)]
+
+        # Remove tokens without text.
+        tokens = [token for token in tokens if bool(token.strip())]
+
+        # Remove punctuation from start of tokens.
+        tokens = [re.sub(START_SPECIAL_CHARS, '', token) for token in tokens]
+
+        # Remove punctuation from end of tokens.
+        tokens = [re.sub(END_SPECIAL_CHARS, '', token) for token in tokens]
 
         # Remove stopwords from the tokens.
         tokens = [token for token in tokens if token not in stop_words]
