@@ -51,7 +51,7 @@ services:
     web:
         build: website
         ports:
-            - 8000:80
+            - 8000:3000
         volumes:
             - .:/srv/agent25-web
-        working_dir: /usr/src/app
+        working_dir: /temp

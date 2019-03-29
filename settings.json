@@ -2,7 +2,7 @@
     "mongo": {
         "username": "agent25",
         "password": "agent25",
-        "url": "agent25.tinusf.com",
+        "url": "localhost",
         "port": 27017,
         "db": "dev_db",
         "testing_db": "test_db"
