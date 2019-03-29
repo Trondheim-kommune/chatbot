@@ -1,11 +1,9 @@
 import nltk
 from nltk.corpus import wordnet as wn
 import spacy
-from spacy.lemmatizer import Lemmatizer
-from spacy.lang.nb import LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES
 import string
 from model.SynsetWrapper import SynsetWrapper
-from model.nlp import get_stopwords
+from model.keyword_gen import get_stopwords, lemmatize
 
 
 nltk.download('wordnet')
@@ -13,8 +11,6 @@ nltk.download('omw')
 
 # Load a Norwegian language model for Spacy.
 nb = spacy.load('nb_dep_ud_sm')
-
-lemmatize = Lemmatizer(LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES)
 
 stopwords = get_stopwords()
 
