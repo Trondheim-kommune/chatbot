@@ -29,9 +29,9 @@ class ModelFactory:
             client = pymongo.MongoClient('mongodb://mongodb:27017')
         else:
             client = pymongo.MongoClient("mongodb://{}:{}@{}:{}/{}"
-                                        .format(username, password,
-                                                ip, port, db_name))
-                                     
+                                         .format(username, password,
+                                                 ip, port, db_name))
+
         self.database = client[db_name]
 
     def get_document(self, query, main_collection="prod", manual_collection="manual",

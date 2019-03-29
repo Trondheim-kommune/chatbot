@@ -1,8 +1,8 @@
 version: '2'
 services:
-    myapp:
+    agent25:
         build: .
-        container_name: "myapp"
+        container_name: "agent25"
         environment:
             - PROJECT_ID=${PROJECT_ID}
             - GOOGLE_APPLICATION_CREDENTIALS=/usr/src/app/backupagent.json
@@ -41,7 +41,7 @@ services:
         environment:
           - DB_USER=${DB_USER}
           - DB_PWD=${DB_PWD}
-          - DB_NAME=testing_db
+          - DB_NAME=test_db
         links:
             - mongodb:mongodb
         #command: mongo --host mongodb --eval  "db.getSiblingDB('dev_db').createUser({user:'agent25', pwd:'agent25', roles:[{role:'readWrite',db:'dev_db'}]});"
