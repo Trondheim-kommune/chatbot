@@ -208,7 +208,7 @@ class InfoGatheringSpider(scrapy.Spider):
             return
 
         # Use the title as the tree root.
-        root = TreeElement('title', page_id, soup.find('title').text)
+        root = TreeElement('title', page_id, soup.find('title').text.strip())
 
         # Attempt extracting the keywords and adding them to the tree.
         self.extract_metadata(root, soup, page_id)
