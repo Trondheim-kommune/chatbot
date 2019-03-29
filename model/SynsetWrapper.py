@@ -1,4 +1,3 @@
-from model.nlp import stem_token
 from util.config_util import Config
 import copy
 
@@ -41,6 +40,6 @@ class SynsetWrapper():
         synset_list '''
         with open(SYNSET_FILE) as synset_file:
             self.synset_list = [
-                [stem_token(word.strip()) for word in line.split(',')]
+                [word.strip() for word in line.split(',')]
                 for line in synset_file
             ]

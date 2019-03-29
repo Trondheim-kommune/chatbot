@@ -1,7 +1,6 @@
 import model.db_util as db_util
 import api.flask.flask_util as flask_util
 from model.ModelFactory import ModelFactory
-from model.nlp import stem_token
 import json
 from flask import request, Blueprint
 
@@ -52,10 +51,6 @@ def update_content():
     json_input_data = json.loads(request.data)
     id = json_input_data["data"]["id"]
     content = json_input_data["data"]["content"]
-
-    for i in range(len(content['keywords'])):
-        content['keywords'][i]['keyword'] = stem_token(content['keywords'][i]['keyword'])
-
     status = factory.get_database().get_collection("manual").update({"id": id}, {"$set": {
         "content": content}})
     if status["updatedExisting"] is False:
