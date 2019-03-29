@@ -20,7 +20,7 @@ class ModelFactory:
         else:
             ModelFactory.__instance = self
 
-    def set_database(self, ip, db_name, username, password, port=27017):
+    def set_database(self, ip, db_name, username, password, port):
         """ Sets up conncetion to given database"""
         client = pymongo.MongoClient("mongodb://{}:{}@{}:{}/{}"
                                      .format(username, password,

@@ -11,7 +11,7 @@ describe('Test search and adding new text and keyword', () => {
   });
 
   it('Search and add new answere and keyword for the first result ', () => {
-    const url = 'https://www.trondheim.kommune.no'
+    const url = 'https://www.trondheim.kommune.no/tema/kultur-og-fritid/lokaler/husebybadet/'
     // Type the url in the search bar
     cy.get('.searchInputField')
       .type(url)
@@ -23,7 +23,7 @@ describe('Test search and adding new text and keyword', () => {
       .click()
       .wait(waitTime);
 
-    const title = ' Velkommen til Trondheim kommune - 295cc564fe771fbb92b3278a6eee2d5cbcae2606-3'
+    const title = ' Svømmehall - Husebybadet Ordinære åpningstider - e3878fe650dc125c5c70ada53cf266b93b4af782-4'
     // Get the first result after searching and check text is what we expect
     cy.get('.itemList').first().children('.itemButton').first()
       .invoke('text').then((text => {

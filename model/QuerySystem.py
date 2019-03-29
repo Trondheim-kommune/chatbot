@@ -1,12 +1,13 @@
 from model.ModelFactory import ModelFactory
 import model.db_util as util
 from sklearn.metrics.pairwise import cosine_similarity
-from model.keyword_gen import get_tfidf_model
+from model.nlp import get_tfidf_model
 from model.query_expansion import expand_query
+from util.config_util import Config
 import pymongo
 
-NOT_FOUND = 'Jeg fant ikke informasjonen du spurte etter.'
-MULTIPLE_ANSWERS = 'Jeg har flere mulige svar til deg.'
+NOT_FOUND = Config.get_value(['query_system', 'not_found'])
+MULTIPLE_ANSWERS = Config.get_value(['query_system', 'multiple_answers'])
 
 factory = ModelFactory.get_instance()
 
@@ -43,10 +44,12 @@ def perform_search(query_text):
     ''' Takes a query string and finds the best matching document in the database. '''
     # Connect to the database to enable retrieving of documents.
     factory = ModelFactory.get_instance()
-    util.set_db(factory, db='dev_db')
+    util.set_db(factory)
 
     # Perform simple query expansion on the original query.
+    print('Pre expansion: ', query_text)
     query = expand_query(query_text)
+    print('Post expansion: ', query)
 
     # Retrieve a set of documents using MongoDB. We then attempt to filter these further.
     docs = factory.get_document(query)

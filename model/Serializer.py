@@ -1,8 +1,9 @@
 import json
 import copy
 import urllib.request
-from model.keyword_gen import get_keywords, get_tfidf_model
+from model.nlp import get_keywords, get_tfidf_model
 from progressbar import ProgressBar
+from util.config_util import Config
 
 
 class KeyWord:
@@ -117,7 +118,7 @@ class Serializer:
         """ Serialize a page object from the web scraper to the data model
         schema """
 
-        accepted_tags = ["p", "a", "li"]
+        accepted_tags = Config.get_value(["model", "accepted_tags"])
 
         # Iterate over all pages in the JSON data from scraper
         print('Serializing {} contents'.format(len(self.__data)))
@@ -157,7 +158,8 @@ class Serializer:
                         # text here and continue
                         keywords = [KeyWord(*keyword)
                                     for keyword in get_keywords(self.__vectorizer,
-                                    self.__feature_names, title+' '+child["text"])]
+                                                                self.__feature_names,
+                                                                title + ' ' + child["text"])]
 
                         content = Content(title, [child["text"]], keywords)
                         new_model = copy.deepcopy(model_template)

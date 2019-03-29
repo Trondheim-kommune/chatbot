@@ -8,6 +8,7 @@ from hashlib import sha1
 import re
 from urllib.parse import urlparse
 from urllib.parse import urljoin
+from util.config_util import Config
 
 
 class TreeElement(NodeMixin):
@@ -31,19 +32,26 @@ class InfoGatheringSpider(scrapy.Spider):
     # Name of the spider. This is the name to use from the Scrapy CLI.
     name = 'info_gathering'
 
+    config = Config.get_value(['scraper'])
+
     # The following few lines contain command line flags.
     # All flags default to false, so do not explicitly set them as so.
     # See the GitHub Wiki for information about how these are used.
 
     # Enable to display additional debugging information to output when the crawler is run.
     # In practice, this will pretty print the exported tree when a page is scraped.
+
     debug = None
+    if config['debug']:
+        debug = 'debug'
 
     # If a strong tag should be seen as a sub header.
     strong_headers = None
+    if config['strong_headers']:
+        strong_headers = 'strong'
 
     # Root url for all web pages. Must not end with '/'.
-    root_url = 'https://www.trondheim.kommune.no'
+    root_url = config['url']['root_url']
 
     # The links to start the crawling process on.
     start_urls = [
@@ -52,94 +60,57 @@ class InfoGatheringSpider(scrapy.Spider):
 
     # Paths on the site which are allowed. Only paths which match
     # these will ever be visited.
-    allowed_paths = [
-        re.compile('https://www.trondheim.kommune.no/tema'),
-        re.compile('https://www.trondheim.kommune.no/aktuelt'),
-        re.compile('https://www.trondheim.kommune.no/org'),
-    ]
+    allowed_paths = map(re.compile, config['url']['allowed_paths'])
 
     # Pages in this list will be visited and links on them will
     # be visited, however the data will not be scrapaed.
-    scrape_blacklist = [
-        # Do not add data from the home page, it ranks highly but is completely useless.
-        re.compile('https://www.trondheim.kommune.no/?$'),
-    ]
+    # Do not add data from the home page, it ranks highly but is completely useless.
+
+    scrape_blacklist = map(re.compile, config['url']['scrape_blacklist'])
 
     # These links will never be visited, even if the path is allowed above.
-    visit_blacklist = [
-        # News articles.
-        re.compile('https://www.trondheim.kommune.no/aktuelt'),
-        # Avoid misinformation about health and safety.
-        re.compile('https://www.trondheim.kommune.no/tema/helse-og-omsorg'),
-        # These pages are pretty boring and contain an awful lot of maps.
-        re.compile('https://www.trondheim.kommune.no/tema/bygg-kart-og-eiendom'),
-        # These pages contain large blocks of text.
-        re.compile('https://www.trondheim.kommune.no/tema/skatt-og-naring'),
-        # These pages are quite technical in their nature.
-        re.compile('https://www.trondheim.kommune.no/tema/veg-vann-og-avlop'),
-        # These pages are difficult to parse and contain little information.
-        re.compile('https://www.trondheim.kommune.no/aktuelt/utvalgt/om-kommunen'),
-    ]
+    visit_blacklist = map(re.compile, config['blacklist']['visits'])
+    # News articles.
+    # Avoid misinformation about health and safety.
+    # These pages are pretty boring and contain an awful lot of maps.
+    # These pages contain large blocks of text.
+    # These pages are quite technical in their nature.
+    # These pages are difficult to parse and contain little information.
 
     # These selectors will be removed from all pages, as they contain very
     # little actual information, and are equal on all pages.
-    garbage_elements = {'.footer', '.header', 'body > .container',
-                        '.skip-link', '.navigation', '.nav', '#ssp_fantdu'}
+    garbage_elements = set(config['blacklist']['elements'])
 
     # Elements containing text equal to one of these sentences will be
     # removed from all pages.
-    garbage_text = {'Sist oppdatert:', 'Se kart', '_______________'}
+
+    garbage_text = set(config['blacklist']['texts'])
 
     # Elements containing an url in href that starts with the following
     # will be removed
-    garbage_start_urls = {'#', '~'}
+    garbage_start_urls = set(config['blacklist']['garbage_start_urls'])
 
     # Elements containing an url in href that ends with the following
     # will be removed.
-    garbage_resources = {}
+    garbage_resources = set(config['blacklist']['resources'])
 
     # The text used for the title on 404 pages. Used to detect silent 404 error.
-    not_found_text = 'Finner ikke siden'
+    not_found_text = config['blacklist']['404_text']
 
     # Hierarchy for sorting categories.
     # Elements with level=None will follow normal html hierarchy
-    hierarchy = {
-        # Header elements.
-        'h1': 1,
-        'h2': 2,
-        'h3': 3,
-        'h4': 4,
-        'h5': 5,
-        'h6': 6,
-
-        # Text elements
-        'strong': 10,
-        'p': 11,
-        'a': 15,
-
-        # Table elements
-        'tr': 8,
-
-        # List elements
-        'li': 9,
-    }
+    hierarchy = config['hierarchy']
 
     # If a tag is listed here, sequences of tabs belonging to one of these types
     # will all be merged into one tag. For example, directly following paragraph
     # tags will be merged into one big paragraph, separated with newlines.
     # The value corresponding to each key is the word limit for when
     # the following tag can be merged together
-    concatenation_tags_word_limit = {
-        'li': 100,
-        'p': 7,
-    }
+    concatenation_tags_word_limit = config['concatenation']
 
     # Of the elements in the hierarchy, these tags will not be created as nodes if
     # their parent is in the set of parents.
-    ignored_children_tags_for_parents = {
-        'strong': {'p', 'li', 'tr', 'h1', 'h2', 'h3', 'h4', 'h5'},
-        'p': {'li'},
-    }
+    ignored_children_tags_for_parents = config['blacklist']['ignored_children_tags_for_parents']
 
     def extract_metadata(self, root, soup, page_id):
         ''' Extract keywords metadata from the header of the page and add them

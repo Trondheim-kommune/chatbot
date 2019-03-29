@@ -77,13 +77,13 @@ def test_insert_document_and_check_conflict():
     serialized_data[0]["content"]["texts"][0] = random_text
 
     # Check if the document was a conflict.
-    conflict_ids = insert_documents(serialized_data, db="test_db")
+    conflict_ids = insert_documents(serialized_data)
     assert correct_conflicts[0]["conflict_id"] == conflict_ids[0]["conflict_id"]
     assert correct_conflicts[0]["title"] == conflict_ids[0]["title"]
 
     # Fetch the document from the prod collection.
     factory = ModelFactory.get_instance()
-    util.set_db(factory, db="test_db")
+    util.set_db(factory)
     document = next(factory.get_database().get_collection("prod").find({"id": id}), None)
     assert document["content"]["texts"][0] == random_text
 
