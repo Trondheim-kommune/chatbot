@@ -7,4 +7,5 @@ done
 
 mongo --host mongodb --eval  "db.getSiblingDB('dev_db').createUser({user:'$DB_USER', pwd:'$DB_PWD', roles:[{role:'readWrite',db:'dev_db'}]});"
 mongo --host mongodb --eval  "db.getSiblingDB('$DB_NAME').createUser({user:'$DB_USER', pwd:'$DB_PWD', roles:[{role:'readWrite',db:'$DB_NAME'}]});"
+mongo --host mongodb --eval  "db.getSiblingDB('testing_db').createUser({user:'$DB_USER', pwd:'$DB_PWD', roles:[{role:'readWrite',db:'testing_db'}]});"
 

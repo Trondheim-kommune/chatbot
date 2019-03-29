@@ -25,12 +25,10 @@ COPY . .
 EXPOSE 8080
 
 # Install extra package
-RUN ["pip3", "install", "-e", "."]
+RUN ["pip", "install", "."]
 
 RUN ["python3", "setup.py", "develop"]
 
 COPY nginx.conf /etc/nginx
 #CMD ["./start_server_docker.sh"]
-
-# Start server
-cmd ["./api/flask/start_server.sh"]
+CMD ["./api/flask/start_server.sh"]
