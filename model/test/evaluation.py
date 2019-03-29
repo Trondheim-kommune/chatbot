@@ -56,10 +56,11 @@ def main():
         n_questions += partial_n
         score += partial_score
         url_score += partial_url
+
     print("Number of questions:", n_questions, "score:", score, "URLs correct:", url_score)
 
-    print("Average score:", score / n_questions)
-    print("Average URLs correct:", url_score / n_questions)
+    print("Text Precision:", score / n_questions)
+    print("URL Precision:", url_score / n_questions)
 
 
 if __name__ == '__main__':
