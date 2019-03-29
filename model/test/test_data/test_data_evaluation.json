@@ -10,7 +10,7 @@
                 "text": "Rita Ottervik"
             },
             {
-                "score": 0.5,
+                "score": 0.2,
                 "text": "Ola Lund Renolen"
             }
         ],
@@ -175,7 +175,7 @@
             },
             {
                 "score": 0.5,
-                "text": "parkeringsavgift i Granåsen."
+                "text": "parkeringsavgift i Granåsen."
             }
         ],
         "url": "https://www.trondheim.kommune.no/tema/kultur-og-fritid/tilskudd-priser-og-stipend/tilskudd/idrett-og-friluftsliv/idrettsstipend/"
@@ -183,7 +183,7 @@
     {
         "question": [
             "kan jeg leie granåsen?",
-            "skidag granåsen"
+            "skidag granåsen leie"
         ],
         "answers": [
             {
@@ -288,10 +288,6 @@
             {
                 "score": 1,
                 "text": "ukm.no"
-            },
-            {
-                "score": 0.99,
-                "text": "Gå inn på ukm.no for å melde deg på."
             }
         ],
         "url": "https://www.trondheim.kommune.no/tema/kultur-og-fritid/aktivitetstilbudkulturtilbud/ukm/"
@@ -312,7 +308,7 @@
             },
             {
                 "score": 0.5,
-                "text": "Du kan leie Husebybadet til bursdager og andre arrangementer, på lørdager og søndager mellom 16.00 og 20.00."
+                "text": "Du kan leie Husebybadet til bursdager og andre arrangementer, på lørdager og søndager mellom 16.00 og 20.00."
             }
         ],
         "url": "https://www.trondheim.kommune.no/tema/kultur-og-fritid/lokaler/husebybadet/"
@@ -353,8 +349,8 @@
                 "text": "Trondheim kommune\nv/kommunaldirektør for kultur og næring\nPostboks 2300 Torgard\n7004 Trondheim"
             },
             {
-                "score": 1,
-                "text": "Frist for å sende inn forslag på kandidater til Trondheim kommunes kulturpris for 2018 er 15. oktober 2018."
+                "score": 0.5,
+                "text": "Frist for å sende inn forslag på kandidater til Trondheim kommunes kulturpris for 2018 er 15. oktober 2018."
             }
         ],
         "url": "https://www.trondheim.kommune.no/tema/kultur-og-fritid/tilskudd-priser-og-stipend/kulturprisen/"
