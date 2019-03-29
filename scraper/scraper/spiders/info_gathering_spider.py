@@ -193,7 +193,7 @@ class InfoGatheringSpider(scrapy.Spider):
                 garbage_element.decompose()
 
         # Locate the title element. It might be used for the tree root.
-        title = self.normalize(soup.find('title').text)
+        title = self.normalize(soup.find('title').text.strip())
 
         # Do not continue with this page if we detect it as a silent 404.
         if self.not_found_text in title:
