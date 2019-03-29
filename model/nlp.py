@@ -1,12 +1,17 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
 import spacy
-from spacy.lemmatizer import Lemmatizer
-from spacy.lang.nb import LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES
+from nltk.stem.snowball import SnowballStemmer
 import string
+import re
 
 
 # Load a Norwegian language model for Spacy.
 nb = spacy.load('nb_dep_ud_sm')
+
+stemmer = SnowballStemmer('norwegian')
+
+START_SPECIAL_CHARS = re.compile('^[{}]+'.format(re.escape(string.punctuation)))
+END_SPECIAL_CHARS = re.compile('[{}]+$'.format(re.escape(string.punctuation)))
 
 
 def get_stopwords():
@@ -30,26 +35,44 @@ def extract_top(feature_names, sorted_items):
     return [(feature_names[i], score) for i, score in sorted_items]
 
 
-class Tokenizer(object):
-    def __init__(self):
-        self.lemmatize = Lemmatizer(LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES)
+def stem_token(token):
+    ''' Stem a token using the NLTK SnowballStemmer. '''
+    return stemmer.stem(token)
 
-    def has_digits(self, token):
-        ''' Returns true if the given string contains any digits. '''
-        return any(char.isdigit() for char in token)
 
-    def __call__(self, doc):
-        ''' Tokenize a given document. '''
-        # Tokenize the document.
-        tokens = [self.lemmatize(token.text, token.pos_)[0] for token in nb(doc)]
-        # Remove stopwords from the tokens.
-        tokens = [token for token in tokens if token not in stop_words]
-        # Remove punctuation tokens.
-        tokens = [token for token in tokens if token not in string.punctuation]
-        # Remove tokens which contain any number.
-        tokens = [token for token in tokens if not self.has_digits(token)]
-        # Return the finished list of tokens.
-        return tokens
+def has_digits(token):
+    ''' Returns true if the given string contains any digits. '''
+    return any(char.isdigit() for char in token)
+
+
+def tokenize(doc):
+    ''' Tokenize a given document. '''
+    # Tokenize the document.
+    tokens = [token.text for token in nb(doc)]
+
+    # Remove punctuation tokens.
+    tokens = [token for token in tokens if token not in string.punctuation]
+
+    # Remove tokens which contain any number.
+    tokens = [token for token in tokens if not has_digits(token)]
+
+    # Remove tokens without text.
+    tokens = [token for token in tokens if bool(token.strip())]
+
+    # Remove punctuation from start of tokens.
+    tokens = [re.sub(START_SPECIAL_CHARS, '', token) for token in tokens]
+
+    # Remove punctuation from end of tokens.
+    tokens = [re.sub(END_SPECIAL_CHARS, '', token) for token in tokens]
+
+    # Remove stopwords from the tokens.
+    tokens = [token for token in tokens if token not in stop_words]
+
+    # Stem all tokens.
+    tokens = [stem_token(token) for token in tokens]
+
+    # Return the finished list of tokens.
+    return tokens
 
 
 def get_tfidf_model(corpus):
@@ -57,9 +80,11 @@ def get_tfidf_model(corpus):
     using cosine similarity as well as keyword generation. '''
     # Create a vectorizer which will turn documents into vectors.
     # We use a custom list of stopwords and a custom tokenizer.
-    vectorizer = TfidfVectorizer(tokenizer=Tokenizer())
+    vectorizer = TfidfVectorizer(tokenizer=tokenize)
+
     # Create a simple index on the corpus.
     corpus_matrix = vectorizer.fit_transform(corpus)
+
     # Retrieve the names of the features. Need this to find which
     # feature a score in the matrix actually belongs to.
     feature_names = vectorizer.get_feature_names()

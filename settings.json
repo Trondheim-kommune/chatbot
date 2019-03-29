@@ -1,0 +1,100 @@
+{
+    "mongo": {
+        "username": "agent25",
+        "password": "agent25",
+        "url": "agent25.tinusf.com",
+        "port": 27017,
+        "db": "dev_db",
+        "testing_db": "test_db"
+    },
+    "model": {
+        "accepted_tags": [
+            "p",
+            "a",
+            "li",
+            "strong"
+        ]
+    },
+    "scraper": {
+        "debug": false,
+        "alternative_headers": ["strong"],
+        "concatenation": {
+            "li": 100,
+            "p": 7
+        },
+        "url": {
+            "root_url": "https://www.trondheim.kommune.no/",
+            "allowed_paths": [
+                "https://www.trondheim.kommune.no/tema",
+                "https://www.trondheim.kommune.no/aktuelt",
+                "https://www.trondheim.kommune.no/org"
+            ]
+        },
+        "blacklist": {
+            "elements": [
+                ".footer",
+                ".header",
+                "body > .container",
+                ".skip-link",
+                ".navigation",
+                ".nav",
+                "#ssp_fantdu"
+            ],
+            "scrape": [
+                "https://www.trondheim.kommune.no/?$"
+            ],
+            "visit": [
+                "https://www.trondheim.kommune.no/aktuelt",
+                "https://www.trondheim.kommune.no/tema/helse-og-omsorg",
+                "https://www.trondheim.kommune.no/tema/bygg-kart-og-eiendom",
+                "https://www.trondheim.kommune.no/tema/skatt-og-naring",
+                "https://www.trondheim.kommune.no/tema/veg-vann-og-avlop",
+                "https://www.trondheim.kommune.no/aktuelt/utvalgt/om-kommunen"
+            ],
+            "texts": [
+                "Sist oppdatert:",
+                "Se kart",
+                "_______________"
+            ],
+            "garbage_start_urls": [
+                "#",
+                "~"
+            ],
+            "resources": [],
+            "not_found_text": "Finner ikke siden",
+            "ignored_children_tags_for_parents": {
+                "strong": [
+                    "p",
+                    "li",
+                    "tr",
+                    "h1",
+                    "h2",
+                    "h3",
+                    "h4",
+                    "h5"
+                ],
+                "p": [
+                    "li"
+                ]
+            }
+        },
+        "hierarchy": {
+            "h1": 1,
+            "h2": 2,
+            "h3": 3,
+            "h4": 4,
+            "h5": 5,
+            "h6": 6,
+            "strong": 10,
+            "p": 11,
+            "a": 15,
+            "tr": 8,
+            "li": 9
+        }
+    },
+    "query_system": {
+        "not_found": "Jeg fant ikke informasjonen du spurte etter.",
+        "multiple_answers": "Jeg har flere mulige svar til deg.",
+        "custom_synset_file": "model/synset.txt"
+    }
+}

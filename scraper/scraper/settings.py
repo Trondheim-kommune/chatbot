@@ -3,8 +3,8 @@
 
 # Project configuration for Python.
 BOT_NAME = 'scraper'
-SPIDER_MODULES = ['scraper.spiders']
-NEWSPIDER_MODULE = 'scraper.spiders'
+SPIDER_MODULES = ['scraper.scraper.spiders']
+NEWSPIDER_MODULE = 'scraper.scraper.spiders'
 
 # Ensure data is encoded as real UTF8.
 FEED_EXPORT_ENCODING = 'utf-8'

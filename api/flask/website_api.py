@@ -1,18 +1,15 @@
 import model.db_util as db_util
 import api.flask.flask_util as flask_util
 from model.ModelFactory import ModelFactory
+from model.nlp import stem_token
 import json
-import os
 from flask import request, Blueprint
 
 web_api = Blueprint('Website API', __name__, template_folder='templates')
 
 factory = ModelFactory.get_instance()
 
-if os.getenv("TEST_FLAG"):
-    db_util.set_db(factory, db="test_db")
-else:
-    db_util.set_db(factory, db="dev_db")
+db_util.set_db(factory)
 
 
 @web_api.route("/v1/web/conflict_ids", methods=["GET"])
@@ -55,6 +52,10 @@ def update_content():
     json_input_data = json.loads(request.data)
     id = json_input_data["data"]["id"]
     content = json_input_data["data"]["content"]
+
+    for i in range(len(content['keywords'])):
+        content['keywords'][i]['keyword'] = stem_token(content['keywords'][i]['keyword'])
+
     status = factory.get_database().get_collection("manual").update({"id": id}, {"$set": {
         "content": content}})
     if status["updatedExisting"] is False:
@@ -85,3 +86,26 @@ def get_docs_from_url():
     for doc in docs:
         out.append({"id": doc["id"], "title": doc["content"]["title"]})
     return json.dumps(out)
+
+
+@web_api.route("/v1/web/unknown_query", methods=["DELETE"])
+def delete_unknown_query():
+    """
+    This function simply deletes a query from the unknown_query collection.
+    :return: A success json if it was successful.
+    """
+    json_input_data = json.loads(request.data)
+    query_text = json_input_data["data"]["query_text"]
+    factory.get_database().get_collection("unknown_queries").delete_one({"query_text": query_text})
+    return flask_util.create_success_response("Successfully deleted an unknown query.")
+
+
+@web_api.route("/v1/web/unknown_queries", methods=["GET"])
+def get_all_unknown_queries():
+    """
+    :return: a list of unknown queries.
+    """
+    unknown_queries_docs = factory.get_collection("unknown_queries").find()
+    unknown_queries = [{"query_text": unknown_query_doc["query_text"]} for unknown_query_doc in
+                       unknown_queries_docs]
+    return json.dumps(unknown_queries)

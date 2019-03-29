@@ -1,12 +1,31 @@
 from model.ModelFactory import ModelFactory
 import model.db_util as util
 from sklearn.metrics.pairwise import cosine_similarity
-from model.keyword_gen import get_tfidf_model
+from model.nlp import get_tfidf_model
 from model.query_expansion import expand_query
+from util.config_util import Config
+import pymongo
+
+NOT_FOUND = Config.get_value(['query_system', 'not_found'])
+MULTIPLE_ANSWERS = Config.get_value(['query_system', 'multiple_answers'])
+
+factory = ModelFactory.get_instance()
 
 
-NOT_FOUND = 'Jeg fant ikke informasjonen du spurte etter.'
-MULTIPLE_ANSWERS = 'Jeg har flere mulige svar til deg.'
+def handle_not_found(query_text):
+    '''
+    Inserts this specific query text into the unknown queries collection as well as returning a
+    fallback string.
+    '''
+    try:
+        factory.get_database().get_collection("unknown_queries").insert_one(
+            {"query_text": query_text})
+    except pymongo.errors.DuplicateKeyError:
+        # If we already have this specific query in our unknown_queries collection we don't need
+        # to add it again.
+        pass
+
+    return NOT_FOUND
 
 
 def get_corpus_text(doc):
@@ -25,17 +44,19 @@ def perform_search(query_text):
     ''' Takes a query string and finds the best matching document in the database. '''
     # Connect to the database to enable retrieving of documents.
     factory = ModelFactory.get_instance()
-    util.set_db(factory, db='dev_db')
+    util.set_db(factory)
 
     # Perform simple query expansion on the original query.
+    print('Pre expansion: ', query_text)
     query = expand_query(query_text)
+    print('Post expansion: ', query)
 
     # Retrieve a set of documents using MongoDB. We then attempt to filter these further.
     docs = factory.get_document(query)
 
     # Prevent generating an empty corpus if no documents were found.
     if not docs:
-        return NOT_FOUND
+        return handle_not_found(query_text)
 
     # Create a corpus on the results from the MongoDB query.
     corpus = [get_corpus_text(doc) for doc in docs]
@@ -51,7 +72,7 @@ def perform_search(query_text):
 
         # This could be calculated using the mean of all scores and the standard deviation.
         if sorted_scores[0] < 0.1:
-            return NOT_FOUND
+            return handle_not_found(query_text)
 
         # Allow returning multiple answers if they rank very similarly.
         answers = []
@@ -73,7 +94,7 @@ def perform_search(query_text):
     except KeyError:
         raise Exception('Document does not have content and texts.')
     except ValueError:
-        return NOT_FOUND
+        return handle_not_found(query_text)
 
 
 class QuerySystem:
