@@ -108,8 +108,10 @@ class Serializer:
             while queue:
                 node = queue.pop(0)
 
-                if 'children' in node:
+                if 'text' in node:
                     corpus.append(node['text'])
+
+                if 'children' in node:
                     queue.append(node['children'])
 
         return get_tfidf_model(corpus)

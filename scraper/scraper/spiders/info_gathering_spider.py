@@ -9,6 +9,7 @@ import re
 from urllib.parse import urlparse
 from urllib.parse import urljoin
 from util.config_util import Config
+import unicodedata
 
 
 class TreeElement(NodeMixin):
@@ -41,16 +42,12 @@ class InfoGatheringSpider(scrapy.Spider):
     # Enable to display additional debugging information to output when the crawler is run.
     # In practice, this will pretty print the exported tree when a page is scraped.
 
-    debug = None
-    if config['debug']:
-        debug = 'debug'
+    debug = 'debug' if config['debug'] else None
 
-    # If a strong tag should be seen as a sub header.
-    strong_headers = None
-    if config['strong_headers']:
-        strong_headers = 'strong'
+    # Elements which sometimes are used to indicate a header.
+    alternative_headers = config['alternative_headers']
 
-    # Root url for all web pages. Must not end with '/'.
+    # Root url for all web pages
     root_url = config['url']['root_url']
 
     # The links to start the crawling process on.
@@ -60,22 +57,14 @@ class InfoGatheringSpider(scrapy.Spider):
 
     # Paths on the site which are allowed. Only paths which match
     # these will ever be visited.
-    allowed_paths = map(re.compile, config['url']['allowed_paths'])
+    allowed_paths = list(map(re.compile, config['url']['allowed_paths']))
 
     # Pages in this list will be visited and links on them will
-    # be visited, however the data will not be scrapaed.
-    # Do not add data from the home page, it ranks highly but is completely useless.
-
-    scrape_blacklist = map(re.compile, config['url']['scrape_blacklist'])
+    # be visited, however the data will not be scraped.
+    scrape_blacklist = list(map(re.compile, config['blacklist']['scrape']))
 
     # These links will never be visited, even if the path is allowed above.
-    visit_blacklist = map(re.compile, config['blacklist']['visits'])
-    # News articles.
-    # Avoid misinformation about health and safety.
-    # These pages are pretty boring and contain an awful lot of maps.
-    # These pages contain large blocks of text.
-    # These pages are quite technical in their nature.
-    # These pages are difficult to parse and contain little information.
+    visit_blacklist = list(map(re.compile, config['blacklist']['visit']))
 
     # These selectors will be removed from all pages, as they contain very
     # little actual information, and are equal on all pages.
@@ -95,7 +84,7 @@ class InfoGatheringSpider(scrapy.Spider):
     garbage_resources = set(config['blacklist']['resources'])
 
     # The text used for the title on 404 pages. Used to detect silent 404 error.
-    not_found_text = config['blacklist']['404_text']
+    not_found_text = config['blacklist']['not_found_text']
 
     # Hierarchy for sorting categories.
     # Elements with level=None will follow normal html hierarchy
@@ -111,6 +100,9 @@ class InfoGatheringSpider(scrapy.Spider):
     # Of the elements in the hierarchy, these tags will not be created as nodes if
     # their parent is in the set of parents.
     ignored_children_tags_for_parents = config['blacklist']['ignored_children_tags_for_parents']
+
+    def normalize(self, text):
+        return unicodedata.normalize('NFKD', text)
 
     def extract_metadata(self, root, soup, page_id):
         ''' Extract keywords metadata from the header of the page and add them
@@ -201,14 +193,14 @@ class InfoGatheringSpider(scrapy.Spider):
                 garbage_element.decompose()
 
         # Locate the title element. It might be used for the tree root.
-        title = soup.find('title').text
+        title = self.normalize(soup.find('title').text.strip())
 
         # Do not continue with this page if we detect it as a silent 404.
         if self.not_found_text in title:
             return
 
         # Use the title as the tree root.
-        root = TreeElement('title', page_id, soup.find('title').text)
+        root = TreeElement('title', page_id, title)
 
         # Attempt extracting the keywords and adding them to the tree.
         self.extract_metadata(root, soup, page_id)
@@ -222,7 +214,7 @@ class InfoGatheringSpider(scrapy.Spider):
                 br.replace_with('\n')
 
             # Remove trailing and tailing spaces from the node contents.
-            elem_text = elem.text.strip()
+            elem_text = self.normalize(elem.text.strip())
 
             # Find the type of this element.
             elem_tag = elem.name
@@ -240,25 +232,25 @@ class InfoGatheringSpider(scrapy.Spider):
             if any(sentence in elem_text for sentence in self.garbage_text):
                 break
 
-            if self.strong_headers:
-                # If a paragraph contains a strong tag, and the correct lag is set, we
-                # treat that combination as a header. This check avoids adding the strong
-                # tag in addition to the custom header.
-                if elem_tag == 'strong' and current_parent.tag == 'h6' and \
-                        current_parent.text == elem_text:
+            if self.alternative_headers:
+                # If a paragraph contains for example a strong tag, we can
+                # treat that combination as a header. This check avoids adding
+                # the strong tag in addition to the custom header.
+                if elem_tag in self.alternative_headers and current_parent.tag == 'h6' and \
+                        self.normalize(current_parent.text) == elem_text:
                     continue
 
                 if elem_tag == 'p':
-                    # Find all strong tags inside this paragraph.
-                    strongs = elem.find_all('strong')
+                    # Find all alternative header tags inside this paragraph.
+                    headers = elem.find_all(self.alternative_headers)
 
-                    # Check if there is only 1 strong tag, and check if it contains
+                    # Check if there is only 1 alternative header tag, and check if it contains
                     # all of the text inside the paragraph.
-                    if len(strongs) == 1 and elem_text == strongs[0].text.strip():
+                    if len(headers) == 1 and elem_text == self.normalize(headers[0].text.strip()):
                         # Locate the parent in which a H6 tag would be inserted.
                         parent = self.locate_parent('h6', current_parent, root)
 
-                        # Add a custom H6 element instead of a paragraph or strong element
+                        # Add a custom H6 element.
                         current_parent = TreeElement(
                             'h6',
                             page_id,
@@ -296,12 +288,12 @@ class InfoGatheringSpider(scrapy.Spider):
                 if url != elem_text:
                     # Add the element text to parent instead of creating a
                     # new element
-                    if elem_text in parent.text:
-                        parent.text += ' ' + url
+                    if elem_text in self.normalize(parent.text):
+                        parent.text += '\n' + url
                         continue
 
                     # Add the URL and elem_text into the end of the parent's text
-                    parent.text += ' ' + elem_text + ' ' + url
+                    parent.text += '\n' + elem_text + ' ' + url
             elif elem_tag in self.ignored_children_tags_for_parents \
                     and current_parent.tag \
                     in self.ignored_children_tags_for_parents[elem_tag]:
