@@ -34,6 +34,40 @@ Additional project documentation is available in the project wiki. The group
 also produced a report which describes the product as well as the process
 behind it in great detail.
 
+## Running the project using docker
+Docker is a containerization tool. In order to run this project, you need
+to have both docker and docker-compose installed. It would be best to run
+this on an unix based system, preferrably Linux.
+
+To build the project
+
+```bash
+docker-compose build
+```
+
+Full rebuild
+
+```bash
+docker-compose build --no-cache
+```
+
+To run
+
+```bash
+docker-compose build
+```
+
+To find the container id of running container
+
+```bash
+docker ps
+```
+
+To enter a container
+```bash
+docker exec -it <container_id> bash
+```
+
 ## Project structure
 
 As requested by the customer, this project is divided into three main parts in
