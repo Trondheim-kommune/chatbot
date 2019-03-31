@@ -1,6 +1,7 @@
 import model.db_util as db_util
 import api.flask.flask_util as flask_util
 from model.ModelFactory import ModelFactory
+from model.keyword_gen import lemmatize_content_keywords
 import json
 from flask import request, Blueprint
 
@@ -51,6 +52,9 @@ def update_content():
     json_input_data = json.loads(request.data)
     id = json_input_data["data"]["id"]
     content = json_input_data["data"]["content"]
+
+    lemmatize_content_keywords(content)
+
     status = factory.get_database().get_collection("manual").update({"id": id}, {"$set": {
         "content": content}})
     if status["updatedExisting"] is False:

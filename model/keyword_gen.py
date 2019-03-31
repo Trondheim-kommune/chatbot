@@ -2,6 +2,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 import spacy
 from spacy.lemmatizer import Lemmatizer
 from spacy.lang.nb import LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES
+import collections
 import string
 import re
 
@@ -66,6 +67,29 @@ def tokenize(doc):
 
     # Return the finished list of tokens.
     return tokens
+
+
+def lemmatize_content_keywords(content):
+    ''' Go through a content in the format given to the API, and lemmatize
+    all keywords again in case something changed. '''
+    # Merge all texts and titles, then tokenize and POS tag them.
+    tokens = nb(' '.join(([content['title']] + content['texts'])))
+
+    # For each word, we count how many times each POS tag occurs.
+    votes = collections.defaultdict(lambda: collections.Counter())
+    for token in tokens: votes[token.text][token.pos_] += 1
+
+    for entry in content['keywords']:
+        # Verify that the keyword is not empty.
+        if not entry['keyword']:
+            continue
+
+        # Find the most likely POS tag for the keyword.
+        # find pos tag. if not in score, find most likely pos tag.
+        pos = next(iter(votes[entry['keyword']].most_common()), nb(entry['keyword'])[0].pos_)
+
+        # Store the lemmatized keyword.
+        entry['keyword'] = lemmatize(entry['keyword'], pos)[0]
 
 
 def get_tfidf_model(corpus):
