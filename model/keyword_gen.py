@@ -75,9 +75,12 @@ def lemmatize_content_keywords(content):
     # Merge all texts and titles, then tokenize and POS tag them.
     tokens = nb(' '.join(([content['title']] + content['texts'])))
 
-    # For each word, we count how many times each POS tag occurs.
+    # Counter for number of times each POS tag occurs for tokens.
     votes = collections.defaultdict(lambda: collections.Counter())
-    for token in tokens: votes[token.text][token.pos_] += 1
+
+    for token in tokens:
+        # For each word, we count how many times each POS tag occurs.
+        votes[token.text][token.pos_] += 1
 
     for entry in content['keywords']:
         # Verify that the keyword is not empty.
@@ -85,7 +88,7 @@ def lemmatize_content_keywords(content):
             continue
 
         # Find the most likely POS tag for the keyword.
-        # find pos tag. if not in score, find most likely pos tag.
+        # If the keyword is not in the document, use an unigram tagger.
         pos = next(iter(votes[entry['keyword']].most_common()), nb(entry['keyword'])[0].pos_)
 
         # Store the lemmatized keyword.
