@@ -32,9 +32,9 @@ def sort_coo(coo_matrix):
     return sorted(tuples, key=lambda x: (x[1], x[0]), reverse=True)
 
 
-def extract_top(feature_names, sorted_items):
+def extract_top(feature_names, sorted_items, n=10):
     ''' Extracts the top scoring keywords from a sorted list of scores. '''
-    return [(feature_names[i], score) for i, score in sorted_items]
+    return [(feature_names[i], score) for i, score in sorted_items[:n]]
 
 
 def has_digits(token):
@@ -117,4 +117,4 @@ def get_keywords(vectorizer, feature_names, document):
     tfidf_vector = vectorizer.transform([document])
     sorted_items = sort_coo(tfidf_vector.tocoo())
 
-    return extract_top(feature_names, sorted_items)
+    return extract_top(feature_names, sorted_items, len(sorted_items))

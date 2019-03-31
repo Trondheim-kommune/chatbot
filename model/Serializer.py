@@ -1,7 +1,7 @@
 import json
 import copy
 import urllib.request
-from model.keyword_gen import tokenize
+from model.keyword_gen import get_keywords, get_tfidf_model
 from progressbar import ProgressBar
 from util.config_util import Config
 
@@ -72,6 +72,12 @@ class Serializer:
         self.url = url
         self.load_data()
 
+        vectorizer, transformed_corpus, feature_names = self.get_tfidf_model()
+
+        self.__transformed_corpus = transformed_corpus
+        self.__feature_names = feature_names
+        self.__vectorizer = vectorizer
+
     def load_data(self):
         """ Load all JSON data from a file and sets self.__data. Mostly used
         for testing-purposes: real data from scraper is a list of several JSON
@@ -90,6 +96,23 @@ class Serializer:
     def get_models(self):
         return self.__models
 
+    def get_tfidf_model(self):
+        corpus = []
+
+        for data in self.__data:
+            queue = list(data['tree'].get('children', []))
+
+            while queue:
+                node = queue.pop(0)
+
+                if 'text' in node:
+                    corpus.append(node['text'])
+
+                if 'children' in node:
+                    queue += node['children']
+
+        return get_tfidf_model(corpus)
+
     def visit_node(self, data, model_template, models, title):
         """ Recursively traverse the children and create new Contents from paragraphs. """
         accepted_tags = Config.get_value(["model", "accepted_tags"])
@@ -101,8 +124,10 @@ class Serializer:
 
             elif child["tag"] in accepted_tags:
                 # Hit a leaf node in recursion tree. We extract the text here and continue.
-                keywords = [KeyWord(token, 1)
-                            for token in tokenize("{} {}".format(title, child["text"]))]
+                keywords = [KeyWord(*keyword)
+                            for keyword in get_keywords(self.__vectorizer,
+                                                        self.__feature_names,
+                                                        "{} {}".format(title, child["text"]))]
 
                 content = Content(title, [child["text"]], keywords)
                 new_model = copy.deepcopy(model_template)
