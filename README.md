@@ -2,19 +2,6 @@
 
 [![Build Status](https://travis-ci.com/vegarab/agent-25.svg?token=L9RN2jPDa7p43DCcYhYZ&branch=dev)](https://travis-ci.com/vegarab/agent-25)
 [![codecov](https://codecov.io/gh/vegarab/agent-25/branch/dev/graph/badge.svg?token=ArL47bWQSN)](https://codecov.io/gh/vegarab/agent-25)
-## Building the website
-Run
-`cd website`  
-`./build_web_server.sh`  
-
-## Running website locally
-Run
-`source venv/bin/activate` 
-`cd website`  
-`npm install`  
-`npm start`
-Then to run Cypress tests
-`npm run cypress open`
 
 Agent 25 is a prototype for a chatbot which is able to teach itself. The
 purpose of this project is to greatly reduce the time which must be spent
@@ -33,40 +20,6 @@ a system which could easiy be introduced to their as well as other websites.
 Additional project documentation is available in the project wiki. The group
 also produced a report which describes the product as well as the process
 behind it in great detail.
-
-## Running the project using docker
-Docker is a containerization tool. In order to run this project, you need
-to have both docker and docker-compose installed. It would be best to run
-this on an unix based system, preferrably Linux.
-
-To build the project
-
-```bash
-docker-compose build
-```
-
-Full rebuild
-
-```bash
-docker-compose build --no-cache
-```
-
-To run
-
-```bash
-docker-compose build
-```
-
-To find the container id of running container
-
-```bash
-docker ps
-```
-
-To enter a container
-```bash
-docker exec -it <container_id> bash
-```
 
 ## Project structure
 
@@ -103,6 +56,70 @@ the server and `certbot` for the required SSL certificates. The project is
 not particulary resource-intensive, but some of the natural language processing
 functionality can be taxing. We therefore reccoment using at least a 4 core CPU
 with 4GB of RAM.
+
+## Running the project using docker
+Docker is a containerization tool. In order to run this project, you need
+to have both docker and docker-compose installed. It would be best to run
+this on an unix based system, preferrably Linux.
+
+To build the project
+
+```bash
+make build
+```
+
+Full rebuild
+
+```bash
+make build-clean
+```
+
+To run
+
+```bash
+make start
+```
+
+To find the container id of running container
+
+```bash
+docker ps
+```
+
+To enter a container
+```bash
+docker exec -it <container_id> bash
+```
+
+To enter the api container
+```bash
+make open-bash-agent25
+```
+
+To enter the web container
+```bash
+make open-bash-web
+```
+
+To run pytest inside docker
+```bash
+make pytest-docker
+```
+
+## Building the website
+Run
+`cd website`  
+`./build_web_server.sh`  
+
+## Running website locally
+Run
+`source venv/bin/activate` 
+`cd website`  
+`npm install`  
+`npm start`
+Then to run Cypress tests
+`npm run cypress open`
+
 
 # Setup
 
