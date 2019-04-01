@@ -1,0 +1,22 @@
+[
+	[["kontaktinformasjon", "NOUN"], ["kontaktinfo", "NOUN"], ["tlf", "NOUN"], ["telefon", "NOUN"], ["telefonnummer", "NOUN"], ["telefonnr", "NOUN"], ["tlfnr", "NOUN"], ["epost", "NOUN"], ["e-post", "NOUN"], ["email", "NOUN"], ["e-mail", "NOUN"], ["adresse", "NOUN"]],
+	[["gymsal", "NOUN"], ["idrettsanlegg", "NOUN"], ["idrettshall", "NOUN"], ["hall", "NOUN"]],
+	[["utleie", "VERB"], ["leie", "VERB"], ["låne", "VERB"], ["leid", "VERB"], ["booke", "VERB"], ["booking", "NOUN"]],
+	[["billett", "NOUN"], ["billettpris", "NOUN"], ["billettservice", "NOUN"], ["voksenbillett", "NOUN"], ["barnebillett", "NOUN"], ["familiebillett", "NOUN"], ["koster", "NOUN"], ["pris", "NOUN"], ["kr", "NOUN"], ["kroner", "NOUN"], ["avgift", "NOUN"]],
+	[["åpner", "VERB"], ["åpning", "NOUN"], ["åpningstid", "NOUN"], ["åpningstider", "NOUN"], ["stenger", "VERB"], ["stengetid", "NOUN"]],
+	[["stipend", "NOUN"], ["tilskudd", "NOUN"], ["penger", "NOUN"], ["idretsstipend", "NOUN"], ["idretstilskudd", "NOUN"]],
+	[["idrett", "NOUN"], ["aktivitet", "NOUN"], ["sport", "NOUN"]],
+	[["parkere", "VERB"], ["parkering", "VERB"]],
+	[["ordfører", "NOUN"], ["rita", "NOUN"], ["ottervik", "NOUN"]],
+	[["møte", "NOUN"], ["bystyremøte", "NOUN"]],
+	[["marka", "NOUN"], ["bymarka", "NOUN"], ["markaområdene", "NOUN"], ["skog", "NOUN"], ["lysløype", "NOUN"], ["tur", "NOUN"], ["skiløype", "NOUN"], ["spaghettien", "NOUN"]],
+	[["ishockey", "NOUN"], ["skøyter", "NOUN"], ["skøytebane", "NOUN"]],
+	[["økonomirapport", "NOUN"], ["budsjett", "NOUN"], ["årsbdusjett", "NOUN"], ["regnskap", "NOUN"], ["årsregnskap", "NOUN"], ["årsrapport", "NOUN"], ["økonomiplan", "NOUN"]],
+	[["søke", "VERB"], ["søknad", "VERB"], ["søknadsskjema", "NOUN"], ["søknaden", "NOUN"]],
+	[["planer", "NOUN"], ["regionale", "NOUN"], ["kommuneplan", "NOUN"]],
+	[["kulturtilbud", "NOUN"], ["fritidsaktiviteter", "NOUN"], ["dramaleker", "NOUN"]],
+	[["ferietilbud", "NOUN"], ["aktiviteter", "NOUN"], ["sommeraktivitet", "NOUN"]],
+	[["alder", "NOUN"], ["år", "NOUN"], ["aldersgrense", "NOUN"], ["gammel", "ADJ"]],
+	[["påmelding", "NOUN"], ["påmelde", "VERB"], ["melde", "VERB"]],
+	[["læreplass", "NOUN"], ["lærlingplass", "NOUN"], ["lærling", "NOUN"]]
+]
