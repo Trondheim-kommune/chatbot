@@ -1,6 +1,7 @@
-from model.nlp import stem_token
 from util.config_util import Config
 import copy
+import json
+from model.keyword_gen import lemmatize
 
 
 SYNSET_FILE = Config.get_value(['query_system', 'custom_synset_file'])
@@ -41,6 +42,6 @@ class SynsetWrapper():
         synset_list '''
         with open(SYNSET_FILE) as synset_file:
             self.synset_list = [
-                [stem_token(word.strip()) for word in line.split(',')]
-                for line in synset_file
+                [lemmatize(*token)[0] for token in synset]
+                for synset in json.load(synset_file)
             ]

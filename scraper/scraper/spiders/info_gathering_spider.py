@@ -102,7 +102,7 @@ class InfoGatheringSpider(scrapy.Spider):
     ignored_children_tags_for_parents = config['blacklist']['ignored_children_tags_for_parents']
 
     def normalize(self, text):
-        return unicodedata.normalize('NFKD', text)
+        return unicodedata.normalize('NFKC', text)
 
     def extract_metadata(self, root, soup, page_id):
         ''' Extract keywords metadata from the header of the page and add them
