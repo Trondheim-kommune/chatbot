@@ -14,7 +14,7 @@
                 "text": "Ola Lund Renolen"
             }
         ],
-        "url": "https://www.trondheim.kommune.no/tema/politikk-og-planer/Politikk/ordforer/"
+        "urls": ["https://www.trondheim.kommune.no/tema/politikk-og-planer/Politikk/ordforer/"]
     },
     {
         "question": [
@@ -31,7 +31,7 @@
                 "text": "Bystyret har møte hver måned, normalt på torsdager kl 17.00 i bystyresalen på Rådhuset."
             }
         ],
-        "url": "https://www.trondheim.kommune.no/tema/politikk-og-planer/Politikk/"
+        "urls": ["https://www.trondheim.kommune.no/tema/politikk-og-planer/Politikk/"]
     },
     {
         "question": [
@@ -50,9 +50,13 @@
             {
                 "score": 1,
                 "text": "Markaområdene kan også nås til fots. Flere turstier i bolignære områder kan brukes som utgangspunkt for turer i marka"
+            },
+            {
+                "score": 1,
+                "text": "Hvordan komme seg ut i marka"
             }
         ],
-        "url": "https://www.trondheim.kommune.no/tema/kultur-og-fritid/park-og-mark/skog-og-mark/"
+        "urls": ["https://www.trondheim.kommune.no/tema/kultur-og-fritid/park-og-mark/skog-og-mark/"]
     },
     {
         "question": [
@@ -67,9 +71,13 @@
             {
                 "score": 0.5,
                 "text": "Tiden etter 16.00 og i helgene fordeles av Sør-Trøndelag ishockeykrets. Det er derfor ikke mulig å bestille treningstid på disse tidspunktene."
+            },
+            {
+                "score": 1,
+                "text": "Se timeplan for ishallen"
             }
         ],
-        "url": "https://www.trondheim.kommune.no/tema/kultur-og-fritid/lokaler/ishaller/"
+        "urls": ["https://www.trondheim.kommune.no/tema/kultur-og-fritid/lokaler/ishaller/"]
     },
     {
         "question": [
@@ -82,23 +90,28 @@
                 "text": "https://www.trondheim.kommune.no/globalassets/10-bilder-og-filer/11-politikk-og-planer/budsjettdokumenter/handlings-og-okonomiplan-budsjett-2012.pdf"
             },
             {
-                "score": 0.5,
-                "text": "årsrapport 2012"
+                "score": 1,
+                "text": "Årsrapport 2012"
             }
         ],
-        "url": "https://www.trondheim.kommune.no/tema/politikk-og-planer/budsjett-regnskap-og-rapporter/handlings-og-okonomiplan-budsjett/"
+        "urls": ["https://www.trondheim.kommune.no/tema/politikk-og-planer/budsjett-regnskap-og-rapporter/handlings-og-okonomiplan-budsjett/"]
     },
     {
         "question": [
-            "Når er søknadsfrist for stipend idrett"
+            "Når er søknadsfrist for stipend idrett",
+            "søknadsfrist på stipend idrett"
         ],
         "answers": [
             {
                 "score": 1,
                 "text": "Frist for å søke idrettsstipend er 1. juli hvert år."
+            },
+            {
+                "score": 1,
+                "text": "Søknadsfristen er 1. juni."
             }
         ],
-        "url": "https://www.trondheim.kommune.no/tema/kultur-og-fritid/tilskudd-priser-og-stipend/tilskudd/idrett-og-friluftsliv/idrettsstipend/"
+        "urls": ["https://www.trondheim.kommune.no/tema/kultur-og-fritid/tilskudd-priser-og-stipend/tilskudd/idrett-og-friluftsliv/idrettsstipend/", "https://www.trondheim.kommune.no/tema/kultur-og-fritid/tilskudd-priser-og-stipend/tilskudd/idrett-og-friluftsliv/idrett---tilskudd-til-drift-og-anlegg/"]
     },
     {
         "question": [
@@ -111,11 +124,19 @@
                 "text": "Søknadsskjema for idrettsstipend"
             },
             {
-                "score": 0.5,
+                "score": 1,
                 "text": "I selve søknaden må du, i tillegg til å oppgi personalia/kontaktinformasjon, beskrive dine idrettslige mål og hva du ser for deg å benytte stipendet til."
+            },
+            {
+                "score": 1,
+                "text": "Stipendet er på kr. 50 000,- pr utøver."
+            },
+            {
+                "score": 1,
+                "text": "https://www.trondheim.kommune.no/tema/kultur-og-fritid/tilskudd-priser-og-stipend/tilskudd/idrett-og-friluftsliv/idrett-arrangementstilskudd/"
             }
         ],
-        "url": "https://www.trondheim.kommune.no/tema/kultur-og-fritid/tilskudd-priser-og-stipend/tilskudd/idrett-og-friluftsliv/idrettsstipend/"
+        "urls": ["https://www.trondheim.kommune.no/tema/kultur-og-fritid/tilskudd-priser-og-stipend/tilskudd/idrett-og-friluftsliv/idrettsstipend/", "https://www.trondheim.kommune.no/tema/kultur-og-fritid/tilskudd-priser-og-stipend/tilskudd/"]
     },
     {
         "question": [
@@ -142,9 +163,13 @@
             {
                 "score": 0.5,
                 "text": "Du kan søke om fast lån av kommunale lokaler på vegne av en organisasjon/aktør. Søknadsfrist er 1. april 2019. Søknaden gjelder for påfølgende skoleår, perioden 2. september til 21. juni."
+            },
+            {
+                "score": 0.5,
+                "text": "Utlån av lokaler og gymsaler"
             }
         ],
-        "url": "https://www.trondheim.kommune.no/tema/kultur-og-fritid/lokaler1/lokaler/"
+        "urls": ["https://www.trondheim.kommune.no/tema/kultur-og-fritid/lokaler1/lokaler/"]
     },
     {
         "question": [
@@ -159,9 +184,13 @@
             {
                 "score": 1,
                 "text": "Dersom låntaker ønsker at det skal drikkes alkohol i kommunale lokaler i forbindelse med et arrangement skal låntaker søke om skjenkebevilling for enkeltanledning / ambulerende på eget skjema."
+            },
+            {
+                "score": 1,
+                "text": "Søke om skjenkebevilling"
             }
         ],
-        "url": "https://www.trondheim.kommune.no/tema/kultur-og-fritid/lokaler1/lokaler/"
+        "urls": ["https://www.trondheim.kommune.no/tema/kultur-og-fritid/lokaler1/lokaler/"]
     },
     {
         "question": [
@@ -174,11 +203,15 @@
                 "text": "Avgiften er kr 50 per bil per dag, og innkreves av idrettslag"
             },
             {
-                "score": 0.5,
+                "score": 1,
                 "text": "parkeringsavgift i Granåsen."
+            },
+            {
+                "score": 1,
+                "text": "De fleste idrettslagene tilbyr Vipps eller betaling med bankkort"
             }
         ],
-        "url": "https://www.trondheim.kommune.no/tema/kultur-og-fritid/tilskudd-priser-og-stipend/tilskudd/idrett-og-friluftsliv/idrettsstipend/"
+        "urls": ["https://www.trondheim.kommune.no/tema/kultur-og-fritid/lokaler/granasen/"]
     },
     {
         "question": [
@@ -193,47 +226,38 @@
             {
                 "score": 1,
                 "text": "https://trondheimkommune.service-now.com/csm?id=sc_cat_item_map&sys_id=c7b1683adb34a2c0524836fffe96194c"
-            }
-        ],
-        "url": "https://www.trondheim.kommune.no/tema/kultur-og-fritid/park-og-mark/skog-og-mark/"
-    },
-    {
-        "question": [
-            "Finnes det planer for nye veier?",
-            "Hvilke veier skal bygges ut i Trondheim?",
-            "Regional plan for veiutviklning",
-            "Planer for veiutvikling",
-            "Hvor finner jeg planer for veiene våre"
-        ],
-        "answers": [
-            {
-                "score": 1,
-                "text": "https://sites.google.com/trondheim.kommune.no/hovedplanveg"
             },
             {
                 "score": 1,
-                "text": "Planen gir en oversikt over status på transportnettet i mengde og i budsjettsammenheng. Den viser forholdet mellom faktisk budsjett, anbefalt budsjett og avvik mellom disse for alle vegtyper og vegelementer."
+                "text": "booking@trondheim.kommune.no"
             },
             {
-                "score": 0.5,
-                "text": "Planens overordna målsetninger er trygghet, framkommelighet, miljøvennlig og smart gjennomføring."
+                "score": 1,
+                "text": "Hoppbakkene kan kun benyttes av lag- og foreninger som har reservert tid"
+            },
+            {
+                "score": 1,
+                "text": "Spør gjerne om skidag i anlegget"
             }
         ],
-        "url": "https://www.trondheim.kommune.no/tema/veg-vann-og-avlop/veg/hovedplan-veg/"
+        "urls": ["https://www.trondheim.kommune.no/tema/kultur-og-fritid/park-og-mark/skog-og-mark/", "https://www.trondheim.kommune.no/tema/kultur-og-fritid/lokaler/granasen/"]
     },
     {
         "question": [
-            "hva kan barnet mitt være med på?",
             "Hvilke kommunale tilbud er det for barn?",
-            "Tilbud for barn i kommunen"
+            "kulturtilbud for barn i kommunen"
         ],
         "answers": [
             {
                 "score": 1,
                 "text": "Kulturtilbud for barn"
+            },
+            {
+                "score": 1,
+                "text": "Kulturtilbud og fritidsklubber for ungdom"
             }
         ],
-        "url": "https://www.trondheim.kommune.no/tema/kultur-og-fritid/aktivitetstilbudkulturtilbud/kulturtilbudforbarn/"
+        "urls": ["https://www.trondheim.kommune.no/tema/kultur-og-fritid/aktivitetstilbudkulturtilbud/kulturtilbudforbarn/", "https://www.trondheim.kommune.no/tema/kultur-og-fritid/aktivitetstilbudkulturtilbud/fritidsklubber/"]
     },
     {
         "question": [
@@ -246,12 +270,11 @@
                 "text": "Ferieaktiviteter"
             }
         ],
-        "url": "https://www.trondheim.kommune.no/tema/kultur-og-fritid/aktivitetstilbudkulturtilbud/ferieaktiviteter/"
+        "urls": ["https://www.trondheim.kommune.no/tema/kultur-og-fritid/aktivitetstilbudkulturtilbud/ferieaktiviteter/"]
     },
     {
         "question": [
             "Når åpner husebybadet på fredag?",
-            "Åpningstider svømmehall huseby.",
             "Åpningstider husebybadet"
         ],
         "answers": [
@@ -262,9 +285,17 @@
             {
                 "score": 0.5,
                 "text": "Alle hverdager: 06.30-08.30"
+            },
+            {
+                "score": 0.5,
+                "text": "Alle hverdager: 14.00-15.00"
+            },
+            {
+                "score": 0.2,
+                "text": "Tirsdag, torsdag: 14.00–15.00"
             }
         ],
-        "url": "https://www.trondheim.kommune.no/tema/kultur-og-fritid/lokaler/husebybadet/"
+        "urls": ["https://www.trondheim.kommune.no/tema/kultur-og-fritid/lokaler/husebybadet/"]
     },
     {
         "question": [
@@ -277,7 +308,7 @@
                 "text": "UKM er for alle ungdommer mellom 13 og 20 år. Både grupper og enkeltpersoner kan delta, og det er gratis å være med."
             }
         ],
-        "url": "https://www.trondheim.kommune.no/tema/kultur-og-fritid/aktivitetstilbudkulturtilbud/ukm/"
+        "urls": ["https://www.trondheim.kommune.no/tema/kultur-og-fritid/aktivitetstilbudkulturtilbud/ukm/"]
     },
     {
         "question": [
@@ -290,16 +321,12 @@
                 "text": "ukm.no"
             }
         ],
-        "url": "https://www.trondheim.kommune.no/tema/kultur-og-fritid/aktivitetstilbudkulturtilbud/ukm/"
+        "urls": ["https://www.trondheim.kommune.no/tema/kultur-og-fritid/aktivitetstilbudkulturtilbud/ukm/"]
     },
     {
         "question": [
             "Prisen for å leie en svømmehall?",
-            "hva koster det å leie husebybadet?",
-            "Pris for å leie svømmehall",
-            "leie svømmehall pris",
-            "hva koster det å leie hele hallen til bursdag",
-            "Pris leie Husebybadet"
+            "hva koster det å leie husebybadet?"
         ],
         "answers": [
             {
@@ -311,7 +338,7 @@
                 "text": "Du kan leie Husebybadet til bursdager og andre arrangementer, på lørdager og søndager mellom 16.00 og 20.00."
             }
         ],
-        "url": "https://www.trondheim.kommune.no/tema/kultur-og-fritid/lokaler/husebybadet/"
+        "urls": ["https://www.trondheim.kommune.no/tema/kultur-og-fritid/lokaler/husebybadet/"]
     },
     {
         "question": [
@@ -332,7 +359,7 @@
                 "text": "Vi har læreplasser ved ulike enheter i kommunen."
             }
         ],
-        "url": "https://www.trondheim.kommune.no/tema/skole/trondheimsskolen/larlinger/"
+        "urls": ["https://www.trondheim.kommune.no/tema/skole/trondheimsskolen/larlinger/"]
     },
     {
         "question": [
@@ -353,6 +380,6 @@
                 "text": "Frist for å sende inn forslag på kandidater til Trondheim kommunes kulturpris for 2018 er 15. oktober 2018."
             }
         ],
-        "url": "https://www.trondheim.kommune.no/tema/kultur-og-fritid/tilskudd-priser-og-stipend/kulturprisen/"
+        "urls": ["https://www.trondheim.kommune.no/tema/kultur-og-fritid/tilskudd-priser-og-stipend/kulturprisen/"]
     }
 ]

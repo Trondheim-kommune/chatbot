@@ -20,8 +20,13 @@ def evaluate_test(test):
         our_answer = perform_search(question)
         # The score for this specific question.
         score_question = 0
-        if test["url"] in our_answer:
-            url_score += 1
+        score_url = 0
+        for correct_url in test["urls"]:
+            if correct_url in our_answer:
+                score_url = 1
+        if score_url == 0:
+            print("\nCorrect URL was", test["urls"])
+        url_score += score_url
 
         correct_answers = test["answers"]
         for correct_answer in correct_answers:
