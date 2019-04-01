@@ -217,3 +217,9 @@ vært
 vøre
 vørt
 å
+mandag
+tirsdag
+onsdag
+torsdag
+lørdag
+søndag
