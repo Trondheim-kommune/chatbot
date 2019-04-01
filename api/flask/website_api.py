@@ -88,6 +88,17 @@ def get_docs_from_url():
     return json.dumps(out)
 
 
+@web_api.route("/v1/web/doc", methods=["DELETE"])
+def delete_manual_document():
+    """
+    This function deletes a document from the manual collection
+    """
+    json_input_data = json.loads(request.data)
+    document_id = json_input_data["data"]["id"]
+    factory.get_database().get_collection("manual").delete_one({"id": document_id})
+    return flask_util.create_success_response("Successfully deleted manual entry")
+
+
 @web_api.route("/v1/web/unknown_query", methods=["DELETE"])
 def delete_unknown_query():
     """
