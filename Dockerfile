@@ -10,7 +10,7 @@ ENV PYTHONPATH "${PYTHONPATH}:/usr/src/app/scraper"
 # Install dependencies
 RUN apt-get update
 RUN apt-get install libssl-dev musl-dev libffi-dev libxslt-dev libstdc++ -y
-RUN apt-get install gcc g++ bash libstdc++ -y nginx cron
+RUN apt-get install gcc g++ bash libstdc++ -y cron
 
 # Add requirements
 COPY ./requirements.txt .
@@ -36,8 +36,8 @@ EXPOSE 8080
 # Install extra package
 RUN ["pip", "install", "."]
 
+# Install pakcage
 RUN ["python3", "setup.py", "develop"]
 
-COPY nginx.conf /etc/nginx
-#CMD ["./start_server_docker.sh"]
+# Start server
 CMD ["./start_server_docker.sh"]

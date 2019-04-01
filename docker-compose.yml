@@ -54,4 +54,4 @@ services:
             - 8000:3000
         volumes:
             - .:/srv/agent25-web
-        working_dir: /temp
+        working_dir: /usr/src/app
