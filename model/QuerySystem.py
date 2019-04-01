@@ -1,10 +1,11 @@
 from model.ModelFactory import ModelFactory
 import model.db_util as util
 from sklearn.metrics.pairwise import cosine_similarity
-from model.nlp import get_tfidf_model
+from model.keyword_gen import get_tfidf_model
 from model.query_expansion import expand_query
 from util.config_util import Config
 import pymongo
+import random
 
 NOT_FOUND = Config.get_value(['query_system', 'not_found'])
 MULTIPLE_ANSWERS = Config.get_value(['query_system', 'multiple_answers'])
@@ -29,14 +30,15 @@ def handle_not_found(query_text):
 
 
 def get_corpus_text(doc):
-    ''' Converts a document from the model into a string which will be used in a corpus. '''
+    ''' Converts a document from the model into a string which will be used in a corpus.
+    All possible answers are used to generate the corpus, if multiple answers exist.'''
     content = ' '.join(doc['content']['texts'])
     return doc['content']['title'] + ' ' + content
 
 
 def get_answer_text(doc):
     ''' Converts a document from the model into a readable string. '''
-    content = ' '.join(doc['content']['texts']) + '\n' + doc['url']
+    content = random.choice(doc['content']['texts']) + '\n' + doc['url']
     return doc['content']['title'] + ':\n' + content
 
 

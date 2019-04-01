@@ -1,9 +1,9 @@
 import nltk
 from nltk.corpus import wordnet as wn
 import spacy
-from model.nlp import stem_token, get_stopwords
 import string
 from model.SynsetWrapper import SynsetWrapper
+from model.keyword_gen import get_stopwords, lemmatize
 
 
 nltk.download('wordnet')
@@ -17,11 +17,11 @@ stopwords = get_stopwords()
 
 def expand_query(query):
     ''' Attempts to expand the given query by using synonyms from WordNet. As
-    a consequnece of this process, the query is also tokenized and stemmed. '''
+    a consequnece of this process, the query is also tokenized and lemmatized. '''
 
     tokens = [
-      # Store tuples of stemmed tokens and their corresponding POS tags.
-      (stem_token(token.text), token.pos_) for token in nb(query)
+      # Store tuples of lemmatized tokens and their corresponding POS tags.
+      (lemmatize(token.text, token.pos_)[0], token.pos_) for token in nb(query)
       # Filter away punctuation.
       if token.text not in string.punctuation
     ]
@@ -65,9 +65,10 @@ def expand_query(query):
             # avoids adding it to the result list twice.
             continue
 
+        # Add the original token to the full query.
         result.append(token[0])
 
-    # Add custom synset to the query.
-    result += list(synonyms)
+    # Add custom synset to the query
+    result += synonyms
 
     return ' '.join(result)

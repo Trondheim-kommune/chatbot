@@ -1,6 +1,8 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
 import spacy
-from nltk.stem.snowball import SnowballStemmer
+from spacy.lemmatizer import Lemmatizer
+from spacy.lang.nb import LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES
+import collections
 import string
 import re
 
@@ -8,7 +10,7 @@ import re
 # Load a Norwegian language model for Spacy.
 nb = spacy.load('nb_dep_ud_sm')
 
-stemmer = SnowballStemmer('norwegian')
+lemmatize = Lemmatizer(LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES)
 
 START_SPECIAL_CHARS = re.compile('^[{}]+'.format(re.escape(string.punctuation)))
 END_SPECIAL_CHARS = re.compile('[{}]+$'.format(re.escape(string.punctuation)))
@@ -30,14 +32,9 @@ def sort_coo(coo_matrix):
     return sorted(tuples, key=lambda x: (x[1], x[0]), reverse=True)
 
 
-def extract_top(feature_names, sorted_items):
+def extract_top(feature_names, sorted_items, n=10):
     ''' Extracts the top scoring keywords from a sorted list of scores. '''
-    return [(feature_names[i], score) for i, score in sorted_items]
-
-
-def stem_token(token):
-    ''' Stem a token using the NLTK SnowballStemmer. '''
-    return stemmer.stem(token)
+    return [(feature_names[i], score) for i, score in sorted_items[:n]]
 
 
 def has_digits(token):
@@ -48,7 +45,7 @@ def has_digits(token):
 def tokenize(doc):
     ''' Tokenize a given document. '''
     # Tokenize the document.
-    tokens = [token.text for token in nb(doc)]
+    tokens = [lemmatize(token.text, token.pos_)[0] for token in nb(doc)]
 
     # Remove punctuation tokens.
     tokens = [token for token in tokens if token not in string.punctuation]
@@ -68,11 +65,34 @@ def tokenize(doc):
     # Remove stopwords from the tokens.
     tokens = [token for token in tokens if token not in stop_words]
 
-    # Stem all tokens.
-    tokens = [stem_token(token) for token in tokens]
-
     # Return the finished list of tokens.
     return tokens
+
+
+def lemmatize_content_keywords(content):
+    ''' Go through a content in the format given to the API, and lemmatize
+    all keywords again in case something changed. '''
+    # Merge all texts and titles, then tokenize and POS tag them.
+    tokens = nb(' '.join(([content['title']] + content['texts'])))
+
+    # Counter for number of times each POS tag occurs for tokens.
+    votes = collections.defaultdict(lambda: collections.Counter())
+
+    for token in tokens:
+        # For each word, we count how many times each POS tag occurs.
+        votes[token.text][token.pos_] += 1
+
+    for entry in content['keywords']:
+        # Verify that the keyword is not empty.
+        if not entry['keyword']:
+            continue
+
+        # Find the most likely POS tag for the keyword.
+        # If the keyword is not in the document, use an unigram tagger.
+        pos = next(iter(votes[entry['keyword']].most_common()), nb(entry['keyword'])[0].pos_)
+
+        # Store the lemmatized keyword.
+        entry['keyword'] = lemmatize(entry['keyword'], pos)[0]
 
 
 def get_tfidf_model(corpus):
@@ -97,4 +117,4 @@ def get_keywords(vectorizer, feature_names, document):
     tfidf_vector = vectorizer.transform([document])
     sorted_items = sort_coo(tfidf_vector.tocoo())
 
-    return extract_top(feature_names, sorted_items)
+    return extract_top(feature_names, sorted_items, len(sorted_items))
