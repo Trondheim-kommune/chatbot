@@ -229,6 +229,10 @@ def test_update_content(app):
         data=json.dumps({"data": {"id": input_dict["data"]["id"]}}))
     assert response.status_code == 200
 
+    response = app.test_client().post('/v1/web/content/',
+                                      data=json.dumps(input_dict))
+    assert response.status_code == 200
+
 
 def test_get_docs_from_url(app):
     response = app.test_client().get('/v1/web/docs/?url=https://www.trondheim.kommune.no')
