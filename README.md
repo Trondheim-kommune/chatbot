@@ -80,15 +80,9 @@ To run
 make start
 ```
 
-To find the container id of running container
-
+To see running containers
 ```bash
 docker ps
-```
-
-To enter a container
-```bash
-docker exec -it <container_id> bash
 ```
 
 To enter the api container
@@ -101,17 +95,23 @@ To enter the web container
 make open-bash-web
 ```
 
-To run pytest inside docker
+To run tests inside docker
 ```bash
-make pytest-docker
+make test-docker
 ```
 
-## Building the website
+To view logs from docker-compose
+```bash
+make docker-logs
+```
+## Building without docker
+
+### Building the website
 Run
 `cd website`  
 `./build_web_server.sh`  
 
-## Running website locally
+### Running website locally
 Run
 `source venv/bin/activate` 
 `cd website`  

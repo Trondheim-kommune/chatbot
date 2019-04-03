@@ -5,8 +5,9 @@ test: install
 	TEST_FLAG=TRUE pytest
 	flake8 --exclude=venv,build,website .
 
-pytest-docker:
-	docker exec -it agent25 pytest
+test-docker:
+	docker exec --env TEST_FLAG=TRUE -it agent25 pytest 
+	docker exec -it agent25 flake8 --exclude=venv,build,website .
 
 build:
 	docker-compose build
@@ -15,10 +16,13 @@ build-clean:
 	docker-compose build --no-cache
 
 start:
-	docker-compose up
+	docker-compose up -d
 
 build-and-run:
-	docker-compose build && docker-compose up
+	docker-compose build && docker-compose up -d
+
+docker-logs:
+	docker-compose logs
 
 stop:
 	docker-compose stop
@@ -28,3 +32,4 @@ make open-bash-agent25:
 
 make open-bash-web:
 	docker exec -it web bash
+

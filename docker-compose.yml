@@ -30,7 +30,7 @@ services:
             - 27017:27017
         command: mongod --smallfiles --logpath=/dev/null # --quiet
 
-    mongoClientTemp:
+    mongoClientInitializer:
         image: mongo:latest
         container_name: mongoClientTemp
         volumes:
