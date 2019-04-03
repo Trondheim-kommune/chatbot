@@ -100,7 +100,7 @@ def get_tfidf_model(corpus):
     using cosine similarity as well as keyword generation. '''
     # Create a vectorizer which will turn documents into vectors.
     # We use a custom list of stopwords and a custom tokenizer.
-    vectorizer = TfidfVectorizer(tokenizer=tokenize)
+    vectorizer = TfidfVectorizer(tokenizer=tokenize, sublinear_tf=True)
 
     # Create a simple index on the corpus.
     corpus_matrix = vectorizer.fit_transform(corpus)
