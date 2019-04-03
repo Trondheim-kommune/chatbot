@@ -49,9 +49,9 @@ services:
     web:
         build: website
         environment:
-            REACT_APP_SERVER_URL=${REACT_APP_SERVER_URL}
+            - REACT_APP_SERVER_URL=${REACT_APP_SERVER_URL}
         ports:
-            - 8000:3000
+            - 8000:80
         volumes:
             - .:/srv/agent25-web
         working_dir: /usr/src/app
