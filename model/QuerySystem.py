@@ -9,6 +9,8 @@ import random
 
 NOT_FOUND = Config.get_value(['query_system', 'not_found'])
 MULTIPLE_ANSWERS = Config.get_value(['query_system', 'multiple_answers'])
+CHAR_LIMIT = Config.get_value(['query_system', 'character_limit'])
+MAX_ANSWERS = Config.get_value(['query_system', 'max_answers'])
 
 factory = ModelFactory.get_instance()
 
@@ -81,7 +83,7 @@ def perform_search(query_text):
 
         for score in sorted_scores:
             # Tolerance for similarity between scores.
-            if sorted_scores[0] - score > 0.05:
+            if sorted_scores[0] - score > 0.1:
                 break
 
             # Add this result to the list of answers.
@@ -91,8 +93,14 @@ def perform_search(query_text):
             # Return the answer straight away if there is only 1 result/
             return answers[0]
 
-        # Join the results with a separator.
-        return '\n\n---\n\n'.join([MULTIPLE_ANSWERS] + answers[0:3])
+        # Append answers until we reach the CHAR_LIMIT
+        i, n_chars = 0, 0
+        while n_chars < CHAR_LIMIT and i < len(answers):
+            n_chars += len(answers[i])
+            i += 1
+
+        # Join the results with a separator. Still setting a max number of answers
+        return '\n\n---\n\n'.join([MULTIPLE_ANSWERS] + answers[0:min(max(i, 1), MAX_ANSWERS)])
     except KeyError:
         raise Exception('Document does not have content and texts.')
     except ValueError:
