@@ -56,13 +56,10 @@ class Serializer:
     __MODEL_SCHEMA = {
         "id": "",
         "title": "",
-        "description": "",
         "url": "",
-        "last_modified": "",
         "header_meta_keywords": [],
-        "keywords": [],
         "content": {},
-        "manually_changed": False,
+        "manually_changed": False
     }
     __models = []
     __data = []
@@ -98,16 +95,12 @@ class Serializer:
 
     def get_tfidf_model(self):
         corpus = []
-
         for data in self.__data:
             queue = list(data['tree'].get('children', []))
-
             while queue:
                 node = queue.pop(0)
-
                 if 'text' in node:
                     corpus.append(node['text'])
-
                 if 'children' in node:
                     queue += node['children']
 

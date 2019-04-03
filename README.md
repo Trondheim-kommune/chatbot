@@ -172,3 +172,6 @@ multiple things you could change. Every change needed to make this project work 
 * query_system
     * not_found: Text that the bot should response with if the bot did not find what you asked for.
     * multiple_answers: Text when multiple answers are found.
+
+## Environment variables
+See the [wiki page](https://github.com/vegarab/agent-25/wiki/Environment-variables) for all necessary credentials and environment variables.
