@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 services:
     agent25:
         build: .
@@ -11,7 +11,7 @@ services:
             - SERVER_URL=mongodb
             - DOCKER=TRUE
         ports:
-            - 8080:8080
+            - 8080:8081
         links:
             - mongodb
         depends_on:
@@ -48,8 +48,6 @@ services:
 
     web:
         build: website
-        environment:
-            - REACT_APP_SERVER_URL=${REACT_APP_SERVER_URL}
         ports:
             - 8000:80
         volumes:

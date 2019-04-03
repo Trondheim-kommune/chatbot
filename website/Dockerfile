@@ -2,10 +2,11 @@ FROM node:9 as build-deps
 
 WORKDIR /temp
 
-ENV REACT_APP_SERVER_URL="https://agent25.tinusf.com/"
 
 ADD package*.json  ./
 RUN npm install
+
+ENV REACT_APP_SERVER_URL="https://agent25.tinusf.com/"
 
 ADD . ./
 
