@@ -1,49 +1,63 @@
 import React from 'react';
 import { fetchData } from '../utils/Util';
+import css from './DocumentView.module.css';
+
 /* 
 This component displays the content field in a document from the manual collection
 and the corresponding document in the prod collection.
 You can edit the "texts" field and the "keywords" field manually.
  */
 export default class DocumentView extends React.Component {
-  constructor() {
-    super();
-    this.state = {};
+  state = {
+    keywordError: false,
+    manual: null,
+    automatic: null,
+    title: null,
+    url: null,
   }
 
   async componentDidMount() {
-    // Fetch content
-    const data = { data: { id: this.props.id } };
+    // Fetch content.
     const content = await fetchData(
       process.env.REACT_APP_SERVER_URL + 'v1/web/content/?id=' + this.props.id,
-      "GET"
+      'GET',
     );
-    if (!content.hasOwnProperty('manual')) {
-      this.setState({
-        manual: content.prod,
-        automatic: content.prod,
-        url: content.url,
-      });
-    } else {
-      this.setState({
-        manual: content.manual,
-        automatic: content.prod,
-        url: content.url,
-      });
-    }
+
+    this.setState({
+      manual: content.manual || content.prod,
+      automatic: content.prod,
+      title: content.prod.title,
+      url: content.url,
+    });
   }
 
-  handleSubmit = e => {
+  validateKeywords = () => this.state.manual.keywords.every(entry =>
+    !/\s/g.test(entry['keyword']));
+
+
+  handleSubmit = async e => {
     e.preventDefault();
-    // Save data and delete entry in manual collection if needed
-    const data = { data: { id: this.props.id, content: this.state.manual } };
-    const content = fetchData(
-      process.env.REACT_APP_SERVER_URL + 'v1/web/content/',
-      "POST",
-      data
-    ).then(() => {
-      this.props.changeView('main');
+
+    if (!this.validateKeywords()) {
+      this.setState({
+        keywordError: true,
+      });
+
+      return;
+    }
+
+    this.setState({
+      keywordError: false,
     });
+
+    // Save data and delete entry in manual collection if needed.
+    const data = { data: { id: this.props.id, content: this.state.manual } };
+
+    await fetchData(
+      process.env.REACT_APP_SERVER_URL + 'v1/web/content/',
+      'POST',
+      data,
+    );
   };
 
   createNewAnswer = e => {
@@ -99,6 +113,18 @@ export default class DocumentView extends React.Component {
     }));
   };
 
+  deleteDocument = (e, i) => {
+    e.preventDefault();
+    const document = { data: { id: this.props.id } };
+    fetchData(
+      process.env.REACT_APP_SERVER_URL + 'v1/web/doc',
+      'DELETE',
+      document
+    ).then(() => {
+      this.props.changeView('main');
+    });
+  }
+
   render() {
     let textAreasManual;
     if (this.state.manual) {
@@ -137,7 +163,7 @@ export default class DocumentView extends React.Component {
     if (this.state.manual) {
       /* Map through the keywords from manual */
       keywordsManual = this.state.manual.keywords.map((keyword, i) => (
-        <div key={i} className="keyword" className="keywordManual">
+        <div key={i} className="keywordManual">
           <input
             type="text"
             value={keyword['keyword']}
@@ -218,59 +244,76 @@ export default class DocumentView extends React.Component {
     return (
       <div>
         <button onClick={e => this.props.changeView('main')}>Tilbake</button>
+
         {this.state.url && (
           <h1 className="title">
-            <a href={this.state.url}>{this.state.url}</a>
+            <a href={this.state.url}>{this.state.title}</a>
           </h1>
         )}
+
         <div className="flex">
           {this.state.manual && (
             <div className="sub-container">
               <h2>Manuelle endringer</h2>
+
+
               <p>
                 Her kan du endre svarene til botten manuelt. Oppdater teksten og
                 trykk på lagre for å oppdatere.
-            </p>
+              </p>
+
               <form>
                 <strong>Svar:</strong>
+
                 {textAreasManual}
+
                 <button
                   className="newText"
                   type="button"
                   onClick={e => this.createNewAnswer(e)}
                 >
                   Nytt svar
-              </button>
+                </button>
+
                 <p>
                   Man kan også oppdatere, legge til og slette nøkkelord og
                   selvsikkerheten deres.
-              </p>
+                </p>
+
                 <p>
                   Selvsikkerheten er et tall fra 0 til 1. 1 om du må ha dette
-                  søketordet for å få dette svaret.
-              </p>
+                  søkeordet for å få dette svaret.
+                </p>
+
                 <p>
                   <strong>Nøkkelord:</strong>
                 </p>
+
+                {this.state.keywordError && (
+                  <p className={css.error}>Nøkkelord kan ikke inneholde mellomrom.</p>
+                )}
+
                 {keywordsManual}
+
                 <button
                   className="newKeyword"
                   type="button"
                   onClick={e => this.createNewKeyword(e)}
                 >
                   Nytt nøkkelord
-              </button>
+                </button>
+
                 <input type="button" value="Lagre" className="save" onClick={e => this.handleSubmit(e)} />
+                <input type="button" value="Slett manuelle endringer" className="delete" onClick={e => this.deleteDocument(e)} />
               </form>
             </div>
           )}
+
           {this.state.automatic && (
             <div className="sub-container">
               {this.state.url && (
                 <h2>
-                  {' '}
-                  Automatisk hentet fra{' '}
-                  <a href={this.state.url}>{this.state.url}</a>
+                  Automatisk hentet fra <a href={this.state.url}>{this.state.url}</a>
                 </h2>
               )}
               <p>

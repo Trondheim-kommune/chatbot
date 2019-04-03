@@ -1,7 +1,7 @@
 import model.db_util as db_util
 import api.flask.flask_util as flask_util
 from model.ModelFactory import ModelFactory
-from model.nlp import stem_token
+from model.keyword_gen import lemmatize_content_keywords
 import json
 from flask import request, Blueprint
 
@@ -53,8 +53,7 @@ def update_content():
     id = json_input_data["data"]["id"]
     content = json_input_data["data"]["content"]
 
-    for i in range(len(content['keywords'])):
-        content['keywords'][i]['keyword'] = stem_token(content['keywords'][i]['keyword'])
+    lemmatize_content_keywords(content)
 
     status = factory.get_database().get_collection("manual").update({"id": id}, {"$set": {
         "content": content}})
@@ -86,6 +85,19 @@ def get_docs_from_url():
     for doc in docs:
         out.append({"id": doc["id"], "title": doc["content"]["title"]})
     return json.dumps(out)
+
+
+@web_api.route("/v1/web/doc", methods=["DELETE"])
+def delete_manual_document():
+    """
+    This function deletes a document from the manual collection
+    """
+    json_input_data = json.loads(request.data)
+    document_id = json_input_data["data"]["id"]
+    factory.get_database().get_collection("manual").delete_one({"id": document_id})
+    factory.get_database().get_collection("prod").update({"id": document_id}, {"$set": {
+        "manually_changed": False}})
+    return flask_util.create_success_response("Successfully deleted manual entry")
 
 
 @web_api.route("/v1/web/unknown_query", methods=["DELETE"])

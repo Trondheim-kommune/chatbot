@@ -7,28 +7,27 @@ This component is a search bar. You search by url and get a DocumentList
 containing the search results
 */
 export default class Search extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      url: '',
-      fetched: false,
-    };
-  }
+  state = {
+    url: '',
+    fetched: false,
+  };
+
   handleSubmit = async e => {
     e.preventDefault();
 
-    // Title and id based on url
-    const data = { data: { url: this.state.url } };
+    // Title and ID based on URL.
     const content = await fetchData(
       process.env.REACT_APP_SERVER_URL + 'v1/web/docs/?url=' + this.state.url,
-      "GET"
+      'GET',
     );
+
     if (content.length === 0) {
       alert('Vi fant ingen for den siden, sjekk om URLen stemmer.');
     } else if (content.length > 0) {
       this.setState({ fetched: true, docs: content });
     }
   };
+
   render() {
     return (
       <div>
