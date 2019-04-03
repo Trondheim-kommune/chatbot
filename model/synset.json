@@ -9,7 +9,7 @@
 	[["parkere", "VERB"], ["parkering", "VERB"]],
 	[["ordfører", "NOUN"], ["rita", "NOUN"], ["ottervik", "NOUN"]],
 	[["møte", "NOUN"], ["bystyremøte", "NOUN"]],
-	[["marka", "NOUN"], ["bymarka", ""], ["markaområdene", "NOUN"], ["skog", "NOUN"], ["lysløype", "NOUN"], ["tur", "NOUN"], ["skiløype", "NOUN"], ["spaghettien", "NOUN"]],
+	[["marka", "NOUN"], ["bymarka", "PROPN"], ["markaområdene", "NOUN"], ["skog", "NOUN"], ["lysløype", "NOUN"], ["tur", "NOUN"], ["skiløype", "NOUN"], ["spaghettien", "NOUN"]],
 	[["ishockey", "NOUN"], ["skøyter", "NOUN"], ["skøytebane", "NOUN"]],
 	[["økonomirapport", "NOUN"], ["budsjett", "NOUN"], ["årsbdusjett", "NOUN"], ["regnskap", "NOUN"], ["årsregnskap", "NOUN"], ["årsrapport", "NOUN"], ["økonomiplan", "NOUN"]],
 	[["søke", "VERB"], ["søknad", "VERB"], ["søknadsskjema", "NOUN"], ["søknaden", "NOUN"]],
