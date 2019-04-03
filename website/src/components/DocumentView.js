@@ -1,13 +1,14 @@
 import React from 'react';
 import { fetchData } from '../utils/Util';
 import css from './DocumentView.module.css';
+import { withToastManager } from 'react-toast-notifications';
 
 /* 
 This component displays the content field in a document from the manual collection
 and the corresponding document in the prod collection.
 You can edit the "texts" field and the "keywords" field manually.
  */
-export default class DocumentView extends React.Component {
+class DocumentView extends React.Component {
   state = {
     keywordError: false,
     manual: null,
@@ -58,6 +59,11 @@ export default class DocumentView extends React.Component {
       'POST',
       data,
     );
+
+    this.props.toastManager.add('Lagringen av manuelle endringer var vellykket.', {
+      appearance: 'success',
+      autoDismiss: true,
+    });
   };
 
   createNewAnswer = e => {
@@ -335,3 +341,5 @@ export default class DocumentView extends React.Component {
     );
   }
 }
+
+export default withToastManager(DocumentView);
