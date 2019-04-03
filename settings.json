@@ -95,6 +95,8 @@
     "query_system": {
         "not_found": "Jeg fant ikke informasjonen du spurte etter.",
         "multiple_answers": "Jeg har flere mulige svar til deg.",
-        "custom_synset_file": "model/synset.json"
+        "custom_synset_file": "model/synset.json",
+        "character_limit": 2500,
+        "max_answers": 5
     }
 }
