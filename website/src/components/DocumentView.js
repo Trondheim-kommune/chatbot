@@ -288,7 +288,7 @@ export default class DocumentView extends React.Component {
                 <p>
                   <strong>Nøkkelord:</strong>
                 </p>
-                
+
                 {this.state.keywordError && (
                   <p className={css.error}>Nøkkelord kan ikke inneholde mellomrom.</p>
                 )}
@@ -304,7 +304,7 @@ export default class DocumentView extends React.Component {
                 </button>
 
                 <input type="button" value="Lagre" className="save" onClick={e => this.handleSubmit(e)} />
-                <input type="button" value="Slett" className="delete" onClick={e => this.deleteDocument(e)} />
+                <input type="button" value="Slett manuelle endringer" className="delete" onClick={e => this.deleteDocument(e)} />
               </form>
             </div>
           )}
