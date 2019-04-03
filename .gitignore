@@ -20,3 +20,6 @@ Agent25-google.json
 .coverage
 .envrc
 
+# Docker volumes
+data/
+

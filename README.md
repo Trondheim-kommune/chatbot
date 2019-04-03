@@ -57,6 +57,70 @@ not particulary resource-intensive, but some of the natural language processing
 functionality can be taxing. We therefore reccoment using at least a 4 core CPU
 with 4GB of RAM.
 
+## Running the project using docker
+Docker is a containerization tool. In order to run this project, you need
+to have both docker and docker-compose installed. It would be best to run
+this on an unix based system, preferrably Linux.
+
+To build the project
+
+```bash
+make build
+```
+
+Full rebuild
+
+```bash
+make build-clean
+```
+
+To run
+
+```bash
+make start
+```
+
+To see running containers
+```bash
+docker ps
+```
+
+To enter the api container
+```bash
+make open-bash-agent25
+```
+
+To enter the web container
+```bash
+make open-bash-web
+```
+
+To run tests inside docker
+```bash
+make test-docker
+```
+
+To view logs from docker-compose
+```bash
+make docker-logs
+```
+## Building without docker
+
+### Building the website
+Run
+`cd website`  
+`./build_web_server.sh`  
+
+### Running website locally
+Run
+`source venv/bin/activate` 
+`cd website`  
+`npm install`  
+`npm start`
+Then to run Cypress tests
+`npm run cypress open`
+
+
 # Setup
 
 This project currently uses virtual environments. To start the project, run
