@@ -8,7 +8,6 @@ services:
             - GOOGLE_APPLICATION_CREDENTIALS=/usr/src/app/backupagent.json
             - DB_USER=${DB_USER}
             - DB_PWD=${DB_PWD}
-            - TEST_FLAG=TRUE
             - SERVER_URL=mongodb
             - DOCKER=TRUE
         ports:
@@ -44,12 +43,13 @@ services:
           - DB_NAME=test_db
         links:
             - mongodb:mongodb
-        #command: mongo --host mongodb --eval  "db.getSiblingDB('dev_db').createUser({user:'agent25', pwd:'agent25', roles:[{role:'readWrite',db:'dev_db'}]});"
         depends_on:
             - mongodb
 
     web:
         build: website
+        environment:
+            REACT_APP_SERVER_URL=${REACT_APP_SERVER_URL}
         ports:
             - 8000:3000
         volumes:
