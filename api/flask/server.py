@@ -15,4 +15,3 @@ CORS(app)
 def test():
     return util.create_success_response("Success")
 
-
