@@ -69,7 +69,7 @@
                 "text": "Du kan leie ishallene på hverdager frem til klokken 15.00. For å bestille tid kan du sende e-post til avdeling for idrett, park og skog:"
             },
             {
-                "score": 0.5,
+                "score": 1,
                 "text": "Tiden etter 16.00 og i helgene fordeles av Sør-Trøndelag ishockeykrets. Det er derfor ikke mulig å bestille treningstid på disse tidspunktene."
             },
             {
@@ -173,7 +173,7 @@
     },
     {
         "question": [
-            "skjenkebevilling i idrettshall",
+            "skjenkebevilling i idrettsanlegg",
             "Skjenkebevilling leie av gymsal"
         ],
         "answers": [
@@ -376,7 +376,7 @@
                 "text": "Trondheim kommune\nv/kommunaldirektør for kultur og næring\nPostboks 2300 Torgard\n7004 Trondheim"
             },
             {
-                "score": 0.5,
+                "score": 1,
                 "text": "Frist for å sende inn forslag på kandidater til Trondheim kommunes kulturpris for 2018 er 15. oktober 2018."
             }
         ],
