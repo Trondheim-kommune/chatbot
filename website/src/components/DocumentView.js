@@ -113,6 +113,18 @@ export default class DocumentView extends React.Component {
     }));
   };
 
+  deleteDocument = (e, i) => {
+    e.preventDefault();
+    const document = { data: { id: this.props.id } };
+    fetchData(
+      process.env.REACT_APP_SERVER_URL + 'v1/web/doc',
+      'DELETE',
+      document
+    ).then(() => {
+      this.props.changeView('main');
+    });
+  }
+
   render() {
     let textAreasManual;
     if (this.state.manual) {
@@ -276,7 +288,7 @@ export default class DocumentView extends React.Component {
                 <p>
                   <strong>Nøkkelord:</strong>
                 </p>
-                
+
                 {this.state.keywordError && (
                   <p className={css.error}>Nøkkelord kan ikke inneholde mellomrom.</p>
                 )}
@@ -292,6 +304,7 @@ export default class DocumentView extends React.Component {
                 </button>
 
                 <input type="button" value="Lagre" className="save" onClick={e => this.handleSubmit(e)} />
+                <input type="button" value="Slett manuelle endringer" className="delete" onClick={e => this.deleteDocument(e)} />
               </form>
             </div>
           )}
