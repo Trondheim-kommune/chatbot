@@ -23,7 +23,7 @@ describe('Test search and deleting text and keyword', () => {
       .click()
       .wait(waitTime);
 
-    const title = 'Svømmehall - Husebybadet Ordinære åpningstider - e3878fe650dc125c5c70ada53cf266b93b4af782-4'
+    const title = ' Svømmehall - Husebybadet Ordinære åpningstider - e3878fe650dc125c5c70ada53cf266b93b4af782-4'
     // Get the first result after searching and check text is what we expect
     cy.get('.itemList').first().children('.itemButton').first()
       .invoke('text').then((text => {
