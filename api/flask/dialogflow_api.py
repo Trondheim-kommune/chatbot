@@ -244,8 +244,6 @@ def batch_create_entities(entity_types):
 
         ID_list.append(response.name.split("/")[-1])
     # After we have inserted all the new entities we get_entities() again.
-    # TODO: it would be more efficient to add to the dictionary whilst
-    # uploading new entities.
     get_entities()
 
     return ID_list

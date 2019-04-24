@@ -62,7 +62,6 @@ class ModelFactory:
 
         return docs
 
-    # TODO: some validation on response to make sure everything is posted
     def post_document(self, data, collection):
         """ Posts JSON data to colletion in db """
         col = self.get_collection(collection)
@@ -72,7 +71,7 @@ class ModelFactory:
             data = json_util.loads(data)
 
         response = col.insert_one(data)
-        return response  # TODO: Fix
+        return response
 
     def update_document(self, query, data, collection):
         """ Updates the document specified in query with the new data """
