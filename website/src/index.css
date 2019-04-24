@@ -36,3 +36,8 @@ button, input {
 .sub-container {
   flex: 1;
 }
+
+.elem {
+  margin: 0.5em;
+  float: left;
+}
