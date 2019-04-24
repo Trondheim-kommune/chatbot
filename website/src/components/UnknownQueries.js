@@ -25,7 +25,7 @@ export default class UnknownQueries extends React.Component {
     queries = this.props.queries.map((query, i) => (
       <div
         key={i}
-        style={{ float: "left" }}
+        className="elem"
       >
         <p>
           {query.query_text}
