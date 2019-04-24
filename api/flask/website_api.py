@@ -97,6 +97,7 @@ def delete_manual_document():
     factory.get_database().get_collection("manual").delete_one({"id": document_id})
     factory.get_database().get_collection("prod").update({"id": document_id}, {"$set": {
         "manually_changed": False}})
+    factory.get_database().get_collection("conflict_ids").delete_one({"conflict_id": document_id})
     return flask_util.create_success_response("Successfully deleted manual entry")
 
 

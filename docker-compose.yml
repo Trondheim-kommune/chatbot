@@ -25,14 +25,14 @@ services:
           - MONGODB_USER=${DB_USER}
           - MONGODB_PASS=${DB_PWD}
         volumes:
-          - ./data/db:/data/db
+          - mongodb:/data/db
         ports:
             - 27017:27017
         command: mongod --smallfiles --logpath=/dev/null # --quiet
 
     mongoClientInitializer:
         image: mongo:latest
-        container_name: mongoClientTemp
+        container_name: mongoClientInitializer
         volumes:
             - ./deployment_scripts:/deployment_scripts
         command: 
@@ -53,3 +53,6 @@ services:
         volumes:
             - .:/srv/agent25-web
         working_dir: /usr/src/app
+
+volumes:
+    mongodb:
