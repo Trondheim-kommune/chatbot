@@ -20,7 +20,7 @@ export default class UnknownQueries extends React.Component {
   render() {
     const DeleteButton = (text, record) => (
       <span>
-        <a onClick={() => this.deleteAnswer(record.index)}>Slett</a>
+        <a onClick={() => this.deleteAnswer(record.key)}>Slett</a>
       </span>
     );
 
