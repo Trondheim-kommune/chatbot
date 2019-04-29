@@ -1,6 +1,7 @@
 import React from 'react';
 import { Typography, Table } from 'antd';
 import css from './DocumentList.module.css';
+import classNames from 'classnames';
 
 const { Title } = Typography;
 
@@ -28,7 +29,7 @@ const DocumentList = ({ docs, changeView, title }) => {
   }));
 
   return (
-    <div className={css.itemList}>
+    <div className={classNames(css.itemList, 'itemList')}>
       <Title level={2}>{title}</Title>
 
       <Table

@@ -3,6 +3,7 @@ import { fetchData } from '../utils/Util';
 import css from './DocumentView.module.css';
 import { withToastManager } from 'react-toast-notifications';
 import { Typography, Input, Button } from 'antd';
+import classNames from 'classnames';
 
 const { Title, Paragraph } = Typography;
 const { TextArea } = Input;
@@ -179,7 +180,7 @@ class DocumentView extends React.Component {
           <Input
             type="text"
             value={keyword['keyword']}
-            className={css.keywordInput}
+            className={classNames(css.keywordInput, 'keywordManual')}
             onChange={e => {
               e.preventDefault();
               const value = e.target.value;
@@ -280,7 +281,7 @@ class DocumentView extends React.Component {
                 <div>
                   <Button
                     type="primary"
-                    className={css.addAnswer}
+                    className={classNames(css.addAnswer, 'newText')}
                     onClick={e => this.createNewAnswer(e)}
                   >
                     Nytt svar
@@ -306,9 +307,15 @@ class DocumentView extends React.Component {
                 {keywordsManual}
 
                 <div className={css.buttonGroup}>
-                  <Button type="primary" onClick={e => this.handleSubmit(e)}>Lagre</Button>
-                  <Button type="secondary" onClick={e => this.createNewKeyword(e)}>Nytt nøkkelord</Button>
-                  <Button type="danger" onClick={e => this.deleteDocument(e)}>Slett manuelle endringer</Button>
+                  <Button type="primary"
+                    className='save'
+                    onClick={e => this.handleSubmit(e)}>Lagre</Button>
+                  <Button type="secondary"
+                    className='newKeyword'
+                    onClick={e => this.createNewKeyword(e)}>Nytt nøkkelord</Button>
+                  <Button type="danger"
+                    className="deleteManual"
+                    onClick={e => this.deleteDocument(e)}>Slett manuelle endringer</Button>
                 </div>
               </form>
             </div>
