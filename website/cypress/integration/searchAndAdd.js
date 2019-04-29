@@ -12,15 +12,11 @@ describe('Test search and adding new text and keyword', () => {
 
   it('Search and add new answere and keyword for the first result ', () => {
     const url = 'https://www.trondheim.kommune.no/tema/kultur-og-fritid/lokaler/husebybadet/'
-    // Type the url in the search bar
+    // Type the url in the search bar and type enter.
     cy.get('.searchInputField')
       .type(url)
       .should('have.value', url)
-      .wait(waitTime);
-
-    // Click the search button
-    cy.get('.submitSearch').first()
-      .click()
+      .type('{enter}')
       .wait(waitTime);
 
     const title = ' Svømmehall - Husebybadet Ordinære åpningstider - e3878fe650dc125c5c70ada53cf266b93b4af782-4'

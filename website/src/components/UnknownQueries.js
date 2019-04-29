@@ -1,48 +1,53 @@
 import React from 'react';
 import { fetchData } from '../utils/Util';
+import { Typography, Table } from 'antd';
 
-/* 
-This component lists multiple DocumentItems
-*/
+const { Title } = Typography;
+
 export default class UnknownQueries extends React.Component {
-  deleteAnswer = async (e, i) => {
-    e.preventDefault();
+  deleteAnswer = async i => {
     const data = { data: { query_text: this.props.queries[i].query_text } };
-    fetchData(
+
+    await fetchData(
       process.env.REACT_APP_SERVER_URL + 'v1/web/unknown_query',
       'DELETE',
-      data
-    ).then(() => {
-      this.props.changeView('main');
-    });
+      data,
+    );
+
+    this.props.changeView('main');
   };
 
   render() {
-    // Maps through every DocumentItem and display them
-    // Each DocumentItem represents a document from the conflict_ids collection
-    let queries;
+    const DeleteButton = (text, record) => (
+      <span>
+        <a onClick={() => this.deleteAnswer(record.index)}>Slett</a>
+      </span>
+    );
 
-    queries = this.props.queries.map((query, i) => (
-      <div
-        key={i}
-        className="elem"
-      >
-        <p>
-          {query.query_text}
-        </p>
-        <button
-          type="button" className="deleteText" onClick={e => this.deleteAnswer(e, i)}>
-          Slett spørsmål
-          </button>
-      </div>
-    ));
+    const columns = [{
+      title: 'Spørring',
+      dataIndex: 'query',
+      key: 'query',
+    }, {
+      title: 'Handling',
+      key: 'action',
+      render: DeleteButton,
+    }];
+
+    const data = this.props.queries.map((query, i) => ({
+      query: query.query_text,
+      key: i,
+    }));
+
     return (
       <div className="itemList">
-        <h1>{this.props.title}</h1>
-        <div>
-          {queries}
+        <Title level={2}>Ukjente spørringer</Title>
 
-        </div>
+        <Table
+          columns={columns}
+          dataSource={data}
+          pagination={false}
+        />
       </div>
     );
   }

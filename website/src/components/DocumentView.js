@@ -2,6 +2,10 @@ import React from 'react';
 import { fetchData } from '../utils/Util';
 import css from './DocumentView.module.css';
 import { withToastManager } from 'react-toast-notifications';
+import { Typography, Input, Button } from 'antd';
+
+const { Title, Paragraph } = Typography;
+const { TextArea } = Input;
 
 /* 
 This component displays the content field in a document from the manual collection
@@ -138,10 +142,11 @@ class DocumentView extends React.Component {
       textAreasManual = this.state.manual.texts.map((text, i) => (
         <div key={i} className="answers">
           <div className="answer">
-            <textarea
+            <TextArea
               rows="10"
               cols="50"
               value={text}
+              className={css.answer}
               onChange={e => {
                 const value = e.target.value;
 
@@ -158,9 +163,10 @@ class DocumentView extends React.Component {
               }}
             />
           </div>
-          <button type="button" className="deleteText" onClick={e => this.deleteAnswer(e, i)}>
+
+          <Button type="danger" onClick={e => this.deleteAnswer(e, i)}>
             Slett svar
-          </button>
+          </Button>
         </div>
       ));
     }
@@ -169,11 +175,11 @@ class DocumentView extends React.Component {
     if (this.state.manual) {
       /* Map through the keywords from manual */
       keywordsManual = this.state.manual.keywords.map((keyword, i) => (
-        <div key={i} className="keywordManual">
-          <input
+        <div key={i} className={css.keywordListItem}>
+          <Input
             type="text"
             value={keyword['keyword']}
-            className="keywordWord"
+            className={css.keywordInput}
             onChange={e => {
               e.preventDefault();
               const value = e.target.value;
@@ -192,8 +198,9 @@ class DocumentView extends React.Component {
               }));
             }}
           />
-          <input
-            className="confidence"
+
+          <Input
+            className={css.confidenceInput}
             type="number"
             min="0"
             max="1"
@@ -217,13 +224,13 @@ class DocumentView extends React.Component {
               }));
             }}
           />
-          <button
-            className="deleteKeyword"
-            type="button"
+
+          <Button
+            type="danger"
             onClick={e => this.deleteKeyword(e, i)}
           >
             Slett nøkkelord
-          </button>
+          </Button>
         </div>
       ));
     }
@@ -232,7 +239,7 @@ class DocumentView extends React.Component {
     if (this.state.automatic) {
       /* Map through the texts field from prod */
       textAreasAutomatic = this.state.automatic.texts.map((text, i) => (
-        <textarea readOnly key={i} rows="10" cols="50" value={text} />
+        <TextArea readOnly key={i} rows="10" cols="50" value={text} className={css.answer} />
       ));
     }
 
@@ -240,77 +247,69 @@ class DocumentView extends React.Component {
     if (this.state.automatic) {
       /* Map through the keywords field from prod */
       keywordsAutomatic = this.state.automatic.keywords.map((keyword, i) => (
-        <div key={i} className="keyword">
-          <input readOnly type="text" value={keyword['keyword']} />
-          <input readOnly type="text" value={keyword['confidence']} />
+        <div key={i} className={css.keywordListItem}>
+          <Input className={css.keywordInput} readOnly type="text" value={keyword['keyword']} />
+          <Input className={css.confidenceInput} readOnly type="text" value={keyword['confidence']} />
         </div>
       ));
     }
 
     return (
       <div>
-        <button onClick={e => this.props.changeView('main')}>Tilbake</button>
-
         {this.state.url && (
-          <h1 className="title">
+          <Title level={2}>
             <a href={this.state.url}>{this.state.title}</a>
-          </h1>
+          </Title>
         )}
 
         <div className="flex">
           {this.state.manual && (
             <div className="sub-container">
-              <h2>Manuelle endringer</h2>
+              <Title level={3}>Manuelle endringer</Title>
 
-
-              <p>
+              <Paragraph>
                 Her kan du endre svarene til botten manuelt. Oppdater teksten og
                 trykk på lagre for å oppdatere.
-              </p>
+              </Paragraph>
+
+              <Title level={4}>Svar</Title>
 
               <form>
-                <strong>Svar:</strong>
-
                 {textAreasManual}
 
-                <button
-                  className="newText"
-                  type="button"
-                  onClick={e => this.createNewAnswer(e)}
-                >
-                  Nytt svar
-                </button>
+                <div>
+                  <Button
+                    type="primary"
+                    className={css.addAnswer}
+                    onClick={e => this.createNewAnswer(e)}
+                  >
+                    Nytt svar
+                  </Button>
+                </div>
 
-                <p>
+                <Paragraph>
                   Man kan også oppdatere, legge til og slette nøkkelord og
                   selvsikkerheten deres.
-                </p>
+                </Paragraph>
 
-                <p>
-                  Selvsikkerheten er et tall fra 0 til 1. 1 om du må ha dette
-                  søkeordet for å få dette svaret.
-                </p>
+                <Paragraph>
+                  Selvsikkerheten er et tall fra 0 til 1. 1  betyr at du må
+                  ha dette søkeordet for å få dette svaret.
+                </Paragraph>
 
-                <p>
-                  <strong>Nøkkelord:</strong>
-                </p>
+                <Title level={4}>Nøkkelord</Title>
 
                 {this.state.keywordError && (
-                  <p className={css.error}>Nøkkelord kan ikke inneholde mellomrom.</p>
+                  <Paragraph className={css.error}>Nøkkelord kan ikke inneholde mellomrom.</Paragraph>
                 )}
 
                 {keywordsManual}
 
-                <button
-                  className="newKeyword"
-                  type="button"
-                  onClick={e => this.createNewKeyword(e)}
-                >
-                  Nytt nøkkelord
-                </button>
-
-                <input type="button" value="Lagre" className="save" onClick={e => this.handleSubmit(e)} />
-                <input type="button" value="Slett manuelle endringer" className="delete" onClick={e => this.deleteDocument(e)} />
+                <div className={css.buttonGroup}>
+                  <Button type="primary" onClick={e => this.handleSubmit(e)}>Lagre</Button>
+                  <Button type="secondary" onClick={e => this.createNewKeyword(e)}>Nytt nøkkelord</Button>
+                  <Button type="danger" onClick={e => this.deleteDocument(e)}>Slett manuelle endringer</Button>
+                </div>
               </form>
             </div>
           )}
@@ -318,21 +317,20 @@ class DocumentView extends React.Component {
           {this.state.automatic && (
             <div className="sub-container">
               {this.state.url && (
-                <h2>
-                  Automatisk hentet fra <a href={this.state.url}>{this.state.url}</a>
-                </h2>
+                <Title level={3}>
+                  Automatisk hentet data
+                </Title>
               )}
-              <p>
+
+              <Paragraph>
                 Sammenlign de manuelle endringene med informasjonen hentet fra
                 nettsiden
-            </p>
-              <p>
-                <strong>Svar:</strong>
-              </p>
+              </Paragraph>
+
+              <Title level={4}>Svar</Title>
               {textAreasAutomatic}
-              <p>
-                <strong>Nøkkelord:</strong>
-              </p>
+
+              <Title level={4} className={css.pushTop}>Nøkkelord</Title>
               {keywordsAutomatic}
             </div>
           )}

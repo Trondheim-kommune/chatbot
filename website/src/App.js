@@ -4,13 +4,15 @@ import DocumentList from './components/DocumentList';
 import UnknownQueries from './components/UnknownQueries';
 import { fetchData } from './utils/Util';
 import DocumentView from './components/DocumentView';
+import { Layout, Menu } from 'antd';
+import css from './App.module.css';
+
+const { Header, Content } = Layout;
 
 class App extends Component {
   state = {
     conflictDocs: [],
-    searchDocs: [],
     view: 'main',
-    id: '',
   };
 
   fetchAllConflictIDs = async () => {
@@ -42,28 +44,50 @@ class App extends Component {
 
   render() {
     return (
-      <div>
-        {this.state.view === 'main' && (
-          <div>
-            <Search changeView={this.changeView} />
-            <DocumentList
-              title="Konflikter"
-              docs={this.state.conflictDocs}
-              changeView={this.changeView}
-            />
-            {this.state.queries &&
-              <UnknownQueries
-                title="Chatbot fant ikke svar på disse:"
-                queries={this.state.queries}
-                changeView={this.changeView}
-              />
-            }
+      <Layout className={css.rootLayout}>
+        <Header>
+          <Menu
+            theme="dark"
+            mode="horizontal"
+            defaultSelectedKeys={['1']}
+            className={css.menu}
+          >
+            <Menu.Item
+              key="1"
+              onClick={() => this.setState({ view: 'main' })}
+            >
+              Home
+            </Menu.Item>
+          </Menu>
+        </Header>
+
+        <Content className={css.contentContainer}>
+          <div className={css.content}>
+            {this.state.view === 'main' && (
+              <div>
+                <Search changeView={this.changeView} />
+
+                <DocumentList
+                  title="Konflikter"
+                  docs={this.state.conflictDocs}
+                  changeView={this.changeView}
+                />
+
+                {this.state.queries &&
+                  <UnknownQueries
+                    queries={this.state.queries}
+                    changeView={this.changeView}
+                  />
+                }
+              </div>
+            )}
+
+            {this.state.view === 'document' && (
+              <DocumentView id={this.state.id} changeView={this.changeView} />
+            )}
           </div>
-        )}
-        {this.state.view === 'document' && (
-          <DocumentView id={this.state.id} changeView={this.changeView} />
-        )}
-      </div>
+        </Content>
+      </Layout>
     );
   }
 }
