@@ -5,3 +5,38 @@
   display: inline-block;
   border-radius: 2px;
 }
+
+.answer {
+  width: 75%;
+}
+
+.addAnswer {
+  margin: 6px 0;
+}
+
+.pushTop {
+  margin-top: 1.2em;
+}
+
+.keywordListItem {
+  margin-bottom: 3px;
+}
+
+.keywordInput {
+  width: 10rem;
+}
+
+.confidenceInput {
+  width: 10rem;
+  margin-left: 2px;
+  margin-right: 2px;
+}
+
+.buttonGroup {
+  margin-top: 1rem;
+}
+
+.buttonGroup > button {
+  margin-right: 3px;
+  margin-bottom: 3px;
+}
