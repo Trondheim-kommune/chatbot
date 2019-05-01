@@ -11,6 +11,7 @@ NOT_FOUND = Config.get_value(['query_system', 'not_found'])
 MULTIPLE_ANSWERS = Config.get_value(['query_system', 'multiple_answers'])
 CHAR_LIMIT = Config.get_value(['query_system', 'character_limit'])
 MAX_ANSWERS = Config.get_value(['query_system', 'max_answers'])
+URL_FROM_TEXT = Config.get_value(['query_system', 'url_from_text'])
 
 factory = ModelFactory.get_instance()
 
@@ -40,7 +41,7 @@ def get_corpus_text(doc):
 
 def get_answer_text(doc):
     ''' Converts a document from the model into a readable string. '''
-    content = random.choice(doc['content']['texts']) + '\n' + doc['url']
+    content = random.choice(doc['content']['texts']) + '\n' + URL_FROM_TEXT + doc['url']
     return doc['content']['title'] + ':\n' + content
 
 
