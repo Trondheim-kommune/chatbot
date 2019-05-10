@@ -45,11 +45,7 @@
             ],
             "visit": [
                 "https://www.trondheim.kommune.no/aktuelt",
-                "https://www.trondheim.kommune.no/tema/helse-og-omsorg",
-                "https://www.trondheim.kommune.no/tema/bygg-kart-og-eiendom",
-                "https://www.trondheim.kommune.no/tema/skatt-og-naring",
-                "https://www.trondheim.kommune.no/tema/veg-vann-og-avlop",
-                "https://www.trondheim.kommune.no/aktuelt/utvalgt/om-kommunen"
+                "https://www.trondheim.kommune.no/tema/bygg-kart-og-eiendom"
             ],
             "texts": [
                 "Sist oppdatert:",
@@ -95,8 +91,9 @@
     "query_system": {
         "not_found": "Jeg fant ikke informasjonen du spurte etter.",
         "multiple_answers": "Jeg har flere mulige svar til deg.",
+        "url_from_text": "Hentet fra: ",
         "custom_synset_file": "model/synset.json",
         "character_limit": 2500,
-        "max_answers": 5
+        "max_answers": 4
     }
 }

@@ -1,23 +1,25 @@
 import React from 'react';
 import { fetchData } from '../utils/Util';
 import DocumentList from './DocumentList';
+import { Input } from 'antd';
+import css from './Search.module.css';
+import classNames from 'classnames';
+
+const { Search } = Input;
 
 /* 
 This component is a search bar. You search by url and get a DocumentList
 containing the search results
 */
-export default class Search extends React.Component {
+export default class SearchBar extends React.Component {
   state = {
-    url: '',
     fetched: false,
   };
 
-  handleSubmit = async e => {
-    e.preventDefault();
-
+  handleSearch = async url => {
     // Title and ID based on URL.
     const content = await fetchData(
-      process.env.REACT_APP_SERVER_URL + 'v1/web/docs/?url=' + this.state.url,
+      process.env.REACT_APP_SERVER_URL + 'v1/web/docs/?url=' + url,
       'GET',
     );
 
@@ -31,21 +33,13 @@ export default class Search extends React.Component {
   render() {
     return (
       <div>
-        <form onSubmit={e => this.handleSubmit(e)}>
-          <label>
-            URL:
-            <input
-              type="text"
-              className="searchInputField"
-              value={this.state.url}
-              name="url"
-              placeholder="https://www.trondheim.kommune.no/"
-              onChange={e => this.setState({ url: e.target.value })}
-            />
-          </label>
-          <input type="submit" value="Search" className="submitSearch" />
-        </form>
-        {/* If data i fetched, render a DocumentList with the search results */}
+        <Search
+          className={classNames(css.search, 'searchInputField')}
+          placeholder="Search for an URL"
+          onSearch={this.handleSearch}
+          enterButton
+        />
+
         {this.state.fetched && (
           <DocumentList
             title="Søkeresultater"

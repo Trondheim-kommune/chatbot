@@ -1,27 +1,44 @@
 import React from 'react';
-import DocumentItem from './DocumentItem';
+import { Typography, Table } from 'antd';
+import css from './DocumentList.module.css';
+import classNames from 'classnames';
 
-/* 
-This component lists multiple DocumentItems
-*/
-export default class DocumentList extends React.Component {
-  render() {
-    // Maps through every DocumentItem and display them
-    // Each DocumentItem represents a document from the conflict_ids collection
-    let documentItems;
-    documentItems = this.props.docs.map((doc, i) => (
-      <DocumentItem
-        id={doc.id}
-        title={doc.title}
-        key={i}
-        changeView={this.props.changeView}
+const { Title } = Typography;
+
+const DocumentList = ({ docs, changeView, title }) => {
+  const ViewButton = (text, record) => (
+    <span>
+      <a onClick={() => changeView('document', record.id)}>{text}</a>
+    </span>
+  );
+
+  const columns = [{
+    title: 'Title',
+    dataIndex: 'title',
+    key: 'titlte',
+    render: ViewButton,
+  }, {
+    title: 'ID',
+    dataIndex: 'id',
+    key: 'id',
+  }];
+
+  const data = docs.map(doc => ({
+    ...doc,
+    key: doc.id,
+  }));
+
+  return (
+    <div className={classNames(css.itemList, 'itemList')}>
+      <Title level={2}>{title}</Title>
+
+      <Table
+        columns={columns}
+        dataSource={data}
+        pagination={false}
       />
-    ));
-    return (
-      <div className="itemList">
-        <h1>{this.props.title}</h1>
-        {documentItems}
-      </div>
-    );
-  }
-}
+    </div>
+  );
+};
+
+export default DocumentList;

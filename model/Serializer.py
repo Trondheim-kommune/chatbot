@@ -106,14 +106,14 @@ class Serializer:
 
         return get_tfidf_model(corpus)
 
-    def visit_node(self, data, model_template, models, title):
+    def visit_node(self, data, model_template, models, title=None):
         """ Recursively traverse the children and create new Contents from paragraphs. """
         accepted_tags = Config.get_value(["model", "accepted_tags"])
 
         for child in data:
             if "children" in child:
-                self.visit_node(child["children"], model_template, models,
-                                title="{} {}".format(title, child["text"]))
+                title_text = "{} - {}".format(title, child["text"]) if title else child["text"]
+                self.visit_node(child["children"], model_template, models, title=title_text)
 
             elif child["tag"] in accepted_tags:
                 # Hit a leaf node in recursion tree. We extract the text here and continue.
@@ -155,7 +155,7 @@ class Serializer:
                 # over the rest of the list
                 child_data.pop(0)
 
-            models = self.visit_node(child_data, model, [], "")
+            models = self.visit_node(child_data, model, [])
             self.__models += models
 
         print("Successfully serialized all contents")
