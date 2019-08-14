@@ -52,7 +52,6 @@ def perform_search(query_text):
     util.set_db(factory)
 
     # Perform simple query expansion on the original query.
-    print('Pre expansion: ', query_text)
     query = expand_query(query_text)
     print('Post expansion: ', query)
 
@@ -131,3 +130,6 @@ class QuerySystem:
         print('result:', result)
 
         return result
+
+    def get_response(self, text):
+        return perform_search(text)
