@@ -70,13 +70,13 @@ def perform_search(query_text):
 
     try:
         # Compare the search query with all documents in our new model using cosine similarity.
-        scores = cosine_similarity(vectorizer.transform([query_text]), corpus_matrix)[0].tolist()
+        scores = cosine_similarity(vectorizer.transform([query]), corpus_matrix)[0].tolist()
 
         sorted_scores = sorted(scores, reverse=True)
 
         # This could be calculated using the mean of all scores and the standard deviation.
         if sorted_scores[0] < 0.1:
-            return handle_not_found(query_text)
+            return handle_not_found(query)
 
         # Allow returning multiple answers if they rank very similarly.
         answers = []
