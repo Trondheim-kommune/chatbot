@@ -18,4 +18,4 @@ CONCURRENT_REQUESTS_PER_DOMAIN = 32
 CONCURRENT_REQUESTS_PER_IP = 32
 
 # Remove printing to output when in production and not needing output.
-# LOG_ENABLED = False
+LOG_ENABLED = False

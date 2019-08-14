@@ -1,8 +1,8 @@
 {
     "mongo": {
-        "username": "agent25",
-        "password": "agent25",
-        "url": "agent25.tinusf.com",
+        "username": "vegardev",
+        "password": "vegardev",
+        "url": "127.0.0.1",
         "port": 27017,
         "db": "dev_db",
         "testing_db": "test_db"
@@ -16,18 +16,16 @@
         ]
     },
     "scraper": {
-        "debug": false,
+        "debug": true,
         "alternative_headers": ["strong"],
         "concatenation": {
-            "li": 100,
+            "li": 300,
             "p": 7
         },
         "url": {
-            "root_url": "https://www.trondheim.kommune.no/",
+            "root_url": "https://www.trondheim.kommune.no/tema/sosiale-tjenester",
             "allowed_paths": [
-                "https://www.trondheim.kommune.no/tema",
-                "https://www.trondheim.kommune.no/aktuelt",
-                "https://www.trondheim.kommune.no/org"
+                "https://www.trondheim.kommune.no/tema/sosiale-tjenester/bolig-med-tjenester/"
             ]
         },
         "blacklist": {
@@ -44,8 +42,6 @@
                 "https://www.trondheim.kommune.no/?$"
             ],
             "visit": [
-                "https://www.trondheim.kommune.no/aktuelt",
-                "https://www.trondheim.kommune.no/tema/bygg-kart-og-eiendom"
             ],
             "texts": [
                 "Sist oppdatert:",

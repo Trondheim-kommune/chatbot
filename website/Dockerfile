@@ -6,7 +6,7 @@ WORKDIR /temp
 ADD package*.json  ./
 RUN npm install
 
-ENV REACT_APP_SERVER_URL="https://agent25.tinusf.com/"
+ENV REACT_APP_SERVER_URL="localhost:8080"
 
 ADD . ./
 
