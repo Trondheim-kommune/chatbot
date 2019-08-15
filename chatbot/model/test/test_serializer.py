@@ -1,9 +1,7 @@
 import pytest
 import json
-import random
 
 from chatbot.model.serializer import KeyWord, Serializer, Content
-from chatbot.model.model_factory import ModelFactory
 
 
 def test_serialize_data():
@@ -12,7 +10,8 @@ def test_serialize_data():
     ser.serialize_data()
     test_data = ser.get_models()
 
-    with open("chatbot/model/test/test_data/test_data_serialized.json", "r") as f:
+    path = "chatbot/model/test/test_data/test_data_serialized.json"
+    with open(path, "r") as f:
         serialized_data = json.load(f)
 
     assert test_data[0]["url"] == serialized_data[0]["url"]
@@ -54,38 +53,3 @@ def test_instance_of_KeyWord():
             "Barnehage", "I Trondheim er det mange barnehager", keyWs)
     except TypeError:
         pytest.fail("Failed creating a Content object with correct KeyWords")
-
-
-'''def test_insert_document_and_check_conflict():
-    """
-    Run the start.py file and insert a record into in_progress that has a conflict with the prod
-    collection so main method should return the conflict id. Also check if the newly inserted
-    document is in prod collection and with the correct manually_changed. Lastly fetch the
-    manual document instead of the document in prod collection.
-    """
-    id = "295cc564fe771fbb92b3278a6eee2d5cbcae2606-3"
-    correct_conflicts = [{"conflict_id": id, "title": " Velkommen til Trondheim kommune"}]
-
-    f = open("model/test/test_data/test_data_in_progress.json")
-    serialized_data = json.load(f)
-
-    # Just to make sure the new document has changed we add a number number here.
-    random_text = "Inserted_document_website_change: " + str(random.randint(1, 100000))
-    serialized_data[0]["content"]["texts"][0] = random_text
-
-    # Check if the document was a conflict.
-    conflict_ids = insert_documents(serialized_data)
-    assert correct_conflicts[0]["conflict_id"] == conflict_ids[0]["conflict_id"]
-    assert correct_conflicts[0]["title"] == conflict_ids[0]["title"]
-
-    # Fetch the document from the prod collection.
-    factory = ModelFactory.get_instance()
-    util.set_db(factory)
-    document = next(factory.get_database().get_collection("prod").find({"id": id}), None)
-    assert document["content"]["texts"][0] == random_text
-
-    # Get the manually changed document.
-    manually_changed_doc = util.check_manually_changed(factory, document)
-    # Check if we actually got the manually changed document.
-    assert manually_changed_doc["content"]["texts"][0] == "El manual
-    changos"'''

@@ -26,10 +26,11 @@ class Config:
     @staticmethod
     def get_value(keys):
         """
-        This is just a function aimed at making it easier to extract values from the settings file.
+        This is just a function aimed at making it easier to extract values
+        from the settings file.
         :param keys: ["Mongo", "Url"]
-        :return: The corresponding value to the keys. This might be a single value or part of
-        the big settings dictionary.
+        :return: The corresponding value to the keys. This might be a single
+        value or part of the big settings dictionary.
         """
         val = Config.get_config()
         for key in keys:

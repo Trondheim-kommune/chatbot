@@ -9,7 +9,6 @@ from spacy.lang.nb import LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 import nltk
-from nltk.corpus import wordnet as wn
 
 
 # Load a Norwegian language model for Spacy.
@@ -20,8 +19,8 @@ lemmatize = Lemmatizer(LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES)
 nltk.download('wordnet')
 nltk.download('omw')
 
-START_SPECIAL_CHARS = re.compile('^[{}]+'.format(re.escape(string.punctuation)))
-END_SPECIAL_CHARS = re.compile('[{}]+$'.format(re.escape(string.punctuation)))
+START_SPEC_CHARS = re.compile('^[{}]+'.format(re.escape(string.punctuation)))
+END_SPEC_CHARS = re.compile('[{}]+$'.format(re.escape(string.punctuation)))
 
 
 def get_stopwords():
@@ -65,10 +64,10 @@ def tokenize(doc):
     tokens = [token for token in tokens if bool(token.strip())]
 
     # Remove punctuation from start of tokens.
-    tokens = [re.sub(START_SPECIAL_CHARS, '', token) for token in tokens]
+    tokens = [re.sub(START_SPEC_CHARS, '', token) for token in tokens]
 
     # Remove punctuation from end of tokens.
-    tokens = [re.sub(END_SPECIAL_CHARS, '', token) for token in tokens]
+    tokens = [re.sub(END_SPEC_CHARS, '', token) for token in tokens]
 
     # Remove stopwords from the tokens.
     tokens = [token for token in tokens if token not in stop_words]
@@ -97,7 +96,8 @@ def lemmatize_content_keywords(content):
 
         # Find the most likely POS tag for the keyword.
         # If the keyword is not in the document, use an unigram tagger.
-        pos = next(iter(votes[entry['keyword']].most_common()), nb(entry['keyword'])[0].pos_)
+        pos = next(iter(votes[entry['keyword']].most_common()),
+                   nb(entry['keyword'])[0].pos_)
 
         # Store the lemmatized keyword.
         entry['keyword'] = lemmatize(entry['keyword'], pos)[0]
@@ -125,5 +125,6 @@ def get_keywords(vectorizer, feature_names, document):
     tfidf_vector = vectorizer.transform([document])
     sorted_items = _sort_coo(tfidf_vector.tocoo())
 
-    return _extract_top(feature_names, sorted_items, len(sorted_items))
-
+    return _extract_top(feature_names,
+                        sorted_items,
+                        len(sorted_items))

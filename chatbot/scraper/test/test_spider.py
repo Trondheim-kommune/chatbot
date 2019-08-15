@@ -3,7 +3,9 @@ import os
 import json
 from chatbot.scraper.spiders import info_gathering_spider as igs
 
-HB = 'https://www.trondheim.kommune.no/tema/kultur-og-fritid/lokaler/husebybadet/'
+HOST = 'https://www.trondheim.kommune.no/'
+URI = 'tema/kultur-og-fritid/lokaler/husebybadet/'
+HB = HOST + URI
 
 
 def fake_response_from_file(file_name, url=HB):

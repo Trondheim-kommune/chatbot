@@ -190,40 +190,42 @@ def test_add_intents(app):
     assert "Batch created 2 intents." == response_json["message"]
 
 
-
 def test_get_all_conflicts(app):
     # Setup two conflicts
-    conflicts = [{ "conflict_id": "test_conflict_id_{}".format(i),
-                   "title": "test_conflict_title_{}".format(i) } 
-                 for i in range(2)
-                ]
+    conflicts = [{"conflict_id": "test_conflict_id_{}".format(i),
+                  "title": "test_conflict_title_{}".format(i)}
+                 for i in range(2)]
 
-    # Post both focuments to conflict_ids 
-    for conflict in conflicts: 
+    # Post both focuments to conflict_ids
+    for conflict in conflicts:
         factory.post_document(conflict, "conflict_ids")
 
     response = app.test_client().get('/v1/web/conflict_ids')
-
 
     try:
         response = app.test_client().get('/v1/web/conflict_ids')
         response_json = json.loads(response.data.decode())
 
-        assert conflicts[0]["conflict_id"] in [resp["conflict_id"] for resp in response_json]
-        assert conflicts[1]["conflict_id"] in [resp["conflict_id"] for resp in response_json]
+        for conflict in conflicts:
+            assert conflict["conflict_id"] in [resp["conflict_id"]
+                                               for resp in response_json]
     finally:
         # Delete test conflits
         for conflict in conflicts:
-            factory.delete_document({"conflict_id": conflict["conflict_id"]}, "conflict_ids")
+            factory.delete_document({"conflict_id": conflict["conflict_id"]},
+                                    "conflict_ids")
 
 
 def test_get_content(app):
     # Setup a content document
-    document = { "id": "test_content_id", "content": "some_test_content", "url": "test_url" }
+    document = {"id": "test_content_id",
+                "content": "some_test_content",
+                "url": "test_url"}
     factory.post_document(document, "prod")
 
     try:
-        response = app.test_client().get("/v1/web/content/?id=test_content_id")
+        url = "/v1/web/content/?id=test_content_id"
+        response = app.test_client().get(url)
         response_json = json.loads(response.data.decode())
         print(response_json)
 
@@ -247,12 +249,12 @@ def test_update_content(app):
                         "confidence": 0.2010
                     }
                 ],
-            "texts": ["some test text"]
+                "texts": ["some test text"]
             }
         }
     }
     factory.post_document(input_doc["data"].copy(), "prod")
-    
+
     try:
         # Make a change
         new_title = "title has been changed"
@@ -283,7 +285,7 @@ def test_get_docs_from_url(app):
                         "confidence": 0.2010
                     }
                 ],
-            "texts": ["some test text"]
+                "texts": ["some test text"]
             }
         }
     }
@@ -299,11 +301,12 @@ def test_get_docs_from_url(app):
 
 def test_unknown_query(app):
     """
-    This test will create a new unknown query and then get every query and then delete that query.
-    """
+    This test will create a new unknown query and then get every query and then
+    delete that query.  """
     epoch_time = str(int(time.time()))
 
-    # pretends epoch_time is an unknown query string, then we insert it into the collection here
+    # pretends epoch_time is an unknown query string, then we insert it into
+    # the collection here
     _handle_not_found(epoch_time)
 
     response = app.test_client().get('/v1/web/unknown_queries',
@@ -320,8 +323,9 @@ def test_unknown_query(app):
             break
     assert found is True
 
+    doc_to_delete = {"data": {"query_text": epoch_time}}
     response = app.test_client().delete('/v1/web/unknown_query',
-                                        data=json.dumps({"data": {"query_text": epoch_time}}))
+                                        data=json.dumps(doc_to_delete))
 
     assert response.status_code == 200
     response_json = json.loads(response.data.decode())

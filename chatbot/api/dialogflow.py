@@ -35,31 +35,17 @@ def handle_invalid_usage(error):
 @dialog_api.route("/v1/dialogflow/response", methods=["POST"])
 def get_response():
     """ Returns the response to a given query. Capable of passing on raw query
-    text, display name, query parameters, entities and intents from DialogFlow """
+    text, display name, query parameters, entities and intents from DialogFlow
+    """
+
     json_input_data = json.loads(request.data)
     try:
         raw_query_text = json_input_data["queryResult"]["queryText"]
     except KeyError:
         raw_query_text = None
 
-    try:
-        intent = json_input_data["queryResult"]["intent"]["displayName"]
-    except KeyError:
-        intent = None
-
-    try:
-        entities = list(json_input_data["queryResult"]["parameters"].keys())
-    except KeyError:
-        entities = []
-
-    try:
-        default_fulfillment_text = \
-            json_input_data["queryResult"]["fulfillmentMessages"][0]["text"][
-                "text"][0]
-    except KeyError:
-        default_fulfillment_text = None
-
-    return json.dumps({"fulfillmentText": query_handler.get_response(raw_query_text)})
+    response = query_handler.get_response(raw_query_text)
+    return json.dumps({"fulfillmentText": response})
 
 
 def create_intent_object(intent_name, training_phrases, match_entity=True):
@@ -89,14 +75,14 @@ def create_intent_object(intent_name, training_phrases, match_entity=True):
                 # This is when we find an entity matching this specific word
                 # in the training phrase. Then we need to add entity type to
                 # the word and add the parameter to the intent.
-                entity_type = entities[word]
+                entity = entities[word]
                 parts.append(
-                    {"text": word + " ", "entity_type": "@" + entity_type,
-                     "alias": entity_type})
+                    {"text": word + " ", "entity_type": "@" + entity,
+                     "alias": entity})
 
-                parameters.append({"display_name": entity_type,
-                                   "entity_type_display_name": "@" + entity_type,
-                                   "value": "$" + entity_type})
+                parameters.append({"display_name": entity,
+                                   "entity_type_display_name": "@" + entity,
+                                   "value": "$" + entity})
 
             except KeyError:
                 # All the non-matching words.
@@ -217,7 +203,8 @@ def batch_create_entities_post():
 
     try:
         ID_list = batch_create_entities(entity_types)
-        return util.create_success_response("Batch created entities.", data=ID_list)
+        return util.create_success_response("Batch created entities.",
+                                            data=ID_list)
     except google_exceptions.FailedPrecondition as e:
         # Entity with same name exception.
         raise InvalidDialogFlowID(str(e), status_code=400)

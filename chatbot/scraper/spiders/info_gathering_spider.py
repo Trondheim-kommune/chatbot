@@ -39,8 +39,9 @@ class InfoGatheringSpider(scrapy.Spider):
     # All flags default to false, so do not explicitly set them as so.
     # See the GitHub Wiki for information about how these are used.
 
-    # Enable to display additional debugging information to output when the crawler is run.
-    # In practice, this will pretty print the exported tree when a page is scraped.
+    # Enable to display additional debugging information to output when the
+    # crawler is run.  In practice, this will pretty print the exported tree
+    # when a page is scraped.
 
     debug = 'debug' if config['debug'] else None
 
@@ -83,23 +84,24 @@ class InfoGatheringSpider(scrapy.Spider):
     # will be removed.
     garbage_resources = set(config['blacklist']['resources'])
 
-    # The text used for the title on 404 pages. Used to detect silent 404 error.
+    # The text used for the title on 404 pages. Used to detect silent 404
+    # error.
     not_found_text = config['blacklist']['not_found_text']
 
     # Hierarchy for sorting categories.
     # Elements with level=None will follow normal html hierarchy
     hierarchy = config['hierarchy']
 
-    # If a tag is listed here, sequences of tabs belonging to one of these types
-    # will all be merged into one tag. For example, directly following paragraph
-    # tags will be merged into one big paragraph, separated with newlines.
-    # The value corresponding to each key is the word limit for when
+    # If a tag is listed here, sequences of tabs belonging to one of these
+    # types will all be merged into one tag. For example, directly following
+    # paragraph tags will be merged into one big paragraph, separated with
+    # newlines.  The value corresponding to each key is the word limit for when
     # the following tag can be merged together
     concatenation_tags_word_limit = config['concatenation']
 
-    # Of the elements in the hierarchy, these tags will not be created as nodes if
-    # their parent is in the set of parents.
-    ignored_children_tags_for_parents = config['blacklist']['ignored_children_tags_for_parents']
+    # Of the elements in the hierarchy, these tags will not be created as nodes
+    # if their parent is in the set of parents.
+    ignored_child_tags = config['blacklist']['ignored_child_tags_for_parents']
 
     def normalize(self, text):
         return unicodedata.normalize('NFKC', text)
@@ -114,7 +116,8 @@ class InfoGatheringSpider(scrapy.Spider):
         if keywords and 'content' in keywords.attrs:
             # Add the keywords beneath the title in the tree, if the meta tag
             # has the content attribute correctly specified.
-            TreeElement('meta', page_id, keywords.attrs['content'], parent=root)
+            TreeElement('meta', page_id,
+                        keywords.attrs['content'], parent=root)
 
     def locate_parent(self, elem_tag, current_parent, root):
         ''' Locate the parent element on which we should insert the next
@@ -180,10 +183,12 @@ class InfoGatheringSpider(scrapy.Spider):
         # Hash the page URL, it will be used as an ID.
         page_id = sha1(response.url.encode()).hexdigest()
 
-        # Parse the HTML using BeautifulSoup. Make sure we use LXML for parsing.
+        # Parse the HTML using BeautifulSoup. Make sure we use LXML for
+        # parsing.
         soup = BeautifulSoup(response.text, 'lxml')
 
-        # We only care about elements on the page which are defined in the hierarchy.
+        # We only care about elements on the page which are defined in the
+        # hierarchy.
         elements = soup.find_all(self.hierarchy.keys())
 
         # We remove the header and footer tags from the page to reduce
@@ -236,19 +241,26 @@ class InfoGatheringSpider(scrapy.Spider):
                 # If a paragraph contains for example a strong tag, we can
                 # treat that combination as a header. This check avoids adding
                 # the strong tag in addition to the custom header.
-                if elem_tag in self.alternative_headers and current_parent.tag == 'h6' and \
-                        self.normalize(current_parent.text) == elem_text:
+                if elem_tag in self.alternative_headers and \
+                               current_parent.tag == 'h6' and \
+                               self.normalize(current_parent.text) \
+                               == elem_text:
                     continue
 
                 if elem_tag == 'p':
                     # Find all alternative header tags inside this paragraph.
                     headers = elem.find_all(self.alternative_headers)
 
-                    # Check if there is only 1 alternative header tag, and check if it contains
-                    # all of the text inside the paragraph.
-                    if len(headers) == 1 and elem_text == self.normalize(headers[0].text.strip()):
-                        # Locate the parent in which a H6 tag would be inserted.
-                        parent = self.locate_parent('h6', current_parent, root)
+                    # Check if there is only 1 alternative header tag, and
+                    # check if it contains all of the text inside the
+                    # paragraph.
+                    if len(headers) == 1 and elem_text \
+                            == self.normalize(headers[0].text.strip()):
+                        # Locate the parent in which a H6 tag would be
+                        # inserted.
+                        parent = self.locate_parent('h6',
+                                                    current_parent,
+                                                    root)
 
                         # Add a custom H6 element.
                         current_parent = TreeElement(
@@ -262,12 +274,15 @@ class InfoGatheringSpider(scrapy.Spider):
             # Locate the parent element to use based on the hierarchy.
             parent = self.locate_parent(elem_tag, current_parent, root)
 
-            # Concatenate tags like paragraph tags which directly follow each other.
-            if elem_tag in self.concatenation_tags_word_limit and parent.children:
+            # Concatenate tags like paragraph tags which directly follow each
+            # other.
+            if elem_tag in self.concatenation_tags_word_limit and \
+                    parent.children:
                 last_child = parent.children[-1]
 
-                # Start a new paragraph if the last child already has children.
-                if last_child and last_child.tag == elem_tag and not last_child.children:
+                # Start a new paragraph if the last child already has children
+                if last_child and last_child.tag == elem_tag and \
+                        not last_child.children:
                     # Concatenate the texts until limit reached
                     if len(elem_text.split()) \
                             <= self.concatenation_tags_word_limit[elem_tag]:
@@ -275,7 +290,8 @@ class InfoGatheringSpider(scrapy.Spider):
                         continue
 
             # Add the anchor's href url when finding an anchor
-            # If anchor, don't create a new element, but add url instead to parent
+            # If anchor, don't create a new element, but add url instead to
+            # parent
             if elem_tag == 'a':
                 # Create a valid url from the href url if any
                 url = self.create_valid_url(elem.get('href'))
@@ -292,11 +308,12 @@ class InfoGatheringSpider(scrapy.Spider):
                         parent.text += '\n' + url
                         continue
 
-                    # Add the URL and elem_text into the end of the parent's text
+                    # Add the URL and elem_text into the end of the parent's
+                    # text
                     parent.text += '\n' + elem_text + ' ' + url
-            elif elem_tag in self.ignored_children_tags_for_parents \
+            elif elem_tag in self.ignored_child_tags \
                     and current_parent.tag \
-                    in self.ignored_children_tags_for_parents[elem_tag]:
+                    in self.ignored_child_tags[elem_tag]:
                 # If the parent's text includes this element's text,
                 # don't create a node for this element.
                 continue
@@ -345,7 +362,8 @@ class InfoGatheringSpider(scrapy.Spider):
         for pre, fill, node in RenderTree(root):
             # We remove newlines from the text with spaces to preserve
             # the shape of the tree when printing in the terminal.
-            print('{}{}: {}'.format(pre, node.tag, node.text.replace('\n', ' ')))
+            print('{}{}: {}'.format(pre, node.tag,
+                                    node.text.replace('\n', ' ')))
 
         # Also add a new line before the next tree.
         print()
@@ -355,19 +373,22 @@ class InfoGatheringSpider(scrapy.Spider):
 
         # Only store HTML responses, not other attachments.
         if isinstance(response, HtmlResponse):
-            if not any(re.match(regex, response.url) for regex in self.scrape_blacklist):
+            if not any(re.match(regex, response.url)
+                       for regex in self.scrape_blacklist):
                 # Generate a tree structure describing this page.
                 root = self.generate_tree(response)
 
-                # The parser might choose to ignore this page, for example when we
-                # detect that the page is a 404 page. In that case, skip the page.
+                # The parser might choose to ignore this page, for example when
+                # we detect that the page is a 404 page. In that case, skip the
+                # page.
                 if root:
                     # Pretty print the node tree if the DEBUG flag is set.
                     if self.debug:
                         self.pretty_print_tree(root)
 
-                    # Export the tree using the DictExporter. Scrapy will then convert
-                    # this dictionary to a JSON structure for us, automatically.
+                    # Export the tree using the DictExporter. Scrapy will then
+                    # convert this dictionary to a JSON structure for us,
+                    # automatically.
                     exporter = DictExporter()
                     tree = exporter.export(root)
 
@@ -382,6 +403,7 @@ class InfoGatheringSpider(scrapy.Spider):
                 for allowed_path in self.allowed_paths:
                     # Only follow links that are in the list of allowed paths.
                     if re.match(allowed_path, next_page.url) and not \
-                            any(re.match(regex, next_page.url) for regex in self.visit_blacklist):
+                            any(re.match(regex, next_page.url)
+                                for regex in self.visit_blacklist):
                         yield response.follow(next_page, self.parse)
                         break

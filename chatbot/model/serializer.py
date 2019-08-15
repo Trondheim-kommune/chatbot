@@ -109,20 +109,26 @@ class Serializer:
         return get_tfidf_model(corpus)
 
     def visit_node(self, data, model_template, models, title=None):
-        """ Recursively traverse the children and create new Contents from paragraphs. """
+        """ Recursively traverse the children and create new Contents from
+        paragraphs. """
         accepted_tags = Config.get_value(["model", "accepted_tags"])
 
         for child in data:
             if "children" in child:
-                title_text = "{} - {}".format(title, child["text"]) if title else child["text"]
-                self.visit_node(child["children"], model_template, models, title=title_text)
+                title_text = "{} - {}".format(title, child["text"]) \
+                             if title else child["text"]
+                self.visit_node(child["children"], model_template,
+                                models, title=title_text)
 
             elif child["tag"] in accepted_tags:
-                # Hit a leaf node in recursion tree. We extract the text here and continue.
-                keywords = [KeyWord(*keyword)
-                            for keyword in get_keywords(self.__vectorizer,
-                                                        self.__feature_names,
-                                                        "{} {}".format(title, child["text"]))]
+                # Hit a leaf node in recursion tree. We extract the text here
+                # and continue.
+                keywords = [KeyWord(*kw)
+                            for kw in get_keywords(self.__vectorizer,
+                                                   self.__feature_names,
+                                                   "{} {}"
+                                                   .format(title,
+                                                           child["text"]))]
 
                 content = Content(title, [child["text"]], keywords)
                 new_model = copy.deepcopy(model_template)
@@ -133,7 +139,8 @@ class Serializer:
         return models
 
     def serialize_data(self):
-        """ Serialize a page object from the web scraper to the data model schema. """
+        """ Serialize a page object from the web scraper to the data model
+        schema. """
         # Iterate over all pages in the JSON data from scraper
         print("Serializing {} contents".format(len(self.__data)))
 

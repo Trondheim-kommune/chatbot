@@ -25,36 +25,40 @@ factory.set_db()
 
 def _handle_not_found(query_text):
     '''
-    Inserts this specific query text into the unknown queries collection as well as returning a
-    fallback string.
+    Inserts this specific query text into the unknown queries collection as
+    well as returning a fallback string.
     '''
     try:
         factory.get_database().get_collection("unknown_queries").insert_one(
             {"query_text": query_text})
     except pymongo.errors.DuplicateKeyError:
-        # If we already have this specific query in our unknown_queries collection we don't need
-        # to add it again.
+        # If we already have this specific query in the unknown_queries
+        # collection we don't need to add it again.
         pass
 
     return NOT_FOUND
 
 
 def _get_corpus_text(doc):
-    ''' Converts a document from the model into a string which will be used in a corpus.
-    All possible answers are used to generate the corpus, if multiple answers exist.'''
+    ''' Converts a document from the model into a string which will be used in
+    a corpus.  All possible answers are used to generate the corpus, if
+    multiple answers exist.'''
     content = ' '.join(doc['content']['texts'])
     return doc['content']['title'] + ' ' + content
 
 
 def _get_answer_text(doc):
     ''' Converts a document from the model into a readable string. '''
-    content = random.choice(doc['content']['texts']) + '\n' + URL_FROM_TEXT + doc['url']
+    doc_string = doc['content']['texts'] + '\n' + URL_FROM_TEXT + doc['url']
+    content = random.choice(doc_string)
+
     return doc['content']['title'] + ':\n' + content
 
 
 def expand_query(query):
     ''' Attempts to expand the given query by using synonyms from WordNet. As
-    a consequnece of this process, the query is also tokenized and lemmatized. '''
+    a consequnece of this process, the query is also tokenized and lemmatized.
+    '''
 
     tokens = [
       # Store tuples of lemmatized tokens and their corresponding POS tags.
@@ -112,14 +116,16 @@ def expand_query(query):
 
 
 def _perform_search(query_text):
-    ''' Takes a query string and finds the best matching document in the database. '''
+    ''' Takes a query string and finds the best matching document in the
+    database. '''
 
     # Perform simple query expansion on the original query.
     query = expand_query(query_text)
 
     print('Post expansion: ', query)
 
-    # Retrieve a set of documents using MongoDB. We then attempt to filter these further.
+    # Retrieve a set of documents using MongoDB. We then attempt to filter
+    # these further.
     docs = factory.get_document(query)
 
     # Prevent generating an empty corpus if no documents were found.
@@ -133,12 +139,15 @@ def _perform_search(query_text):
     vectorizer, corpus_matrix, feature_names = get_tfidf_model(corpus)
 
     try:
-        # Compare the search query with all documents in our new model using cosine similarity.
-        scores = cosine_similarity(vectorizer.transform([query_text]), corpus_matrix)[0].tolist()
+        # Compare the search query with all documents in our new model using
+        # cosine similarity.
+        scores = cosine_similarity(vectorizer.transform([query_text]),
+                                   corpus_matrix)[0].tolist()
 
         sorted_scores = sorted(scores, reverse=True)
 
-        # This could be calculated using the mean of all scores and the standard deviation.
+        # This could be calculated using the mean of all scores and the
+        # standard deviation.
         if sorted_scores[0] < 0.1:
             return _handle_not_found(query_text)
 
@@ -163,17 +172,16 @@ def _perform_search(query_text):
             n_chars += len(answers[i])
             i += 1
 
-        # Join the results with a separator. Still setting a max number of answers
-        return '\n\n---\n\n'.join([MULTIPLE_ANSWERS] + answers[0:min(max(i, 1), MAX_ANSWERS)])
+        # Join the results with a separator. Still setting a max number of
+        # answers
+        return '\n\n---\n\n'.join([MULTIPLE_ANSWERS] + answers[0:min(max(i, 1),
+                                  MAX_ANSWERS)])
     except KeyError:
         raise Exception('Document does not have content and texts.')
     except ValueError:
         return _handle_not_found(query_text)
 
 
-
-
 class QueryHandler:
-
     def get_response(self, query):
         return _perform_search(query)

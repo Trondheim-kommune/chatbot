@@ -37,17 +37,18 @@ class ModelFactory:
 
         self.database = client[db_name]
 
-    def get_document(self, query, main_collection="prod", manual_collection="manual",
-                     number_of_docs=30):
+    def get_document(self, query, main_collection="prod",
+                     manual_collection="manual", number_of_docs=30):
         """
         Searches for documents using MongoDB in a given document collection.
         Get 15 results from prod. Get 15 from Manual.
-        Go through every doc in prod and delete the ones with manually_changed=true.
-        Then return every remaining document, remember it's not sorted now, but for what we need
-        it for this is not necessary.
+        Go through every doc in prod and delete the ones with
+        manually_changed=true.  Then return every remaining document, remember
+        it's not sorted now, but for what we need it for this is not necessary.
         """
         main_col = self.get_collection(main_collection)
-        cursor = main_col.find({'$text': {'$search': query}}, {'score': {'$meta': 'textScore'}})
+        cursor = main_col.find({'$text': {'$search': query}},
+                               {'score': {'$meta': 'textScore'}})
         # Sort and retrieve some of the top scoring documents.
         cursor.sort([('score', {'$meta': 'textScore'})]).limit(number_of_docs)
 
@@ -57,7 +58,8 @@ class ModelFactory:
                 docs.append(doc)
 
         manual_col = self.get_collection(manual_collection)
-        cursor = manual_col.find({'$text': {'$search': query}}, {'score': {'$meta': 'textScore'}})
+        cursor = manual_col.find({'$text': {'$search': query}},
+                                 {'score': {'$meta': 'textScore'}})
         # Sort and retrieve some of the top scoring documents.
         cursor.sort([('score', {'$meta': 'textScore'})]).limit(number_of_docs)
         for doc in cursor:
@@ -76,7 +78,7 @@ class ModelFactory:
         response = None
         try:
             response = col.insert_one(data)
-        except DiplaceKeyError as e:
+        except Exception as e:
             print(e)
 
         return response
@@ -97,8 +99,10 @@ class ModelFactory:
         """ Create indexing based on three different keyword fields. Set the
         default language to Norwegian to map similar words """
         self.get_collection(collection).create_index(
-                [("keywords", TEXT), ("content.keywords.keyword", TEXT),
-                 ("header_meta_keywords", TEXT)], default_language="norwegian")
+                [("keywords", pymongo.TEXT),
+                 ("content.keywords.keyword", pymongo.TEXT),
+                 ("header_meta_keywords", pymongo.TEXT)],
+                default_language="norwegian")
 
     def set_db(self):
         """ Set the working database """
@@ -115,4 +119,3 @@ class ModelFactory:
 
     def get_database(self):
         return self.database
-

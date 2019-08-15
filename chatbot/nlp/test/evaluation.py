@@ -31,7 +31,8 @@ def evaluate_test(test):
         correct_answers = test["answers"]
         for correct_answer in correct_answers:
             if correct_answer["text"] in our_answer:
-                # Max here, because the maximum score for score_question should be 1.
+                # Max here, because the maximum score for score_question should
+                # be 1.
                 score_question = max(score_question, correct_answer["score"])
         score += score_question
 
@@ -62,7 +63,9 @@ def main():
         score += partial_score
         url_score += partial_url
 
-    print("Number of questions:", n_questions, "score:", score, "URLs correct:", url_score)
+    print("Number of questions:", n_questions,
+          "score:", score,
+          "URLs correct:", url_score)
 
     print("Text Precision:", score / n_questions)
     print("URL Precision:", url_score / n_questions)

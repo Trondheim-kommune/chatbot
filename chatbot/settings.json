@@ -54,7 +54,7 @@
             ],
             "resources": [],
             "not_found_text": "Finner ikke siden",
-            "ignored_children_tags_for_parents": {
+            "ignored_child_tags_for_parents": {
                 "strong": [
                     "p",
                     "li",

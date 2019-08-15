@@ -28,7 +28,6 @@ def insert_documents(data):
     factory = ModelFactory.get_instance()
     factory.set_db()
 
-
     """
     How we use MongoDB:
     We have 3 different collections:
@@ -36,11 +35,13 @@ def insert_documents(data):
         One for production called "prod"
         One for the in_progress collection called "in_progress"
 
-    After we have scraped we add all the scraped data into the collection "in_progress" and then
-    we go through every entry in the "manual" collection and use that entry's ID to query both
-    prod and in_progress collection. We compare the two contents in prod and in_progress to see
-    if something changed from last time this was run and now. If they do not have the same
-    content then we need to alert someone that the manual entry needs to be updated.
+    After we have scraped we add all the scraped data into the collection
+    "in_progress" and then we go through every entry in the "manual" collection
+    and use that entry's ID to query both prod and in_progress collection. We
+    compare the two contents in prod and in_progress to see if something
+    changed from last time this was run and now. If they do not have the same
+    content then we need to alert someone that the manual entry needs to be
+    updated.
 
     When this is done in_progress will become our new prod.
     """
@@ -55,8 +56,8 @@ def insert_documents(data):
 
     manual_documents = factory.get_collection("manual").find()
 
-    # These are the IDs of the documents that are changed in manual and have been changed since
-    # last time.
+    # These are the IDs of the documents that are changed in manual and have
+    # been changed since last time.
     conflict_ids = []
     for manual_document in manual_documents:
         if "id" in manual_document:
@@ -64,32 +65,38 @@ def insert_documents(data):
         else:
             continue
 
-        factory.get_database().get_collection("in_progress").update({"id": id}, {"$set": {
-            "manually_changed": True}})
+        factory.get_database() \
+               .get_collection("in_progress") \
+               .update({"id": id}, {"$set": {"manually_changed": True}})
 
         prod_match = factory.get_collection("prod").find({"id": id})
-        in_progress_match = factory.get_collection("in_progress").find({"id": id})
+        in_progress_match = factory.get_collection("in_progress") \
+                                   .find({"id": id})
 
         prod_match_doc = next(prod_match, None)
-        in_progress_doc = next(in_progress_match, None)
+        in_prog_doc = next(in_progress_match, None)
 
-        if prod_match_doc and in_progress_doc:
-            if prod_match_doc['content'] != in_progress_doc['content']:
-                conflict_ids.append({"conflict_id": id, "title": in_progress_doc["content"][
-                    "title"]})
+        if prod_match_doc and in_prog_doc:
+            if prod_match_doc['content'] != in_prog_doc['content']:
+                title = in_prog_doc["content"]["title"]
+                conflict_ids.append({"conflict_id": id,
+                                     "title": title})
 
     print("Conflict IDs are", conflict_ids)
     # Set ID to be unique.
-    factory.get_collection("conflict_ids").create_index([("conflict_id", 1)], unique=True)
+    factory.get_collection("conflict_ids").create_index([("conflict_id", 1)],
+                                                        unique=True)
     # Insert all the conflict ids into our collection.
     for conflict in conflict_ids:
         try:
             factory.post_document(conflict, "conflict_ids")
         except pymongo.errors.DuplicateKeyError:
-            # Then we already know this is a conflict ID and should not be added again to the list.
+            # Then we already know this is a conflict ID and should not be
+            # added again to the list.
             pass
 
-    # Delete the backup prod and rename prod to prod2 and then rename in_progress to prod.
+    # Delete the backup prod and rename prod to prod2 and then rename
+    # in_progress to prod.
     factory.get_database().drop_collection("prod2")
     try:
         factory.get_database().get_collection("prod").rename("prod2")
@@ -101,7 +108,8 @@ def insert_documents(data):
     factory.set_index("prod", factory)
     factory.set_index("manual", factory)
     # Set query_text to be unique.
-    factory.get_collection("unknown_queries").create_index([("query_text", 1)], unique=True)
+    factory.get_collection("unknown_queries").create_index([("query_text", 1)],
+                                                           unique=True)
 
     return conflict_ids
 
