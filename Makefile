@@ -2,7 +2,7 @@ install:
 	pip install .
 
 test: install
-	TEST_FLAG=TRUE pytest
+	TEST_FLAG=TRUE python -m pytest
 	flake8 --exclude=venv,build,chatbot/website .
 
 test-docker:

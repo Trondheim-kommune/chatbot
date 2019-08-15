@@ -17,7 +17,7 @@ class Config:
         if Config.__config is not None:
             raise Exception("This class is a singleton!")
         else:
-            f = open("settings.json")
+            f = open("chatbot/settings.json")
             file_raw = f.read()
             f.close()
             config = json.loads(file_raw)
