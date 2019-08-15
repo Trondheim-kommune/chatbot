@@ -20,9 +20,15 @@ def get_all_conflict_ids():
     """
     conflict_ids_docs = factory.get_collection("conflict_ids").find()
     conflict_ids = []
-    for conflict_id_doc in conflict_ids_docs:
-        conflict_ids.append({"id": conflict_id_doc["conflict_id"],
-                             "title": conflict_id_doc["title"]})
+
+    # Validate if result is empty or does not contain keys
+    try:
+        for conflict_id_doc in conflict_ids_docs:
+            conflict_ids.append({"conflict_id": conflict_id_doc["conflict_id"],
+                                 "title": conflict_id_doc["title"]})
+    except KeyError:
+        pass
+
     return json.dumps(conflict_ids)
 
 
@@ -33,18 +39,18 @@ def get_content():
     """
     id = request.args.get('id')
 
-    document_prod = next(factory.get_collection("prod").find({"id": id}), None)
-    output = {"prod": document_prod["content"]}
-    document_manual = next(factory.get_collection("manual").find({"id": id}), None)
+    prod = next(factory.get_collection("prod").find({"id": id}), None)
+    manual = next(factory.get_collection("manual").find({"id": id}), None)
 
-    if document_manual:
-        output["manual"] = document_manual["content"]
+    response = {}
+    response["content"] = manual["content"] if manual else prod["content"]
+    print(prod)
+    response["url"] = prod["url"]
 
-    # Add the url
-    output["url"] = document_prod["url"]
-    return json.dumps(output)
+    return json.dumps(response)
 
 
+# TODO: This should use PUT and verify that the content exists
 @web_api.route("/v1/web/content/", methods=["POST"])
 def update_content():
     """ Update the manual collection with new content. """
@@ -61,6 +67,8 @@ def update_content():
         # If the document wasn't already in the manual db then we need to copy the automatic one
         # first.
         document = next(factory.get_collection("prod").find({"id": id}), None)
+        # TODO: If document is None, return a Bad Request because the content
+        # that is attempted to be updated does not exists
         document["content"] = content
         factory.get_database().get_collection("manual").insert_one(document)
 

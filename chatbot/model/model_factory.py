@@ -73,7 +73,12 @@ class ModelFactory:
         if not isinstance(data, dict):
             data = json_util.loads(data)
 
-        response = col.insert_one(data)
+        response = None
+        try:
+            response = col.insert_one(data)
+        except DiplaceKeyError as e:
+            print(e)
+
         return response
 
     def update_document(self, query, data, collection):
@@ -81,6 +86,12 @@ class ModelFactory:
         col = self.get_collection(collection)
         data = json_util.loads(data)
         col.find_one_and_update({"$and": [query]}, {"$set": data})
+
+    def delete_document(self, query, collection):
+        """ Deleted document using a query, from collection """
+        col = self.get_collection(collection)
+        response = col.delete_one(query)
+        return response
 
     def set_index(self, collection):
         """ Create indexing based on three different keyword fields. Set the

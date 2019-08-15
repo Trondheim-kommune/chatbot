@@ -1,10 +1,15 @@
 import pytest
 import json
 import time
-from chatbot.nlp.query import _handle_not_found
 
+from chatbot.nlp.query import _handle_not_found
+from chatbot.model.model_factory import ModelFactory
 from chatbot.api import server
 from chatbot.api import dialogflow
+
+
+factory = ModelFactory.get_instance()
+factory.set_db()
 
 
 # Just see if we can create an intent object that is correct.
@@ -185,60 +190,111 @@ def test_add_intents(app):
     assert "Batch created 2 intents." == response_json["message"]
 
 
+
 def test_get_all_conflicts(app):
+    # Setup two conflicts
+    conflicts = [{ "conflict_id": "test_conflict_id_{}".format(i),
+                   "title": "test_conflict_title_{}".format(i) } 
+                 for i in range(2)
+                ]
+
+    # Post both focuments to conflict_ids 
+    for conflict in conflicts: 
+        factory.post_document(conflict, "conflict_ids")
+
     response = app.test_client().get('/v1/web/conflict_ids')
-    response_json = json.loads(response.data.decode())
-    assert response_json[0]["id"] == "295cc564fe771fbb92b3278a6eee2d5cbcae2606-3"
-    assert response_json[0]["title"] == " Velkommen til Trondheim kommune"
+
+
+    try:
+        response = app.test_client().get('/v1/web/conflict_ids')
+        response_json = json.loads(response.data.decode())
+
+        assert conflicts[0]["conflict_id"] in [resp["conflict_id"] for resp in response_json]
+        assert conflicts[1]["conflict_id"] in [resp["conflict_id"] for resp in response_json]
+    finally:
+        # Delete test conflits
+        for conflict in conflicts:
+            factory.delete_document({"conflict_id": conflict["conflict_id"]}, "conflict_ids")
 
 
 def test_get_content(app):
-    response = app.test_client().get(
-        '/v1/web/content/?id=295cc564fe771fbb92b3278a6eee2d5cbcae2606-3')
-    response_json = json.loads(response.data.decode())
-    assert response_json["url"] == "https://www.trondheim.kommune.no"
-    assert type(response_json["manual"]) is dict
-    assert type(response_json["prod"]) is dict
+    # Setup a content document
+    document = { "id": "test_content_id", "content": "some_test_content", "url": "test_url" }
+    factory.post_document(document, "prod")
+
+    try:
+        response = app.test_client().get("/v1/web/content/?id=test_content_id")
+        response_json = json.loads(response.data.decode())
+        print(response_json)
+
+        assert response_json["content"] == "some_test_content"
+    finally:
+        # Delete test content
+        factory.delete_document({"id": "test_content_id"}, "prod")
 
 
 def test_update_content(app):
-    input_dict = {
+    # Setup a content document
+    input_doc = {
         "data": {
-            "id": "295cc564fe771fbb92b3278a6eee2d5cbcae2606-3",
+            "id": "test_id",
+            "url": "some test url",
             "content": {
-                "title": " Velkommen til Trondheim kommune",
+                "title": "some_test_title",
                 "keywords": [
                     {
                         "keyword": "change_from_test",
                         "confidence": 0.2010
                     }
                 ],
-                "texts": [
-                    "El manual changos",
-                    "New answer"
-                ]
+            "texts": ["some test text"]
             }
         }
     }
-    response = app.test_client().post('/v1/web/content/',
-                                      data=json.dumps(input_dict))
-    assert response.status_code == 200
+    factory.post_document(input_doc["data"].copy(), "prod")
+    
+    try:
+        # Make a change
+        new_title = "title has been changed"
+        input_doc["data"]["content"]["title"] = new_title
+        response = app.test_client().post('/v1/web/content/',
+                                          data=json.dumps(input_doc))
+        response = app.test_client().get('/v1/web/content/?id=test_id')
+        response_doc = json.loads(response.data.decode())
 
-    response = app.test_client().delete(
-        '/v1/web/doc',
-        data=json.dumps({"data": {"id": input_dict["data"]["id"]}}))
-    assert response.status_code == 200
-
-    response = app.test_client().post('/v1/web/content/',
-                                      data=json.dumps(input_dict))
-    assert response.status_code == 200
+        assert response_doc["content"]["title"] == new_title
+    finally:
+        pass
+        # Delete test content
+        factory.delete_document({"id": "test_id"}, "prod")
 
 
 def test_get_docs_from_url(app):
-    response = app.test_client().get('/v1/web/docs/?url=https://www.trondheim.kommune.no')
-    response_json = json.loads(response.data.decode())
-    assert response_json[0]["id"] == "295cc564fe771fbb92b3278a6eee2d5cbcae2606-3"
-    assert response_json[0]["title"] == " Velkommen til Trondheim kommune"
+    # Setup a content document
+    input_doc = {
+        "data": {
+            "id": "test_id_for_url",
+            "url": "some test url",
+            "content": {
+                "title": "some_test_title",
+                "keywords": [
+                    {
+                        "keyword": "change_from_test",
+                        "confidence": 0.2010
+                    }
+                ],
+            "texts": ["some test text"]
+            }
+        }
+    }
+    factory.post_document(input_doc["data"].copy(), "prod")
+
+    try:
+        response = app.test_client().get('/v1/web/docs/?url=some test url')
+        response_json = json.loads(response.data.decode())
+        assert response_json[0]["id"] == "test_id_for_url"
+    finally:
+        factory.delete_document({"id": "test_id_for_url"}, "prod")
 
 
 def test_unknown_query(app):
