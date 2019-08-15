@@ -5,7 +5,7 @@ WORKDIR /usr/src/app
 
 # Docker pythonpath having trouble resolving some packages, easy fix
 ENV PYTHONPATH "${PYTHONPATH}:/usr/src/app"
-ENV PYTHONPATH "${PYTHONPATH}:/usr/src/app/scraper"
+ENV PYTHONPATH "${PYTHONPATH}:/usr/src/app/chatbot/scraper"
 
 # Install dependencies
 RUN apt-get update

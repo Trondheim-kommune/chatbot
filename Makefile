@@ -3,11 +3,11 @@ install:
 
 test: install
 	TEST_FLAG=TRUE pytest
-	flake8 --exclude=venv,build,website .
+	flake8 --exclude=venv,build,chatbot/website .
 
 test-docker:
 	docker exec --env TEST_FLAG=TRUE -it agent25 pytest 
-	docker exec -it agent25 flake8 --exclude=venv,build,website .
+	docker exec -it agent25 flake8 --exclude=venv,build,chatbot/website .
 
 build:
 	docker-compose build

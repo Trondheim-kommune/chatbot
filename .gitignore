@@ -1,10 +1,8 @@
 # Python build files
-venv/
 __pycache__/
 *.pyc
 .pytest_cache
 backupagent.json
-*scraped.json
 *.egg-info/
 build/
 dist/
@@ -16,9 +14,11 @@ dist/
 # Miscellaneous
 backupagent.json
 *trondheim.json
+*scraped.json
 Agent25-google.json
 .coverage
 .envrc
+venv/
 
 # Docker volumes
 data/

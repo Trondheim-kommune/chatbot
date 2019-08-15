@@ -1,6 +1,6 @@
-from model.QuerySystem import QuerySystem
+from chatbot.nlp.query import QueryHandler
 
-handler = QuerySystem()
+handler = QueryHandler()
 
 while True:
     text = input('> ')
