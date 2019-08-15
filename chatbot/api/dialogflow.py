@@ -8,17 +8,17 @@ import dialogflow_v2beta1
 import google.api_core.exceptions as google_exceptions
 
 from chatbot.nlp.query import QueryHandler
-from chatbot.api.flask.flask_exceptions import InvalidDialogFlowID
-import chatbot.api.flask.flask_util as util
+from chatbot.api.exceptions import InvalidDialogFlowID
+import chatbot.api.util as util
 
 
 PROJECT_ID = os.getenv("PROJECT_ID")
 
 query_handler = QueryHandler()
-# This dictionary contains a mapping from synonyms to entity_type in order to
-# match training phrases with entities.
+
+# Used for mapping synonyms to entity_type
 entities = {}
-# A simple flag if you have already loaded the entities or not.
+
 entities_loaded = False
 
 dialog_api = Blueprint('DialogFlow_API', __name__, template_folder='templates')
@@ -34,9 +34,8 @@ def handle_invalid_usage(error):
 
 @dialog_api.route("/v1/dialogflow/response", methods=["POST"])
 def get_response():
-    """
-    Read the data sent using POST.
-    """
+    """ Returns the response to a given query. Capable of passing on raw query
+    text, display name, query parameters, entities and intents from DialogFlow """
     json_input_data = json.loads(request.data)
     try:
         raw_query_text = json_input_data["queryResult"]["queryText"]
@@ -64,12 +63,11 @@ def get_response():
 
 
 def create_intent_object(intent_name, training_phrases, match_entity=True):
-    """
-    This method take in a name and training phrases and creates the intent
+    """ Take in a name and training phrases and creates the intent
     object and maps intents to entities if it finds a match. (Also a
     variable match_entity if you do not wish to match with entities you
-    can turn it off.)
-    """
+    can turn it off.) """
+
     intent = {
         "display_name": intent_name,
         "webhook_state": True,
@@ -132,12 +130,11 @@ def create_intent_post():
 
 
 def create_intent(intent_name, training_phrases):
-    """
-    This method creates only a single intent.
+    """ Create a single intent.
     :param intent_name: A simple string.
     :param training_phrases: A list containing multiple training_phrases.
-    :return: the newly created intent.
-    """
+    :return: the newly created intent. """
+
     client = dialogflow_v2beta1.IntentsClient()
     parent = client.project_agent_path(PROJECT_ID)
 
@@ -146,7 +143,7 @@ def create_intent(intent_name, training_phrases):
 
 
 def get_entities():
-    """This method is used for fetching every entity and caching it."""
+    """ Fetch and cache all entities """
     global entities_loaded
 
     global entities
@@ -184,12 +181,10 @@ def batch_create_intents_post():
 
 
 def batch_create_intents(intents):
-    """
-    This is used to insert multiple intents at the same time, much more
+    """ Inserts multiple intents at the same time, much more
     efficient than running the create_intent multiple times.
-    :param intents: A list of intents you want to create.
-    :return: a simple int of
-    """
+    :param intents: list of intents you want to create.
+    :return: int of """
     intents_out = []
 
     # A simple counter for how many intents we have inserted.
@@ -229,11 +224,9 @@ def batch_create_entities_post():
 
 
 def batch_create_entities(entity_types):
-    """
-    Creates entites and adds them into the global entities dictionary.
+    """ Creates entites and adds them into a global entity dictionary.
     :param entity_types: A list of entity types.
-    :return: a list of the entity ID's created.
-    """
+    :return: a list of the entity ID's created. """
     client = dialogflow_v2beta1.EntityTypesClient()
     parent = client.project_agent_path(PROJECT_ID)
 
@@ -268,11 +261,10 @@ def batch_delete_entities_post():
 
 
 def batch_delete_entities(entity_ids):
-    """
-    In order to delete multiple entities at a time.
-    :param entity_ids:
-    :return: response which is an operation/ future object.
-    """
+    """ Batch deletes multiple entities
+    :param entity_ids: list of ids to delete
+    :return: response which is an operation/ future object. """
+
     client = dialogflow_v2beta1.EntityTypesClient()
     parent = client.project_agent_path(PROJECT_ID)
 

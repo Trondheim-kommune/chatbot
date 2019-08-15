@@ -4,7 +4,7 @@ from flask import request, Blueprint
 
 from chatbot.model.model_factory import ModelFactory
 from chatbot.nlp.keyword import lemmatize_content_keywords
-import chatbot.api.flask.flask_util as flask_util
+import chatbot.api.util as flask_util
 
 
 web_api = Blueprint('Website API', __name__, template_folder='templates')
@@ -47,9 +47,8 @@ def get_content():
 
 @web_api.route("/v1/web/content/", methods=["POST"])
 def update_content():
-    """
-    Updates the manual collection with new content.
-    """
+    """ Update the manual collection with new content. """
+
     json_input_data = json.loads(request.data)
     id = json_input_data["data"]["id"]
     content = json_input_data["data"]["content"]
@@ -90,9 +89,7 @@ def get_docs_from_url():
 
 @web_api.route("/v1/web/doc", methods=["DELETE"])
 def delete_manual_document():
-    """
-    This function deletes a document from the manual collection
-    """
+    """ Delete a document from the manual collection """
     json_input_data = json.loads(request.data)
     document_id = json_input_data["data"]["id"]
     factory.get_database().get_collection("manual").delete_one({"id": document_id})
@@ -104,8 +101,7 @@ def delete_manual_document():
 
 @web_api.route("/v1/web/unknown_query", methods=["DELETE"])
 def delete_unknown_query():
-    """
-    This function simply deletes a query from the unknown_query collection.
+    """ Delete a query from the unknown_query collection.
     :return: A success json if it was successful.
     """
     json_input_data = json.loads(request.data)

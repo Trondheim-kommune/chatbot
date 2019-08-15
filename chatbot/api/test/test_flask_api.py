@@ -3,15 +3,15 @@ import json
 import time
 from chatbot.nlp.query import _handle_not_found
 
-from chatbot.api.flask import server
-from chatbot.api.flask import dialogflow_api
+from chatbot.api import server
+from chatbot.api import dialogflow
 
 
 # Just see if we can create an intent object that is correct.
 def test_create_intent_object():
     # match_entitity = False because entities might change in future and I
     # don't want this test to break in the future.
-    intent = dialogflow_api.create_intent_object(
+    intent = dialogflow.create_intent_object(
         "Husbybadet", [
             "Når åpner husbybadet?", "husbybadet åpningstid"],
         match_entity=False)
