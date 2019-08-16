@@ -30,7 +30,7 @@ def get_all_conflict_ids():
     # Validate if result is empty or does not contain keys
     try:
         for conflict_id_doc in conflict_ids_docs:
-            conflict_ids.append({"conflict_id": conflict_id_doc["conflict_id"],
+            conflict_ids.append({"id": conflict_id_doc["conflict_id"],
                                  "title": conflict_id_doc["title"]})
     except KeyError:
         pass

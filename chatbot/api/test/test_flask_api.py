@@ -209,7 +209,7 @@ def test_get_all_conflicts(app):
         response_json = json.loads(response.data.decode())
 
         for conflict in conflicts:
-            assert conflict["conflict_id"] in [resp["conflict_id"]
+            assert conflict["conflict_id"] in [resp["id"]
                                                for resp in response_json]
     finally:
         # Delete test conflits
