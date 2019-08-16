@@ -6,13 +6,14 @@ from progressbar import ProgressBar
 
 from chatbot.model.serializer import Serializer
 from chatbot.model.model_factory import ModelFactory
+from chatbot.util.config_util import Config
 
 
 def main():
     if len(sys.argv) > 1:
         filepath = sys.argv[1]
     else:
-        raise ValueError('No data-file path provided')
+        raise ValueError("No data-file path provided")
 
     ser = Serializer(filepath)
     ser.serialize_data()
@@ -21,98 +22,90 @@ def main():
 
 
 def insert_documents(data):
-    """
-    :param data: Is a list of serialized documents that should be inserted.
-    :return: a list of conflict document ids.
-    """
+    """ Insert all provided documents. Checks if the document has been manually
+    changed before - if it has, and the new document does not match, it is
+    marked as a conflict """
     factory = ModelFactory.get_instance()
     factory.set_db()
 
-    """
-    How we use MongoDB:
-    We have 3 different collections:
-        One for manual entries called "manual"
-        One for production called "prod"
-        One for the in_progress collection called "in_progress"
+    temp_col = Config.get_mongo_collection("temp_scraped")
+    manual_col = Config.get_mongo_collection("manual")
+    unknown_col = Config.get_mongo_collection("unknown")
+    prod_col = Config.get_mongo_collection("prod")
+    conflict_col = Config.get_mongo_collection("conflicts")
 
-    After we have scraped we add all the scraped data into the collection
-    "in_progress" and then we go through every entry in the "manual" collection
-    and use that entry's ID to query both prod and in_progress collection. We
-    compare the two contents in prod and in_progress to see if something
-    changed from last time this was run and now. If they do not have the same
-    content then we need to alert someone that the manual entry needs to be
-    updated.
-
-    When this is done in_progress will become our new prod.
-    """
-
-    factory.get_database().drop_collection("in_progress")
-
-    print('Starting insertion of {} documents'.format(len(data)))
+    print("Starting insertion of {} documents".format(len(data)))
     pbar = ProgressBar()
     for i, doc in enumerate(pbar(data)):
-        factory.post_document(doc, "in_progress")
-    print('Successfully inserted {} documents'.format(i + 1))
+        factory.post_document(doc, temp_col)
+    print("Successfully inserted {} documents".format(i + 1))
 
-    manual_documents = factory.get_collection("manual").find()
+    manual_docs = factory.get_collection(manual_col).find()
 
-    # These are the IDs of the documents that are changed in manual and have
-    # been changed since last time.
-    conflict_ids = []
-    for manual_document in manual_documents:
-        if "id" in manual_document:
-            id = manual_document["id"]
+    conflicts = []
+    for manual_doc in manual_docs:
+        if "id" in manual_doc:
+            idx = manual_doc["id"]
         else:
             continue
 
+        # Mark corresponding entry in temp collection as manually changed
         factory.get_database() \
-               .get_collection("in_progress") \
-               .update({"id": id}, {"$set": {"manually_changed": True}})
+               .get_collection(temp_col) \
+               .update_one({"id": idx}, {"$set": {"manually_changed": True}})
 
-        prod_match = factory.get_collection("prod").find({"id": id})
-        in_progress_match = factory.get_collection("in_progress") \
-                                   .find({"id": id})
+        prod_doc = next(factory.get_collection(prod_col).find({"id": idx}),
+                        None)
+        temp_doc = next(factory.get_collection(temp_col).find({"id": idx}),
+                        None)
 
-        prod_match_doc = next(prod_match, None)
-        in_prog_doc = next(in_progress_match, None)
+        if prod_doc and temp_doc:
+            if temp_doc["content"] != prod_doc["content"]:
+                title = temp_doc["content"]["title"]
+                conflicts.append({"conflict_id": idx,
+                                  "title": title})
 
-        if prod_match_doc and in_prog_doc:
-            if prod_match_doc['content'] != in_prog_doc['content']:
-                title = in_prog_doc["content"]["title"]
-                conflict_ids.append({"conflict_id": id,
-                                     "title": title})
-
-    print("Conflict IDs are", conflict_ids)
-    # Set ID to be unique.
-    factory.get_collection("conflict_ids").create_index([("conflict_id", 1)],
-                                                        unique=True)
-    # Insert all the conflict ids into our collection.
-    for conflict in conflict_ids:
+    print("Conflicts: {}".format(conflicts))
+    factory.get_collection(conflict_col).create_index([("conflict_id", 1)],
+                                                      unique=True)
+    for conflict in conflicts:
         try:
-            factory.post_document(conflict, "conflict_ids")
+            factory.post_document(conflict, conflict_col)
         except pymongo.errors.DuplicateKeyError:
-            # Then we already know this is a conflict ID and should not be
-            # added again to the list.
+            # In case there are dupliacte, unsolved conflicts
             pass
 
-    # Delete the backup prod and rename prod to prod2 and then rename
-    # in_progress to prod.
-    factory.get_database().drop_collection("prod2")
+    # Update production collection
+    db = factory.get_database()
     try:
-        factory.get_database().get_collection("prod").rename("prod2")
+        db.get_collection(prod_col).rename("old_prod")
     except pymongo.errors.OperationFailure:
+        # If the prod collection does not exist
         pass
-    factory.get_database().get_collection("in_progress").rename("prod")
 
-    factory.set_index("in_progress", factory)
-    factory.set_index("prod", factory)
-    factory.set_index("manual", factory)
-    # Set query_text to be unique.
-    factory.get_collection("unknown_queries").create_index([("query_text", 1)],
-                                                           unique=True)
+    try:
+        db.get_collection(temp_col).rename(prod_col)
+    except Exception as e:
+        print("Failed to update production db collection")
+        print(e)
+        db.get_collection("old_prod").rename(prod_col)
+    finally:
+        db.get_collection("old_prod").drop()
+        db.get_collection(temp_col).drop()
 
-    return conflict_ids
+    # Update all indexes
+    factory.set_index(prod_col)
+    factory.set_index(manual_col)
+    factory.set_index(temp_col)
+    # Removes duplicates
+    factory.get_collection(unknown_col).create_index([("query_text", 1)],
+                                                     unique=True)
+
+    if not conflicts:
+        factory.get_collection(conflict_col).drop()
+
+    return conflicts
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

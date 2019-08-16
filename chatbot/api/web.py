@@ -46,13 +46,14 @@ def get_content():
 
     id = request.args.get('id')
 
+    response = {}
     prod = next(factory.get_collection(prod_col).find({"id": id}), None)
     manual = next(factory.get_collection(manual_col).find({"id": id}), None)
 
-    response = {}
-    response["content"] = manual["content"] if manual else prod["content"]
-    print(prod)
-    response["url"] = prod["url"]
+    # TODO: Return not found if not
+    response["prod"] = prod["content"] if prod else None
+    response["manual"] = manual["content"] if manual else None
+    response["url"] = prod["url"] if prod else None
 
     return json.dumps(response)
 
@@ -69,7 +70,7 @@ def update_content():
     lemmatize_content_keywords(content)
 
     index = ({"id": id}, {"$set": {"content": content}})
-    status = factory.get_database().get_collection(prod_col).update(*index)
+    status = factory.get_database().get_collection(manual_col).update(*index)
     if status["updatedExisting"] is False:
         # If the document wasn't already in the manual db then we need to copy
         # the automatic one first.

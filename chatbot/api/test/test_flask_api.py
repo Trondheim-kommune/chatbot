@@ -232,7 +232,7 @@ def test_get_content(app):
         response_json = json.loads(response.data.decode())
         print(response_json)
 
-        assert response_json["content"] == "some_test_content"
+        assert response_json["prod"] == "some_test_content"
     finally:
         # Delete test content
         factory.delete_document({"id": "test_content_id"}, prod_col)
@@ -257,8 +257,9 @@ def test_update_content(app):
         }
     }
     prod_col = Config.get_mongo_collection("prod")
+    manual_col = Config.get_mongo_collection("manual")
     factory.post_document(input_doc["data"].copy(), prod_col)
-#
+
     try:
         # Make a change
         new_title = "title has been changed"
@@ -268,10 +269,11 @@ def test_update_content(app):
         response = app.test_client().get('/v1/web/content/?id=test_id')
         response_doc = json.loads(response.data.decode())
 
-        assert response_doc["content"]["title"] == new_title
+        print(response_doc)
+        assert response_doc["manual"]["title"] == new_title
     finally:
-        pass
         # Delete test content
+        factory.delete_document({"id": "test_id"}, manual_col)
         factory.delete_document({"id": "test_id"}, prod_col)
 
 
