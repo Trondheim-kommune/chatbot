@@ -50,8 +50,8 @@ def _get_corpus_text(doc):
 
 def _get_answer_text(doc):
     ''' Converts a document from the model into a readable string. '''
-    doc_string = doc['content']['texts'] + '\n' + URL_FROM_TEXT + doc['url']
-    content = random.choice(doc_string)
+    content = random.choice(doc['content']['texts'])
+    content = content + '\n' + URL_FROM_TEXT + doc['url']
 
     return doc['content']['title'] + ':\n' + content
 
