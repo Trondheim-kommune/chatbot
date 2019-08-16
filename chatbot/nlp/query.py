@@ -1,5 +1,6 @@
 import string
 import random
+import os
 import pymongo
 
 from sklearn.metrics.pairwise import cosine_similarity
@@ -123,7 +124,8 @@ def _perform_search(query_text):
     # Perform simple query expansion on the original query.
     query = expand_query(query_text)
 
-    print('Post expansion: ', query)
+    if str(os.getenv('LOG')) == 'TRUE':
+        print('Post expansion: ', query)
 
     # Retrieve a set of documents using MongoDB. We then attempt to filter
     # these further.
@@ -142,7 +144,7 @@ def _perform_search(query_text):
     try:
         # Compare the search query with all documents in our new model using
         # cosine similarity.
-        scores = cosine_similarity(vectorizer.transform([query_text]),
+        scores = cosine_similarity(vectorizer.transform([query]),
                                    corpus_matrix)[0].tolist()
 
         sorted_scores = sorted(scores, reverse=True)

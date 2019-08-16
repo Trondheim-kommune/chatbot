@@ -16,8 +16,8 @@ nb = spacy.load('nb_dep_ud_sm')
 
 lemmatize = Lemmatizer(LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES)
 
-nltk.download('wordnet')
-nltk.download('omw')
+nltk.download('wordnet', quiet=True)
+nltk.download('omw', quiet=True)
 
 START_SPEC_CHARS = re.compile('^[{}]+'.format(re.escape(string.punctuation)))
 END_SPEC_CHARS = re.compile('[{}]+$'.format(re.escape(string.punctuation)))

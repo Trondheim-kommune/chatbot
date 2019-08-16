@@ -96,7 +96,7 @@
         "multiple_answers": "Jeg har flere mulige svar til deg.",
         "url_from_text": "Hentet fra: ",
         "custom_synset_file": "chatbot/nlp/statics/synset.json",
-        "character_limit": 2500,
+        "character_limit": 250,
         "max_answers": 4
     }
 }
