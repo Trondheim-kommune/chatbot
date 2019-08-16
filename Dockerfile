@@ -22,7 +22,7 @@ RUN python3 -m pip install -r requirements.txt --no-cache-dir
 COPY . .
 
 # Add crontab file in the cron directory
-ADD deployment_scripts/crontab /etc/cron.d/crontab
+ADD scripts/crontab /etc/cron.d/crontab
 
 # Give execution rights on the cron job
 RUN chmod 0644 /etc/cron.d/crontab
@@ -40,4 +40,4 @@ RUN ["pip", "install", "."]
 RUN ["python3", "setup.py", "develop"]
 
 # Start server
-CMD ["./start_server_docker.sh"]
+CMD ["./scripts/start_server_docker.sh"]

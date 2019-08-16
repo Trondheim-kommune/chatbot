@@ -1,0 +1,1 @@
+* * 1 * * ./usr/src/app/scripts/refresh_data.sh >> /var/log/cron.log

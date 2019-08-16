@@ -6,8 +6,8 @@ test: install
 	flake8 --exclude=venv,build,chatbot/website .
 
 test-docker:
-	docker exec --env TEST_FLAG=TRUE -it agent25 pytest 
-	docker exec -it agent25 flake8 --exclude=venv,build,chatbot/website .
+	docker exec --env TEST_FLAG=TRUE -it chatbot pytest 
+	docker exec -it chatbot flake8 --exclude=venv,build,chatbot/website .
 
 build:
 	docker-compose build
@@ -27,8 +27,8 @@ docker-logs:
 stop:
 	docker-compose stop
 
-make open-bash-agent25:
-	docker exec -it agent25 bash
+make open-bash-chatbot:
+	docker exec -it chatbot bash
 
 make open-bash-web:
 	docker exec -it web bash
