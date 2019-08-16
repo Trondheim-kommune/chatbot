@@ -4,8 +4,15 @@
         "password": "vegardev",
         "url": "127.0.0.1",
         "port": 27017,
-        "db": "dev_db",
-        "testing_db": "test_db"
+        "prod_db": "prod_chatbot",
+        "dev_db": "dev_chatbot",
+		"collections": {
+			"manual": "manual",
+			"temp_scraped": "temp_scraped",
+			"prod": "prod",
+			"conflicts": "conflicts",
+			"unknown": "unknown"
+		}
     },
     "model": {
         "accepted_tags": [

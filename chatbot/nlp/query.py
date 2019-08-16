@@ -29,7 +29,8 @@ def _handle_not_found(query_text):
     well as returning a fallback string.
     '''
     try:
-        factory.get_database().get_collection("unknown_queries").insert_one(
+        unknown_col = Config.get_mongo_collection("unknown")
+        factory.get_database().get_collection(unknown_col).insert_one(
             {"query_text": query_text})
     except pymongo.errors.DuplicateKeyError:
         # If we already have this specific query in the unknown_queries

@@ -4,6 +4,7 @@ from flask import request, Blueprint
 
 from chatbot.model.model_factory import ModelFactory
 from chatbot.nlp.keyword import lemmatize_content_keywords
+from chatbot.util.config_util import Config
 import chatbot.api.util as flask_util
 
 
@@ -12,13 +13,18 @@ web_api = Blueprint('Website API', __name__, template_folder='templates')
 factory = ModelFactory.get_instance()
 factory.set_db()
 
+prod_col = Config.get_mongo_collection("prod")
+manual_col = Config.get_mongo_collection("manual")
+conflict_col = Config.get_mongo_collection("conflicts")
+unknown_col = Config.get_mongo_collection("unknown")
+
 
 @web_api.route("/v1/web/conflict_ids", methods=["GET"])
 def get_all_conflict_ids():
     """
     :return: a list of {"title" "...", "id": "..."}
     """
-    conflict_ids_docs = factory.get_collection("conflict_ids").find()
+    conflict_ids_docs = factory.get_collection(conflict_col).find()
     conflict_ids = []
 
     # Validate if result is empty or does not contain keys
@@ -40,8 +46,8 @@ def get_content():
 
     id = request.args.get('id')
 
-    prod = next(factory.get_collection("prod").find({"id": id}), None)
-    manual = next(factory.get_collection("manual").find({"id": id}), None)
+    prod = next(factory.get_collection(prod_col).find({"id": id}), None)
+    manual = next(factory.get_collection(manual_col).find({"id": id}), None)
 
     response = {}
     response["content"] = manual["content"] if manual else prod["content"]
@@ -62,24 +68,25 @@ def update_content():
 
     lemmatize_content_keywords(content)
 
-    index = {"id": id}, {"$set": {"content": content}}
-    status = factory.get_database().get_collection("manual").update(index)
+    index = ({"id": id}, {"$set": {"content": content}})
+    status = factory.get_database().get_collection(prod_col).update(*index)
     if status["updatedExisting"] is False:
         # If the document wasn't already in the manual db then we need to copy
         # the automatic one first.
-        document = next(factory.get_collection("prod").find({"id": id}), None)
+        document = next(factory.get_collection(prod_col).find({"id": id}),
+                        None)
         # TODO: If document is None, return a Bad Request because the content
         # that is attempted to be updated does not exists
         document["content"] = content
-        factory.get_database().get_collection("manual").insert_one(document)
+        factory.get_database().get_collection(manual_col).insert_one(document)
 
     # set manually_changed to true.
-    factory.get_database().get_collection("prod").update({"id": id}, {"$set": {
-        "manually_changed": True}})
+    index = ({"id": id}, {"$set": {"manually_changed": True}})
+    factory.get_database().get_collection(prod_col).update(*index)
 
     # delete this document from the conflict ids collection
     query = {"conflict_id": id}
-    factory.get_database().get_collection("conflict_ids").delete_one(query)
+    factory.get_database().get_collection(conflict_col).delete_one(query)
     return flask_util.create_success_response("Success")
 
 
@@ -89,7 +96,7 @@ def get_docs_from_url():
     :return: Every document for a single url with id and title.
     """
     url = request.args.get('url')
-    docs = factory.get_collection("prod").find({"url": url})
+    docs = factory.get_collection(prod_col).find({"url": url})
 
     out = []
     for doc in docs:
@@ -103,12 +110,12 @@ def delete_manual_document():
     json_input_data = json.loads(request.data)
     document_id = json_input_data["data"]["id"]
     factory.get_database() \
-           .get_collection("manual") \
+           .get_collection(manual_col) \
            .delete_one({"id": document_id})
     factory.get_database() \
-           .get_collection("prod") \
+           .get_collection(prod_col) \
            .update({"id": document_id}, {"$set": {"manually_changed": False}})
-    factory.get_database().get_collection("conflict_ids") \
+    factory.get_database().get_collection(conflict_col) \
                           .delete_one({"conflict_id": document_id})
     success_msg = "Successfully deleted manual entry"
     return flask_util.create_success_response(success_msg)
@@ -122,7 +129,7 @@ def delete_unknown_query():
     json_input_data = json.loads(request.data)
     query_text = json_input_data["data"]["query_text"]
     factory.get_database() \
-           .get_collection("unknown_queries") \
+           .get_collection(unknown_col) \
            .delete_one({"query_text": query_text})
     success_msg = "Successfully deleted an unknown query."
     return flask_util.create_success_response(success_msg)
@@ -133,7 +140,7 @@ def get_all_unknown_queries():
     """
     :return: a list of unknown queries.
     """
-    unknown_queries_docs = factory.get_collection("unknown_queries").find()
+    unknown_queries_docs = factory.get_collection(unknown_col).find()
     unknown_queries = [{"query_text": unknown_query_doc["query_text"]}
                        for unknown_query_doc in unknown_queries_docs]
     return json.dumps(unknown_queries)

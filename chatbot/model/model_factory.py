@@ -24,7 +24,7 @@ class ModelFactory:
         else:
             ModelFactory.__instance = self
 
-    def set_database(self, ip, db_name, username, password, port):
+    def _set_database(self, ip, db_name, username, password, port):
         """ Sets up conncetion to given database"""
 
         # Seperate url for mongodb in dopcker container
@@ -34,11 +34,21 @@ class ModelFactory:
             client = pymongo.MongoClient("mongodb://{}:{}@{}:{}/{}"
                                          .format(username, password,
                                                  ip, port, db_name))
-
         self.database = client[db_name]
 
-    def get_document(self, query, main_collection="prod",
-                     manual_collection="manual", number_of_docs=30):
+    def set_db(self):
+        """ Set the working database """
+        url, port = Config.get_db_connection()
+
+        user, password = Config.get_mongo_db_credentials()
+        db = Config.get_mongo_db()
+
+        self._set_database(url, db, user, password, port)
+
+    def get_document(self, query,
+                     prod_col=Config.get_mongo_collection("prod"),
+                     manual_col=Config.get_mongo_collection("manual"),
+                     number_of_docs=30):
         """
         Searches for documents using MongoDB in a given document collection.
         Get 15 results from prod. Get 15 from Manual.
@@ -46,8 +56,8 @@ class ModelFactory:
         manually_changed=true.  Then return every remaining document, remember
         it's not sorted now, but for what we need it for this is not necessary.
         """
-        main_col = self.get_collection(main_collection)
-        cursor = main_col.find({'$text': {'$search': query}},
+        prod_col = self.get_collection(prod_col)
+        cursor = prod_col.find({'$text': {'$search': query}},
                                {'score': {'$meta': 'textScore'}})
         # Sort and retrieve some of the top scoring documents.
         cursor.sort([('score', {'$meta': 'textScore'})]).limit(number_of_docs)
@@ -57,7 +67,7 @@ class ModelFactory:
             if doc["manually_changed"] is False:
                 docs.append(doc)
 
-        manual_col = self.get_collection(manual_collection)
+        manual_col = self.get_collection(manual_col)
         cursor = manual_col.find({'$text': {'$search': query}},
                                  {'score': {'$meta': 'textScore'}})
         # Sort and retrieve some of the top scoring documents.
@@ -103,16 +113,6 @@ class ModelFactory:
                  ("content.keywords.keyword", pymongo.TEXT),
                  ("header_meta_keywords", pymongo.TEXT)],
                 default_language="norwegian")
-
-    def set_db(self):
-        """ Set the working database """
-        url = Config.get_value(["mongo", "url"])
-        port = Config.get_value(["mongo", "port"])
-        user = Config.get_value(["mongo", "username"])
-        password = Config.get_value(["mongo", "password"])
-        db = Config.get_mongo_db()
-
-        self.set_database(url, db, user, password, port)
 
     def get_collection(self, collection):
         return self.database[collection]

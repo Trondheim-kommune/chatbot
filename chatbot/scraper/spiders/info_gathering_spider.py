@@ -1,15 +1,21 @@
+import re
+import unicodedata
+
+from hashlib import sha1
+
+from urllib.parse import urlparse
+from urllib.parse import urljoin
+
 import scrapy
 from scrapy.linkextractors import LinkExtractor
 from scrapy.http import HtmlResponse
+
 from bs4 import BeautifulSoup
+
 from anytree import RenderTree, NodeMixin
 from anytree.exporter import DictExporter
-from hashlib import sha1
-import re
-from urllib.parse import urlparse
-from urllib.parse import urljoin
+
 from chatbot.util.config_util import Config
-import unicodedata
 
 
 class TreeElement(NodeMixin):

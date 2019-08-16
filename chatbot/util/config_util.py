@@ -39,8 +39,40 @@ class Config:
 
     @staticmethod
     def get_mongo_db():
+        """ Return the mongodb database to be used, given environment variables
+        """
         Config.get_config()
-        if os.getenv("TEST_FLAG"):
-            return Config.get_value(["mongo", "testing_db"])
+        if str(os.getenv("DEBUG")) == "TRUE":
+            return Config.get_value(["mongo", "dev_db"])
         else:
-            return Config.get_value(["mongo", "db"])
+            return Config.get_value(["mongo", "prod_db"])
+
+    @staticmethod
+    def get_db_connection():
+        """ Return the (url, port) of the mongodb database to be used """
+        url = Config.get_value(["mongo", "url"])
+        port = Config.get_value(["mongo", "port"])
+
+        return url, port
+
+    @staticmethod
+    def get_mongo_db_credentials():
+        """ Return (username, password) for mongodb database, given environment
+        variables """
+
+        Config.get_config()
+        usr = None
+        pwd = None
+        if str(os.getenv("DEBUG")) == "TRUE":
+            usr = Config.get_value(["mongo", "username"])
+            pwd = Config.get_value(["mongo", "password"])
+        else:
+            usr = os.getenv("DB_USER")
+            pwd = os.getenv("DB_PWD")
+
+        return usr, pwd
+
+    @staticmethod
+    def get_mongo_collection(collection):
+        """ Return the given collection string from settings file """
+        return Config.get_value(["mongo", "collections", collection])

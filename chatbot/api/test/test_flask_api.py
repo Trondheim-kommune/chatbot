@@ -6,6 +6,7 @@ from chatbot.nlp.query import _handle_not_found
 from chatbot.model.model_factory import ModelFactory
 from chatbot.api import server
 from chatbot.api import dialogflow
+from chatbot.util.config_util import Config
 
 
 factory = ModelFactory.get_instance()
@@ -196,9 +197,10 @@ def test_get_all_conflicts(app):
                   "title": "test_conflict_title_{}".format(i)}
                  for i in range(2)]
 
+    conflict_col = Config.get_mongo_collection("conflicts")
     # Post both focuments to conflict_ids
     for conflict in conflicts:
-        factory.post_document(conflict, "conflict_ids")
+        factory.post_document(conflict, conflict_col)
 
     response = app.test_client().get('/v1/web/conflict_ids')
 
@@ -213,7 +215,7 @@ def test_get_all_conflicts(app):
         # Delete test conflits
         for conflict in conflicts:
             factory.delete_document({"conflict_id": conflict["conflict_id"]},
-                                    "conflict_ids")
+                                    conflict_col)
 
 
 def test_get_content(app):
@@ -221,7 +223,8 @@ def test_get_content(app):
     document = {"id": "test_content_id",
                 "content": "some_test_content",
                 "url": "test_url"}
-    factory.post_document(document, "prod")
+    prod_col = Config.get_mongo_collection("prod")
+    factory.post_document(document, prod_col)
 
     try:
         url = "/v1/web/content/?id=test_content_id"
@@ -232,7 +235,7 @@ def test_get_content(app):
         assert response_json["content"] == "some_test_content"
     finally:
         # Delete test content
-        factory.delete_document({"id": "test_content_id"}, "prod")
+        factory.delete_document({"id": "test_content_id"}, prod_col)
 
 
 def test_update_content(app):
@@ -240,7 +243,7 @@ def test_update_content(app):
     input_doc = {
         "data": {
             "id": "test_id",
-            "url": "some test url",
+            "url": "some test url 123",
             "content": {
                 "title": "some_test_title",
                 "keywords": [
@@ -253,8 +256,9 @@ def test_update_content(app):
             }
         }
     }
-    factory.post_document(input_doc["data"].copy(), "prod")
-
+    prod_col = Config.get_mongo_collection("prod")
+    factory.post_document(input_doc["data"].copy(), prod_col)
+#
     try:
         # Make a change
         new_title = "title has been changed"
@@ -268,7 +272,7 @@ def test_update_content(app):
     finally:
         pass
         # Delete test content
-        factory.delete_document({"id": "test_id"}, "prod")
+        factory.delete_document({"id": "test_id"}, prod_col)
 
 
 def test_get_docs_from_url(app):
@@ -289,14 +293,15 @@ def test_get_docs_from_url(app):
             }
         }
     }
-    factory.post_document(input_doc["data"].copy(), "prod")
+    prod_col = Config.get_mongo_collection("prod")
+    factory.post_document(input_doc["data"].copy(), prod_col)
 
     try:
         response = app.test_client().get('/v1/web/docs/?url=some test url')
         response_json = json.loads(response.data.decode())
         assert response_json[0]["id"] == "test_id_for_url"
     finally:
-        factory.delete_document({"id": "test_id_for_url"}, "prod")
+        factory.delete_document({"id": "test_id_for_url"}, prod_col)
 
 
 def test_unknown_query(app):
