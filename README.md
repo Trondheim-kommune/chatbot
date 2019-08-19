@@ -1,151 +1,142 @@
-# Agent 25
+# Chatbot
 
 [![Build Status](https://travis-ci.com/vegarab/agent-25.svg?token=L9RN2jPDa7p43DCcYhYZ&branch=dev)](https://travis-ci.com/vegarab/agent-25)
 [![codecov](https://codecov.io/gh/vegarab/agent-25/branch/dev/graph/badge.svg?token=ArL47bWQSN)](https://codecov.io/gh/vegarab/agent-25)
 
-Agent 25 is a prototype for a chatbot which is able to teach itself. The
-purpose of this project is to greatly reduce the time which must be spent
-manually creating training data for chatbots, by automating the process.
-This project attempts to do this by automatically scraping data from a
-specific website, structuring it, and using the data to create a knowledge
-base for the chatbot. When the chatbot frontend receives a query from an user,
-the query is forwarded to this system, which in turn attempts to formulate
-a query using the information stored in the knowledge base.
+This is a general purpose, retrieval-based chatbot, initially built as a
+Bachelor's project at NTNU. The bot is self-learning, based on an XML-based
+knowledge (e.g. a website). The main purpose of this project is to greatly
+reduce the required resources for building a production-ready chatbot system
+that can be deployed anywhere. This issue is solved by automatically scraping
+data from a specific knowledge base, strcturing and indexing the data and
+constructing a language model based on the knowledge base. The chatbot is then
+capable of recieving queries from a user, phrased with natural human language,
+while the system in turn attempts to return an answer using the information
+stored in the knowledge base. 
 
 This project was carried out by a group of six students in their third year
 at the Informatics study at the Norwegian Unviversity of Science and
 Technology, as a part of their bachelor thesis course IT2901. Trondheim
 Kommune was the project customer, and the goal of the projet was to create
-a system which could easiy be introduced to their as well as other websites.
-Additional project documentation is available in the project wiki. The group
-also produced a report which describes the product as well as the process
-behind it in great detail.
+a system which could easiy be introduced to their, as well as other, websites.
+The group also produced a report which describes the product as well as the
+process behind it in great detail. The initial project was developed as a
+prototype, while some further development has been carried out in order to make
+the system production ready.
 
 ## Project structure
 
-As requested by the customer, this project is divided into three main parts in
-an MVC-inspired fashion. This is to make it easier to exchange any of the three
-parts of the system.
+The project is divided into three main parts, in an MVC-inspired fashion (by
+request from the product customer). This is is to make the exchange of any
+module easier.
 
-- Google DialogFlow is used for the frontend part of the chatbot. The code in
-  this project handles the response generation, which is then fed to DialogFlow.
-- `api` contains a Flask API whose main task is to interface with DialogFlow.
-- `model` contains a knowledge base using MongoDB. This part of the project
-  attempts to structure and store information for later retrieval, and is also
-  responsible for formulating answers when a query is sent to the API.
+- An information gathering module `chatbot/scraper` - a highly general web
+  scraper capable of indexing XML-structured data.
+- A data model, representing the knowledge base of the bot `chatbot/model`.
+  This is a non-SQL based system, powered by MongoDB
+- A language processing and query module `chatbot/nlp` that performs similarity
+  measures and matching between an input user query and knowledge in the model.
 
-The project also contains a couple other modules, whcih do not tie directly
-into the MVC-inspired structure of the project.
+In addition, the project includes a web-interface that allows for modifcation
+of the knowledge base, `chatbot/web`. This provides an administration control
+panel which allows admins to fine-tune the results which are returned by the
+system by overriding answers stored in the knowledge base.
 
-- `scraper` contains a web scraper using Scrapy. This system visits all pages
-  on a given domain, and attempts to extract information which is then fed to
-  the knowledge base.
-- `website` contains a simple administration control panel which allows administrators
-to fine-tune the results which are returned by the system, by overriding answers
-stored in the knowledge base.
+Communication between the data model, language processing module, web-interface
+and chat integrations is carried out through an HTTP-based API, `chatbot/api`.
+This API also includes integration directly to Google's DialogFlow, allowing
+for easy interaction with existing chat-view systems such as Facebook Messenger
+and Slack.
 
 # Project requirements
+This system assumes a UNIX-like (pref. Linux) system, with a minimum of 2 CPU
+Cores and 2GB of RAM (depending on the size of the knowledge base). Integration
+to DialogFlow requires HTTPS, but this is disabled by default. 
 
-This project is currently designed to be used with DialogFlow using webbooks.
-In order to communicate with DialogFlow, the API needs to run on a server which
-has HTTPS enabled. This is also required during development, if you want to
-develop on all parts of the system
+The system is designed to run in Docker-containers, using Docker compose.
 
-This project is currently hosted on a DigitalOcean Droplet, using NGINX as
-the server and `certbot` for the required SSL certificates. The project is
-not particulary resource-intensive, but some of the natural language processing
-functionality can be taxing. We therefore reccoment using at least a 4 core CPU
-with 4GB of RAM.
+## System setup
+### Environment variables
+`DB_USER` and `DB_PWD` for accessing mongoDB.
 
-## Running the project using docker
-Docker is a containerization tool. In order to run this project, you need
-to have both docker and docker-compose installed. It would be best to run
-this on an unix based system, preferrably Linux.
+`PROJECT_ID` and `GOOGLE_APPLICATION_CREDENTIALS` (filepath, JSON) if using DialogFlow
+Integrations.
 
-To build the project
 
-```bash
+### Deployment
+Build the system
+```
 make build
 ```
+or through a clean build `make build-clean`. 
 
-Full rebuild
-
-```bash
-make build-clean
+Start up the system through
 ```
-
-To run
-
-```bash
 make start
 ```
 
-To see running containers
-```bash
-docker ps
-```
+This will start up three containers: 
+* mongoDB instance
+* Python-powered HTTP API
+* Web app powered by NodeJS
 
-To enter the api container
-```bash
-make open-bash-agent25
+Entering the API container:
 ```
-
-To enter the web container
-```bash
+make open-bash-chatbot
+```
+Entering the web container
+```
 make open-bash-web
 ```
 
-To run tests inside docker
-```bash
+The automatic test-suite can also be executed within Docker:
+```
 make test-docker
 ```
 
-To view logs from docker-compose
-```bash
+Logs can be accessed through 
+```
 make docker-logs
 ```
-## Building without docker
 
-### Building the website
-Run
-`cd website`  
-`./build_web_server.sh`  
+### Development setup
+#### Installation
+Python dependencies:
+```
+pip install -r requirements.txt
+```
 
-### Running website locally
-Run
-`source venv/bin/activate` 
-`cd website`  
-`npm install`  
-`npm start`
-Then to run Cypress tests
-`npm run cypress open`
+Node dependencies:
+```
+cd chatbot/web
+npm install
+npm build
+rm /usr/share/nginx/html/ -r
+cp build /usr/share/nginx/html/ -r
+```
 
+Install the latest version of MongoDB, creating a user matching the user in
+`chatbot/settings.json` to the two databases specified `dev_db` and `prod_db`. 
 
-# Setup
+#### Start the API:
+```
+./chatbot/api/start_server.sh
+```
 
-This project currently uses virtual environments. To start the project, run
-`./setup.sh`. This will create a new virtual environment with all dependencies
-installed.
+#### Start the web application
+```
+cd chatbot/web
+npm run
+```
 
-To run the scraper and populate the knowledge base, run `./model/start.sh`. This
-command might take multiple minutes to finish. Whe
-
-When the knowledge base is populated with data, the server can be started. To do
-this, run `./api/flask/start_server_screen.sh`. This will start the server in
-the background. You can see the logs by using `screen -r`.
-
-To start the website, run `cd website`, `npm install` and `npm start`. The website
-is a simple React app which uses `create-react-app`. The tests for the website are
-written using Cypress, and the test suite can be run by executing `npm run cypress open`.
-
-If you want to build the website on a server where NGINX is already installed, you
-can alternatively use the command `./build_web_server.sh`. This will build the project
-and copy the files to `/usr/share/nginx/html/`. Inspect the script for further information.
-
+#### Prototype chat view
+```
+python chatbot/prototype.py
+```
 
 
 ## Settings file
-There is a settings file called `settings.json`, in this file there are
+There is a settings file called `chatbot/settings.json`, in this file there are
 multiple things you could change. Every change needed to make this project work on any website should be able to be configured here. 
 
 * mongo
@@ -173,5 +164,9 @@ multiple things you could change. Every change needed to make this project work 
     * not_found: Text that the bot should response with if the bot did not find what you asked for.
     * multiple_answers: Text when multiple answers are found.
 
-## Environment variables
-See the [wiki page](https://github.com/vegarab/agent-25/wiki/Environment-variables) for all necessary credentials and environment variables.
+
+## LICENSE
+Chatbot  Copyright (C) 2019  Vegar Andreas Bergum, Tinus Flagstad, Thomas Skaaheim, Torjus Iveland, Anders Hopland
+
+This program comes with ABSOLUTELY NO WARRANTY; 
+This is free software, and you are welcome to redistribute it under certain conditions; 
