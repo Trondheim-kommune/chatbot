@@ -28,7 +28,7 @@ services:
           - mongodb:/data/db
         ports:
             - 27017:27017
-        command: mongod --smallfiles --logpath=/dev/null # --quiet
+        command: mongod --logpath=/dev/null
 
     mongoClientInitializer:
         image: mongo:latest

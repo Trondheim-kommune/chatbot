@@ -1,4 +1,4 @@
 #!/bin/sh
 cron
-cd ..
+#cd ..
 ./chatbot/api/start_server.sh

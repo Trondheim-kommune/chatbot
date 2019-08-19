@@ -9,8 +9,8 @@ ENV PYTHONPATH "${PYTHONPATH}:/usr/src/app/chatbot/scraper"
 
 # Install dependencies
 RUN apt-get update
-RUN apt-get install libssl-dev musl-dev libffi-dev libxslt-dev libstdc++ -y
-RUN apt-get install gcc g++ bash libstdc++ -y cron
+RUN apt-get install libssl-dev musl-dev libffi-dev libxslt-dev libstdc++6 -y
+RUN apt-get install gcc g++ bash -y cron
 
 # Add requirements
 COPY ./requirements.txt .
