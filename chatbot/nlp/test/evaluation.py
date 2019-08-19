@@ -25,6 +25,7 @@ def evaluate_test(test):
             if correct_url in our_answer:
                 score_url = 1
         if score_url == 0:
+            print("\nOur answer was", our_answer)
             print("\nCorrect URL was", test["urls"])
         url_score += score_url
 
@@ -48,7 +49,7 @@ def evaluate_test(test):
 
 
 def main():
-    f = open("model/test/test_data/test_data_evaluation.json")
+    f = open("chatbot/nlp/test/test_data/test_data_evaluation.json")
     raw_file = f.read()
     f.close()
     tests = json.loads(raw_file)

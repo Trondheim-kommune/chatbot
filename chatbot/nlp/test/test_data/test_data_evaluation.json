@@ -1,385 +1,223 @@
 [
     {
         "question": [
-            "Hvem er ordføreren?",
-            "Hvem er ordfører i Trondheim?"
+            "Jeg trenger vaktmester"
         ],
         "answers": [
             {
                 "score": 1,
-                "text": "Rita Ottervik"
-            },
-            {
-                "score": 0.2,
-                "text": "Ola Lund Renolen"
+                "text": "Jeg fant ikke informasjonen du spurte etter."
             }
         ],
-        "urls": ["https://www.trondheim.kommune.no/tema/politikk-og-planer/Politikk/ordforer/"]
+        "urls": [""]
     },
     {
         "question": [
-            "når er neste møte i bystyret",
-            "Når har bystyret neste møte?"
+            "Jeg trenger utsettelse på faktura"
         ],
         "answers": [
             {
                 "score": 1,
-                "text": "Neste bystyremøte:"
-            },
-            {
-                "score": 0.5,
-                "text": "Bystyret har møte hver måned, normalt på torsdager kl 17.00 i bystyresalen på Rådhuset."
+                "text": "Det går ikke an å endre forfallsdato. Forfallsdato er bestemt av husleiekontrakten din."
             }
         ],
-        "urls": ["https://www.trondheim.kommune.no/tema/politikk-og-planer/Politikk/"]
+        "urls": ["https://www.trondheim.kommune.no/tema/sosiale-tjenester/bolig-med-tjenester/for-deg-som-bor-i-kommunal-utleiebolig/"]
     },
     {
         "question": [
-            "hvordan kommer jeg meg til marka?",
-            "Hvordan kommer jeg meg til Bymarka?"
+            "Jeg har vannlekkasje"
         ],
         "answers": [
             {
                 "score": 1,
-                "text": "I markaområdene i Trondheim finnes det mange parkeringsplasser som brøytes og strøs på vinterstid."
-            },
-            {
-                "score": 1,
-                "text": "Kart over holdeplasser og oversikt over rutetider finner du på"
-            },
-            {
-                "score": 1,
-                "text": "Markaområdene kan også nås til fots. Flere turstier i bolignære områder kan brukes som utgangspunkt for turer i marka"
-            },
-            {
-                "score": 1,
-                "text": "Hvordan komme seg ut i marka"
+                "text": "Ta kontakt med Boligadministrasjonen dersom det oppstår akutte situasjoner og problemer - for eksempel vannlekkasje."
             }
         ],
-        "urls": ["https://www.trondheim.kommune.no/tema/kultur-og-fritid/park-og-mark/skog-og-mark/"]
+        "urls": ["https://www.trondheim.kommune.no/tema/sosiale-tjenester/bolig-med-tjenester/for-deg-som-bor-i-kommunal-utleiebolig/"]
     },
     {
         "question": [
-            "Hvordan booker jeg treningstid for ishockey",
-            "treningstid i ishallen"
+			"Jeg trenger ny nøkkel",
+			"Jeg vil bestille ny nøkkel",
+			"Jeg vil bestille ny brikke",
+			"Hva koster ny nøkkel",
+			"Nøkkelen min virker ikke lengre",
+			"Brikken min har sluttet å virke",
+			"Hvor kan jeg bestille nøkler",
+			"Hva koster nye nøkler"
         ],
         "answers": [
             {
                 "score": 1,
-                "text": "Du kan leie ishallene på hverdager frem til klokken 15.00. For å bestille tid kan du sende e-post til avdeling for idrett, park og skog:"
+                "text": "Nøklene må du betale ved henting."
             },
             {
                 "score": 1,
-                "text": "Tiden etter 16.00 og i helgene fordeles av Sør-Trøndelag ishockeykrets. Det er derfor ikke mulig å bestille treningstid på disse tidspunktene."
+                "text": "Klikk her for å bestille ekstra eller ny nøkkel."
             },
             {
                 "score": 1,
-                "text": "Se timeplan for ishallen"
+                "text": "Hvis du ikke finner informasjonen du trenger er er du velkommen til å kontakte Boligadministrasjonen."
             }
         ],
-        "urls": ["https://www.trondheim.kommune.no/tema/kultur-og-fritid/lokaler/ishaller/"]
+        "urls": ["https://www.trondheim.kommune.no/tema/sosiale-tjenester/bolig-med-tjenester/for-deg-som-bor-i-kommunal-utleiebolig/"]
     },
     {
         "question": [
-            "er det mulig å få se årsrapporten fra 2012?",
-            "årsrapport 2012"
+			"jeg vil flytte",
+			"jeg vil si opp leiligheten"
         ],
         "answers": [
             {
                 "score": 1,
-                "text": "https://www.trondheim.kommune.no/globalassets/10-bilder-og-filer/11-politikk-og-planer/budsjettdokumenter/handlings-og-okonomiplan-budsjett-2012.pdf"
+                "text": "Hvis du ønsker å flytte før leiekontrakten utløper, må du sende oss en"
             },
             {
                 "score": 1,
-                "text": "Årsrapport 2012"
+                "text": "En oppsigelse fra et leieforhold skal være skriftlig."
             }
         ],
-        "urls": ["https://www.trondheim.kommune.no/tema/politikk-og-planer/budsjett-regnskap-og-rapporter/handlings-og-okonomiplan-budsjett/"]
+        "urls": ["https://www.trondheim.kommune.no/tema/sosiale-tjenester/bolig-med-tjenester/for-deg-som-bor-i-kommunal-utleiebolig/",
+				 "https://www.trondheim.kommune.no/tema/sosiale-tjenester/bolig-med-tjenester/veien-til-egen-bolig/"]
     },
     {
         "question": [
-            "Når er søknadsfrist for stipend idrett",
-            "søknadsfrist på stipend idrett"
+            "nabo bråker",
+			"jeg ønsker å klage"
         ],
         "answers": [
             {
                 "score": 1,
-                "text": "Frist for å søke idrettsstipend er 1. juli hvert år."
-            },
-            {
-                "score": 1,
-                "text": "Søknadsfristen er 1. juni."
-            }
+                "text": "Hvis din nabo bryter husordensreglene"
+			}
         ],
-        "urls": ["https://www.trondheim.kommune.no/tema/kultur-og-fritid/tilskudd-priser-og-stipend/tilskudd/idrett-og-friluftsliv/idrettsstipend/", "https://www.trondheim.kommune.no/tema/kultur-og-fritid/tilskudd-priser-og-stipend/tilskudd/idrett-og-friluftsliv/idrett---tilskudd-til-drift-og-anlegg/"]
+        "urls": ["https://www.trondheim.kommune.no/tema/sosiale-tjenester/bolig-med-tjenester/for-deg-som-bor-i-kommunal-utleiebolig/", 
+				 "https://www.trondheim.kommune.no/tema/sosiale-tjenester/bolig-med-tjenester/kommunal-bolig/"]
     },
     {
         "question": [
-            "Hvordan kan mitt idrettslag søke stipend?",
-            "søke penger idrett"
+            "doen virker ikke",
+			"toalettet er tett"
         ],
         "answers": [
             {
-                "score": 1,
-                "text": "Søknadsskjema for idrettsstipend"
-            },
+                "score": 1.0,
+                "text": "Er ikke annet avtalt, plikter leieren å vedlikeholde dørlåser, kraner, vannklosetter, elektriske kontakter og brytere, og inventar og utstyr i husrommet som ikke er en del av den faste eiendommen."
+			},
             {
-                "score": 1,
-                "text": "I selve søknaden må du, i tillegg til å oppgi personalia/kontaktinformasjon, beskrive dine idrettslige mål og hva du ser for deg å benytte stipendet til."
-            },
+                "score": 1.0,
+                "text": "Hjelp fra oss til åpning av tette sluk og avløp på dagtid: 1.000 kroner"
+			},
             {
-                "score": 1,
-                "text": "Stipendet er på kr. 50 000,- pr utøver."
-            },
+                "score": 1.0,
+                "text": "Hjelp til åpning av tette sluk og avløp på kveld/helg: Faktiske kostnader"
+			},
             {
-                "score": 1,
-                "text": "https://www.trondheim.kommune.no/tema/kultur-og-fritid/tilskudd-priser-og-stipend/tilskudd/idrett-og-friluftsliv/idrett-arrangementstilskudd/"
-            }
+                "score": 1.0,
+                "text": "Hvis rørlegger må tilkalles: Faktiske kostnader"
+			}
         ],
-        "urls": ["https://www.trondheim.kommune.no/tema/kultur-og-fritid/tilskudd-priser-og-stipend/tilskudd/idrett-og-friluftsliv/idrettsstipend/", "https://www.trondheim.kommune.no/tema/kultur-og-fritid/tilskudd-priser-og-stipend/tilskudd/"]
+        "urls": ["https://www.trondheim.kommune.no/tema/sosiale-tjenester/bolig-med-tjenester/for-deg-som-bor-i-kommunal-utleiebolig/"]
     },
     {
         "question": [
-            "Hvordan leie en idrettshall?",
-            "Hvordan leie en hall?"
+            "jeg må ha rørlegger"
         ],
         "answers": [
             {
-                "score": 1,
-                "text": "Frivillige organisasjoner, idrettsklubber, kulturaktører, grupper og privatpersoner kan søke om å låne eller leie kommunale lokaler når kommunen ikke har behov for å disponere lokalene selv."
-            },
-            {
-                "score": 1,
-                "text": "Idrettshaller: Informasjon om hvordan du kan søke om treningstid og arrangement i idrettshaller, samt hvordan du kan reservere strøtimer i idrettshaller finner du på siden om idrettshaller."
-            },
-            {
-                "score": 1,
-                "text": "https://booking.trondheim.kommune.no/search"
-            },
-            {
-                "score": 0.8,
-                "text": "https://www.trondheim.kommune.no/tema/kultur-og-fritid/lokaler/idrettshaller/"
-            },
-            {
-                "score": 0.5,
-                "text": "Du kan søke om fast lån av kommunale lokaler på vegne av en organisasjon/aktør. Søknadsfrist er 1. april 2019. Søknaden gjelder for påfølgende skoleår, perioden 2. september til 21. juni."
-            },
-            {
-                "score": 0.5,
-                "text": "Utlån av lokaler og gymsaler"
-            }
+                "score": 1.0,
+                "text": "Hvis rørlegger må tilkalles: Faktiske kostnader"
+			}
         ],
-        "urls": ["https://www.trondheim.kommune.no/tema/kultur-og-fritid/lokaler1/lokaler/"]
-    },
+        "urls": ["https://www.trondheim.kommune.no/tema/sosiale-tjenester/bolig-med-tjenester/for-deg-som-bor-i-kommunal-utleiebolig/"]
+	},
     {
         "question": [
-            "skjenkebevilling i idrettsanlegg",
-            "Skjenkebevilling leie av gymsal"
+            "Jeg må ha elektriker",
+			"Lyset virker ikke"
         ],
         "answers": [
             {
-                "score": 1,
-                "text": "Det er som hovedregel ikke tillatt å nyte alkohol på enhetens inne- og uteområder."
-            },
-            {
-                "score": 1,
-                "text": "Dersom låntaker ønsker at det skal drikkes alkohol i kommunale lokaler i forbindelse med et arrangement skal låntaker søke om skjenkebevilling for enkeltanledning / ambulerende på eget skjema."
-            },
-            {
-                "score": 1,
-                "text": "Søke om skjenkebevilling"
-            }
+                "score": 1.0,
+                "text": "Er ikke annet avtalt, plikter leieren å vedlikeholde dørlåser, kraner, vannklosetter, elektriske kontakter og brytere, og inventar og utstyr i husrommet som ikke er en del av den faste eiendommen."
+			}
         ],
-        "urls": ["https://www.trondheim.kommune.no/tema/kultur-og-fritid/lokaler1/lokaler/"]
-    },
+        "urls": ["https://www.trondheim.kommune.no/tema/sosiale-tjenester/bolig-med-tjenester/for-deg-som-bor-i-kommunal-utleiebolig/"]
+	},
     {
         "question": [
-            "hva koster det å parkere på granåsen?",
-            "Hva er pris og åpningstider for parkering i Granåsen?"
+            "Det er så skittent ute i gangene",
+			"Det er ingen som vasker trappene"
         ],
         "answers": [
             {
-                "score": 1,
-                "text": "Avgiften er kr 50 per bil per dag, og innkreves av idrettslag"
-            },
+                "score": 1.0,
+                "text": "Leietaker har ansvaret for renhold av sitt leieareal inkl. eventuell andel av fellesareal."
+			},
             {
-                "score": 1,
-                "text": "parkeringsavgift i Granåsen."
-            },
-            {
-                "score": 1,
-                "text": "De fleste idrettslagene tilbyr Vipps eller betaling med bankkort"
-            }
+                "score": 1.0,
+                "text": "For at vi skal kunne behandle klager på bomiljø på en god måte vil vi at du sender en skriftlig klage."
+			}
         ],
-        "urls": ["https://www.trondheim.kommune.no/tema/kultur-og-fritid/lokaler/granasen/"]
-    },
+        "urls": ["https://www.trondheim.kommune.no/tema/sosiale-tjenester/bolig-med-tjenester/for-deg-som-bor-i-kommunal-utleiebolig/"]
+	},
     {
         "question": [
-            "kan jeg leie granåsen?",
-            "skidag granåsen leie"
+			"Det er ingen som har klippet plena her",
+			"når kommer de å klippe plena",
+			"når kommer de å måke snø",
+			"når kommer de for å strø, det er så glatt"
         ],
         "answers": [
             {
-                "score": 1,
-                "text": "Ønsker du å leie Granåsen skianlegg eller gjennomføre et arrangement i Trondheim kommunes markaområder"
-            },
-            {
-                "score": 1,
-                "text": "https://trondheimkommune.service-now.com/csm?id=sc_cat_item_map&sys_id=c7b1683adb34a2c0524836fffe96194c"
-            },
-            {
-                "score": 1,
-                "text": "booking@trondheim.kommune.no"
-            },
-            {
-                "score": 1,
-                "text": "Hoppbakkene kan kun benyttes av lag- og foreninger som har reservert tid"
-            },
-            {
-                "score": 1,
-                "text": "Spør gjerne om skidag i anlegget"
-            }
+                "score": 1.0,
+                "text": "Hvis ikke annet er bestemt av utleier har leietaker ansvaret for snømåking, plenklipping og lignende arbeid som for eksempel å holde tomtearealet ryddig."
+			}
         ],
-        "urls": ["https://www.trondheim.kommune.no/tema/kultur-og-fritid/park-og-mark/skog-og-mark/", "https://www.trondheim.kommune.no/tema/kultur-og-fritid/lokaler/granasen/"]
-    },
+        "urls": ["https://www.trondheim.kommune.no/tema/sosiale-tjenester/bolig-med-tjenester/for-deg-som-bor-i-kommunal-utleiebolig/"]
+	},
     {
         "question": [
-            "Hvilke kommunale tilbud er det for barn?",
-            "kulturtilbud for barn i kommunen"
+			"strømregningen min er så stor",
+			"jeg har ikke fått strømregning"
         ],
         "answers": [
             {
-                "score": 1,
-                "text": "Kulturtilbud for barn"
-            },
+                "score": 1.0,
+                "text": "Hvis du ikke kan betale utgifter som husleie og strøm ved hjelp av arbeidsinntekt eller andre rettigheter, kan du søke om økonomisk stønad."
+			},
             {
-                "score": 1,
-                "text": "Kulturtilbud og fritidsklubber for ungdom"
-            }
+                "score": 1.0,
+                "text": "Det varierer hva som er inkludert i husleien. Det kan for eksempel være strøm, oppvarming, tv og internett. Hva som er inkludert står i husleiekontrakten din."
+			}
         ],
-        "urls": ["https://www.trondheim.kommune.no/tema/kultur-og-fritid/aktivitetstilbudkulturtilbud/kulturtilbudforbarn/", "https://www.trondheim.kommune.no/tema/kultur-og-fritid/aktivitetstilbudkulturtilbud/fritidsklubber/"]
-    },
+        "urls": ["https://www.trondheim.kommune.no/tema/sosiale-tjenester/bolig-med-tjenester/kommunal-bolig/",
+			     "https://www.trondheim.kommune.no/tema/sosiale-tjenester/bolig-med-tjenester/for-deg-som-bor-i-kommunal-utleiebolig/"]
+	},
     {
         "question": [
-            "ferietilbud barn",
-            "hvilke barneaktiveter er åpent i ferien?"
+			"hva er husordensregler"
         ],
         "answers": [
             {
-                "score": 1,
-                "text": "Ferieaktiviteter"
-            }
+                "score": 1.0,
+                "text": "Når du bor hos oss har du ansvar for å overholde husordensregler. "
+			}
         ],
-        "urls": ["https://www.trondheim.kommune.no/tema/kultur-og-fritid/aktivitetstilbudkulturtilbud/ferieaktiviteter/"]
-    },
+        "urls": ["https://www.trondheim.kommune.no/tema/sosiale-tjenester/bolig-med-tjenester/for-deg-som-bor-i-kommunal-utleiebolig/"]
+			
+	},
     {
         "question": [
-            "Når åpner husebybadet på fredag?",
-            "Åpningstider husebybadet"
+			"jeg vil snakke med helse og velferd"
         ],
         "answers": [
             {
-                "score": 1,
-                "text": "fredag: 15.00–20.00"
-            },
-            {
-                "score": 0.5,
-                "text": "Alle hverdager: 06.30-08.30"
-            },
-            {
-                "score": 0.5,
-                "text": "Alle hverdager: 14.00-15.00"
-            },
-            {
-                "score": 0.2,
-                "text": "Tirsdag, torsdag: 14.00–15.00"
-            }
+                "score": 1.0,
+                "text": "Helse- velferdskontor"
+			}
         ],
-        "urls": ["https://www.trondheim.kommune.no/tema/kultur-og-fritid/lokaler/husebybadet/"]
-    },
-    {
-        "question": [
-            "hvem kan være deltakere ukm",
-            "Aldersgrense ukm"
-        ],
-        "answers": [
-            {
-                "score": 1,
-                "text": "UKM er for alle ungdommer mellom 13 og 20 år. Både grupper og enkeltpersoner kan delta, og det er gratis å være med."
-            }
-        ],
-        "urls": ["https://www.trondheim.kommune.no/tema/kultur-og-fritid/aktivitetstilbudkulturtilbud/ukm/"]
-    },
-    {
-        "question": [
-            "hvor melder jeg meg på til ukm",
-            "påmelding UKM"
-        ],
-        "answers": [
-            {
-                "score": 1,
-                "text": "ukm.no"
-            }
-        ],
-        "urls": ["https://www.trondheim.kommune.no/tema/kultur-og-fritid/aktivitetstilbudkulturtilbud/ukm/"]
-    },
-    {
-        "question": [
-            "Prisen for å leie en svømmehall?",
-            "hva koster det å leie husebybadet?"
-        ],
-        "answers": [
-            {
-                "score": 1,
-                "text": "Pris for leie er kr 1605,- per time."
-            },
-            {
-                "score": 0.5,
-                "text": "Du kan leie Husebybadet til bursdager og andre arrangementer, på lørdager og søndager mellom 16.00 og 20.00."
-            }
-        ],
-        "urls": ["https://www.trondheim.kommune.no/tema/kultur-og-fritid/lokaler/husebybadet/"]
-    },
-    {
-        "question": [
-            "hvordan søke læreplass",
-            "har kommunen læreplasser?"
-        ],
-        "answers": [
-            {
-                "score": 1,
-                "text": "fagopplaring.postmottak@trondheim.kommune.no"
-            },
-            {
-                "score": 1,
-                "text": "Søk læreplass"
-            },
-            {
-                "score": 1,
-                "text": "Vi har læreplasser ved ulike enheter i kommunen."
-            }
-        ],
-        "urls": ["https://www.trondheim.kommune.no/tema/skole/trondheimsskolen/larlinger/"]
-    },
-    {
-        "question": [
-            "nomiasjon kulturprisen",
-            "Hvordan nominere til kulturprisen"
-        ],
-        "answers": [
-            {
-                "score": 1,
-                "text": "Forslag sendes pr epost til kultur.postmottak@trondheim.kommune.no. Skriv \"Kulturpris 2018\" i emne-felt."
-            },
-            {
-                "score": 1,
-                "text": "Trondheim kommune\nv/kommunaldirektør for kultur og næring\nPostboks 2300 Torgard\n7004 Trondheim"
-            },
-            {
-                "score": 1,
-                "text": "Frist for å sende inn forslag på kandidater til Trondheim kommunes kulturpris for 2018 er 15. oktober 2018."
-            }
-        ],
-        "urls": ["https://www.trondheim.kommune.no/tema/kultur-og-fritid/tilskudd-priser-og-stipend/kulturprisen/"]
-    }
+        "urls": ["https://www.trondheim.kommune.no/tema/sosiale-tjenester/bolig-med-tjenester/for-deg-som-bor-i-kommunal-utleiebolig/"]
+			
+	}
 ]

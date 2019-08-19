@@ -1,5 +1,5 @@
 [
-	[["kontaktinformasjon", "NOUN"], ["kontaktinfo", "NOUN"], ["tlf", "NOUN"], ["telefon", "NOUN"], ["telefonnummer", "NOUN"], ["telefonnr", "NOUN"], ["tlfnr", "NOUN"], ["epost", "NOUN"], ["e-post", "NOUN"], ["email", "NOUN"], ["e-mail", "NOUN"], ["adresse", "NOUN"], ["kontakt", "NOUN"]],
+	[["kontaktinformasjon", "NOUN"], ["kontaktinfo", "NOUN"], ["tlf", "NOUN"], ["telefon", "NOUN"], ["telefonnummer", "NOUN"], ["telefonnr", "NOUN"], ["tlfnr", "NOUN"], ["epost", "NOUN"], ["e-post", "NOUN"], ["email", "NOUN"], ["e-mail", "NOUN"], ["adresse", "NOUN"], ["kontakt", "NOUN"], ["snakke", "VERB"]],
 	[["åpner", "VERB"], ["åpning", "NOUN"], ["åpningstid", "NOUN"], ["åpningstider", "NOUN"], ["stenger", "VERB"], ["stengetid", "NOUN"]],
 	[["stipend", "NOUN"], ["tilskudd", "NOUN"], ["penger", "NOUN"]],
 	[["parkere", "VERB"], ["parkering", "VERB"]],
@@ -10,6 +10,18 @@
 	[["dyr", "NOUN"], ["dyrehold", "NOUN"], ["katt", "NOUN"], ["katte", "NOUN"], ["hund", "NOUN"], ["kjæledyr", "NOUN"]],
 	[["pris", "NOUN"], ["leie", "NOUN"], ["betale", "VERB"], ["faktura", "NOUN"], ["giro", "NOUN"]],
 	[["kontonr", "NOUN"], ["kontonummer", "NOUN"], ["konto nr", "NOUN"], ["konto", "NOUN"]],
-	[["forfall", "NOUN"], ["forfallsdato", "NOUN"], ["folfalt", "VERB"], ["skylder", "VERB"], ["rekker ikke", "VERB"]],
-	[["inkasso", "NOUN"], ["inkassovarsel", "NOUN"], ["purre", "VERB"], ["purregebyr", "NOUN"], ["inkassoomkostninger", "NOUN"], ["gebyr", "NOUN"]]
+	[["forfall", "NOUN"], ["forfallsdato", "NOUN"], ["folfalt", "VERB"], ["skylder", "VERB"], ["rekker ikke", "VERB"], ["utsette", "VERB"], ["utsettelse", "VERB"], ["skyld", "VERB"]],
+	[["inkasso", "NOUN"], ["inkassovarsel", "NOUN"], ["purre", "VERB"], ["purregebyr", "NOUN"], ["inkassoomkostninger", "NOUN"], ["gebyr", "NOUN"]],
+	[["lekkasje", "NOUN"], ["vannlekkasje", "NOUN"], ["akutt", "NOUN"], ["skade", "NOUN"]],
+	[["nøkkel", "NOUN"], ["nøkler", "NOUN"], ["lås", "NOUN"], ["brikke", "NOUN"]],
+	[["flytte", "VERB"], ["oppsigelse", "NOUN"], ["si opp", "VERB"], ["sagt opp", "VERB"], ["kastes", "VERB"]],
+	[["do", "NOUN"], ["doen", "NOUN"], ["toalett", "NOUN"], ["vannklosetter", "NOUN"], ["sluk", "NOUN"]],
+	[["vask", "NOUN"], ["kran", "NOUN"], ["sluk", "NOUN"], ["rørlegger", "NOUN"]],
+	[["elektriker", "NOUN"], ["lys", "NOUN"], ["lyset", "NOUN"], ["brytere", "NOUN"], ["elektriske", "NOUN"], ["kontakter", "NOUN"]],
+	[["vaske", "VERB"], ["skittent", "NOUN"], ["renhold", "NOUN"], ["fellesareal", "NOUN"]],
+	[["plena", "NOUN"], ["plen", "NOUN"], ["klippe", "VERB"], ["plenklipping", "VERB"]],
+	[["snø", "NOUN"], ["måke", "NOUN"], ["snømåking", "VERB"]],
+	[["strøm", "NOUN"], ["strømregning", "NOUN"], ["oppvarming", "NOUN"]],
+	[["husordensregler", "NOUN"], ["regler", "NOUN"]],
+	[["velferd", "NOUN"], ["velferskontor", "NOUN"]]
 ]

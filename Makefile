@@ -33,3 +33,14 @@ make open-bash-chatbot:
 make open-bash-web:
 	docker exec -it web bash
 
+make evaluate:
+	python chatbot/nlp/test/evaluation.py
+
+make run-dev:
+	python chatbot/prototype.py
+
+make run-api-erver:
+	./chatbot/api/start_server.py
+
+make run-website:
+	cd chatbot/web && npm start
