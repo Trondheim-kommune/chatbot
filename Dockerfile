@@ -5,12 +5,12 @@ WORKDIR /usr/src/app
 
 # Docker pythonpath having trouble resolving some packages, easy fix
 ENV PYTHONPATH "${PYTHONPATH}:/usr/src/app"
-ENV PYTHONPATH "${PYTHONPATH}:/usr/src/app/scraper"
+ENV PYTHONPATH "${PYTHONPATH}:/usr/src/app/chatbot/scraper"
 
 # Install dependencies
 RUN apt-get update
-RUN apt-get install libssl-dev musl-dev libffi-dev libxslt-dev libstdc++ -y
-RUN apt-get install gcc g++ bash libstdc++ -y cron
+RUN apt-get install libssl-dev musl-dev libffi-dev libxslt-dev libstdc++6 -y
+RUN apt-get install gcc g++ bash -y cron
 
 # Add requirements
 COPY ./requirements.txt .
@@ -22,7 +22,7 @@ RUN python3 -m pip install -r requirements.txt --no-cache-dir
 COPY . .
 
 # Add crontab file in the cron directory
-ADD deployment_scripts/crontab /etc/cron.d/crontab
+ADD scripts/crontab /etc/cron.d/crontab
 
 # Give execution rights on the cron job
 RUN chmod 0644 /etc/cron.d/crontab
@@ -40,4 +40,4 @@ RUN ["pip", "install", "."]
 RUN ["python3", "setup.py", "develop"]
 
 # Start server
-CMD ["./start_server_docker.sh"]
+CMD ["./scripts/start_server_docker.sh"]

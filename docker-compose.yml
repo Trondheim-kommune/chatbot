@@ -1,8 +1,8 @@
 version: '3'
 services:
-    agent25:
+    chatbot:
         build: .
-        container_name: "agent25"
+        container_name: "chatbot"
         environment:
             - PROJECT_ID=${PROJECT_ID}
             - GOOGLE_APPLICATION_CREDENTIALS=/usr/src/app/backupagent.json
@@ -28,30 +28,30 @@ services:
           - mongodb:/data/db
         ports:
             - 27017:27017
-        command: mongod --smallfiles --logpath=/dev/null # --quiet
+        command: mongod --logpath=/dev/null
 
     mongoClientInitializer:
         image: mongo:latest
         container_name: mongoClientInitializer
         volumes:
-            - ./deployment_scripts:/deployment_scripts
+            - ./scripts:/scripts
         command: 
-            - /deployment_scripts/entrypoint_db.sh
+            - /scripts/entrypoint_db.sh
         environment:
           - DB_USER=${DB_USER}
           - DB_PWD=${DB_PWD}
-          - DB_NAME=test_db
+          - DB_NAME=prod_chatbot
         links:
             - mongodb:mongodb
         depends_on:
             - mongodb
 
     web:
-        build: website
+        build: chatbot/web
         ports:
             - 8000:80
         volumes:
-            - .:/srv/agent25-web
+            - .:/srv/chatbot-web
         working_dir: /usr/src/app
 
 volumes:

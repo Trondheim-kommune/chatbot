@@ -1,0 +1,102 @@
+{
+    "mongo": {
+        "username": "agent25dev",
+        "password": "agent25dev",
+        "url": "127.0.0.1",
+        "port": 27017,
+        "prod_db": "prod_chatbot",
+        "dev_db": "dev_chatbot",
+		"collections": {
+			"manual": "manual",
+			"temp_scraped": "temp_scraped",
+			"prod": "prod",
+			"conflicts": "conflicts",
+			"unknown": "unknown"
+		}
+    },
+    "model": {
+        "accepted_tags": [
+            "p",
+            "a",
+            "li",
+            "strong"
+        ]
+    },
+    "scraper": {
+        "debug": true,
+        "alternative_headers": ["strong"],
+        "concatenation": {
+            "li": 300,
+            "p": 7
+        },
+        "url": {
+            "root_url": "https://www.trondheim.kommune.no/tema/sosiale-tjenester",
+            "allowed_paths": [
+                "https://www.trondheim.kommune.no/tema/sosiale-tjenester/bolig-med-tjenester/"
+            ]
+        },
+        "blacklist": {
+            "elements": [
+                ".footer",
+                ".header",
+                "body > .container",
+                ".skip-link",
+                ".navigation",
+                ".nav",
+                "#ssp_fantdu"
+            ],
+            "scrape": [
+                "https://www.trondheim.kommune.no/?$"
+            ],
+            "visit": [
+            ],
+            "texts": [
+                "Sist oppdatert:",
+                "Se kart",
+                "_______________"
+            ],
+            "garbage_start_urls": [
+                "#",
+                "~"
+            ],
+            "resources": [],
+            "not_found_text": "Finner ikke siden",
+            "ignored_child_tags_for_parents": {
+                "strong": [
+                    "p",
+                    "li",
+                    "tr",
+                    "h1",
+                    "h2",
+                    "h3",
+                    "h4",
+                    "h5"
+                ],
+                "p": [
+                    "li"
+                ]
+            }
+        },
+        "hierarchy": {
+            "h1": 1,
+            "h2": 2,
+            "h3": 3,
+            "h4": 4,
+            "h5": 5,
+            "h6": 6,
+            "strong": 10,
+            "p": 11,
+            "a": 15,
+            "tr": 8,
+            "li": 9
+        }
+    },
+    "query_system": {
+        "not_found": "Jeg fant ikke informasjonen du spurte etter.",
+        "multiple_answers": "Jeg har flere mulige svar til deg.",
+        "url_from_text": "Hentet fra: ",
+        "custom_synset_file": "chatbot/nlp/statics/synset.json",
+        "character_limit": 250,
+        "max_answers": 4
+    }
+}

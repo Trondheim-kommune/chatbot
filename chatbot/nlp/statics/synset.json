@@ -1,0 +1,15 @@
+[
+	[["kontaktinformasjon", "NOUN"], ["kontaktinfo", "NOUN"], ["tlf", "NOUN"], ["telefon", "NOUN"], ["telefonnummer", "NOUN"], ["telefonnr", "NOUN"], ["tlfnr", "NOUN"], ["epost", "NOUN"], ["e-post", "NOUN"], ["email", "NOUN"], ["e-mail", "NOUN"], ["adresse", "NOUN"], ["kontakt", "NOUN"]],
+	[["åpner", "VERB"], ["åpning", "NOUN"], ["åpningstid", "NOUN"], ["åpningstider", "NOUN"], ["stenger", "VERB"], ["stengetid", "NOUN"]],
+	[["stipend", "NOUN"], ["tilskudd", "NOUN"], ["penger", "NOUN"]],
+	[["parkere", "VERB"], ["parkering", "VERB"]],
+	[["søke", "VERB"], ["søknad", "VERB"], ["søknadsskjema", "NOUN"], ["søknaden", "NOUN"]],
+	[["lån", "NOUN"], ["tilskudd", "NOUN"], ["boliglån", "NOUN"], ["startlån", "NOUN"], ["boligtilskudd", "NOUN"], ["låne", "VERB"]],
+	[["bolig", "NOUN"], ["omsorgsbolig", "NOUN"], ["utleiebolig", "NOUN"]],
+	[["ungbo", "NOUN"], ["ungdomsboliger", "NOUN"], ["ungdomsbolig", "NOUN"]],
+	[["dyr", "NOUN"], ["dyrehold", "NOUN"], ["katt", "NOUN"], ["katte", "NOUN"], ["hund", "NOUN"], ["kjæledyr", "NOUN"]],
+	[["pris", "NOUN"], ["leie", "NOUN"], ["betale", "VERB"], ["faktura", "NOUN"], ["giro", "NOUN"]],
+	[["kontonr", "NOUN"], ["kontonummer", "NOUN"], ["konto nr", "NOUN"], ["konto", "NOUN"]],
+	[["forfall", "NOUN"], ["forfallsdato", "NOUN"], ["folfalt", "VERB"], ["skylder", "VERB"], ["rekker ikke", "VERB"]],
+	[["inkasso", "NOUN"], ["inkassovarsel", "NOUN"], ["purre", "VERB"], ["purregebyr", "NOUN"], ["inkassoomkostninger", "NOUN"], ["gebyr", "NOUN"]]
+]
