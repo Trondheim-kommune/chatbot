@@ -110,7 +110,7 @@ Node dependencies:
 ```
 cd chatbot/web
 npm install
-npm build
+npm run-script build
 rm /usr/share/nginx/html/ -r
 cp build /usr/share/nginx/html/ -r
 ```
@@ -122,18 +122,29 @@ Install the latest version of MongoDB, creating a user matching the user in
 ```
 ./chatbot/api/start_server.sh
 ```
+or
+```
+make run-api-server
+```
 
 #### Start the web application
 ```
 cd chatbot/web
 npm run
 ```
+or 
+```
+make run-website
+```
 
 #### Prototype chat view
 ```
 python chatbot/prototype.py
 ```
-
+or
+```
+make run-dev
+```
 
 ## Settings file
 There is a settings file called `chatbot/settings.json`, in this file there are
@@ -166,6 +177,6 @@ multiple things you could change. Every change needed to make this project work 
 
 
 ## LICENSE
-Chatbot Copyright GPLv3 (C) 2019  Vegar Andreas Bergum, Tinus Flagstad, Thomas Skaaheim, Torjus Iveland, Anders Hopland
+Chatbot Copyright GPLv3 (C) 2019  Vegar Andreas Bergum, Tinus Flagstad, Thomas Skaaheim, Torjus Iveland, Anders Hopland, Martin Gjerde.
 
 Spellchecker content CC-by-sa-3.0 license
