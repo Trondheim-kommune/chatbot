@@ -20,6 +20,9 @@ Agent25-google.json
 .envrc
 venv/
 
+# nlp corpora
+*no_50k.txt
+
 # Docker volumes
 data/
 
