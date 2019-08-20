@@ -2,6 +2,7 @@ import json
 import os
 
 from flask import jsonify, request, Blueprint
+from flask_cors import CORS
 
 import dialogflow_v2beta1
 
@@ -22,6 +23,14 @@ entities = {}
 entities_loaded = False
 
 dialog_api = Blueprint('DialogFlow_API', __name__, template_folder='templates')
+CORS(dialog_api)
+
+
+@dialog_api.after_request
+def after_request(response):
+    header = response.headers
+    header['Access-Control-Allow-Origin'] = '*'
+    return response
 
 
 # Register handle for flask_exceptions error messages.

@@ -1,0 +1,95 @@
+@import url('https://fonts.googleapis.com/css?family=Playfair+Display');
+@import url('https://fonts.googleapis.com/css?family=Overpass');
+
+body {
+  margin: 0;
+  font-family: Overpass, Arial;
+  font-size: 22px;
+  font-weight: lighter;
+}
+
+h1 {
+  margin: 20px auto;
+}
+
+#user-input-field {
+  width: 90%;
+  margin: 0px auto;
+}
+
+#user-input {
+  width: 80%;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+#page-container {
+  display: flex;
+  flex-direction: column;
+}
+
+#chat-window {
+  position: relative;
+
+  display: inline-block;
+  align-items: flex-start;
+  align-content: flex-start;
+  flex-direction: column;
+
+  margin: 20px auto;
+  width: 80%;
+  height: 900px;
+  max-height: 900px;
+  overflow: auto;
+  border-style: solid;
+  border-width: 3px;
+}
+
+.msg {
+  height: auto;
+  width: 100%;
+  max-height: 450px;
+  margin-bottom: 10px;
+}
+
+.user {
+  margin-left: auto;
+  margin-right: 0;
+}
+
+.user p {
+  float: right;
+  border-radius: 10px;
+  background: #1F90FF;
+  margin-left: 100px;
+  margin-right: 10px;
+}
+
+.bot {
+  margin-left: 0;
+  margin-right: auto;
+  float: left;
+}
+
+.bot p {
+  float: left;
+  border-radius: 10px;
+  background: #DCDCDC;
+  margin-left: 10px;
+  margin-right: 100px;
+}
+
+p {
+  width: auto;
+  padding: 10px;
+  display: inline-block;
+  margin-bottom: 0;
+
+}
+
+#input-form {
+  font-size: 22px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
