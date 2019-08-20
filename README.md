@@ -166,7 +166,6 @@ multiple things you could change. Every change needed to make this project work 
 
 
 ## LICENSE
-Chatbot  Copyright (C) 2019  Vegar Andreas Bergum, Tinus Flagstad, Thomas Skaaheim, Torjus Iveland, Anders Hopland
+Chatbot Copyright GPLv3 (C) 2019  Vegar Andreas Bergum, Tinus Flagstad, Thomas Skaaheim, Torjus Iveland, Anders Hopland
 
-This program comes with ABSOLUTELY NO WARRANTY; 
-This is free software, and you are welcome to redistribute it under certain conditions; 
+Spellchecker content CC-by-sa-3.0 license

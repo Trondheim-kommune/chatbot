@@ -5,6 +5,8 @@ import pymongo
 
 from sklearn.metrics.pairwise import cosine_similarity
 
+from spellchecker import SpellChecker
+
 from nltk.corpus import wordnet as wn
 
 from chatbot.model.model_factory import ModelFactory
@@ -61,12 +63,30 @@ def expand_query(query):
     ''' Attempts to expand the given query by using synonyms from WordNet. As
     a consequnece of this process, the query is also tokenized and lemmatized.
     '''
+    spell = SpellChecker(local_dictionary='chatbot/nlp/statics/no_50k.json')
 
+    # Tokenize, tag and filter query using Spacy
+    tokens = [
+        # Store both token text and POS tag
+        (token.text, token.pos_) for token in nb(query)
+        # Filter away punctuation.
+        if token.text not in string.punctuation
+    ]
+
+    # Add possible spelling corrections, without duplicates
+    # We also want to keep the original token, since the detected misspelling
+    # migt be intentional - power to the user!
+    tokens += [
+        (spell.correction(token[0]), token[1]) for token in tokens
+        if not spell.correction(token[0]) in [
+            token[0] for token in tokens
+        ]
+    ]
+
+    # Lemmatize tokens
     tokens = [
       # Store tuples of lemmatized tokens and their corresponding POS tags.
-      (lemmatize(token.text, token.pos_)[0], token.pos_) for token in nb(query)
-      # Filter away punctuation.
-      if token.text not in string.punctuation
+      (lemmatize(token[0], token[1])[0], token[0]) for token in tokens
     ]
 
     # Filter away stopwords as we do not want to expand them.
