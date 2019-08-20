@@ -195,6 +195,11 @@ def _perform_search(query_text):
             n_chars += len(answers[i])
             i += 1
 
+        # If we only have 1 answer after threshold we don't want to add the
+        # MULTI_ANSWERS option to the response
+        if max(i, 1) == 1:
+            return answers[0]
+
         # Join the results with a separator. Still setting a max number of
         # answers
         return '\n\n---\n\n'.join([MULTIPLE_ANSWERS] + answers[0:min(max(i, 1),
