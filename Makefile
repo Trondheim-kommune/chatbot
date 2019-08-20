@@ -39,8 +39,8 @@ make evaluate:
 make run-dev:
 	python chatbot/prototype.py
 
-make run-api-erver:
-	./chatbot/api/start_server.py
+make run-api-server:
+	bash chatbot/api/start_server.sh
 
 make run-website:
 	cd chatbot/web && npm start
