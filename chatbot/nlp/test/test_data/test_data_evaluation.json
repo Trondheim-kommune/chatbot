@@ -165,8 +165,7 @@
         "question": [
 			"Det er ingen som har klippet plena her",
 			"når kommer de å klippe plena",
-			"når kommer de å måke snø",
-			"når kommer de for å strø, det er så glatt"
+			"når kommer de å måke snø"
         ],
         "answers": [
             {
@@ -219,5 +218,17 @@
         ],
         "urls": ["https://www.trondheim.kommune.no/tema/sosiale-tjenester/bolig-med-tjenester/for-deg-som-bor-i-kommunal-utleiebolig/"]
 			
+	},
+    {
+        "question": [
+			"komfyr virker ikke"
+        ],
+        "answers": [
+            {
+                "score": 1.0,
+                "text": "Komfyren virker ikke:"
+			}
+        ],
+        "urls": ["https://www.trondheim.kommune.no/tema/sosiale-tjenester/bolig-med-tjenester/for-deg-som-bor-i-kommunal-utleiebolig/"]
 	}
 ]

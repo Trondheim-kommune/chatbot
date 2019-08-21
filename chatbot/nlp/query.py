@@ -171,7 +171,7 @@ def _perform_search(query_text):
 
         # This could be calculated using the mean of all scores and the
         # standard deviation.
-        if sorted_scores[0] < 0.1:
+        if sorted_scores[0] < 0.05:
             return _handle_not_found(query_text)
 
         # Allow returning multiple answers if they rank very similarly.
