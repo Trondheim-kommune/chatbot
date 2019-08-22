@@ -22,3 +22,9 @@ class Conflict(object):
     def __init__(self, conflict_id, title):
         self.conflict_id = conflict_id
         self.title = title
+
+
+class Document(object):
+    def __init__(self, id, title):
+        self.id = id
+        self.title = title
