@@ -9,8 +9,8 @@ import dialogflow_v2beta1
 import google.api_core.exceptions as google_exceptions
 
 from chatbot.nlp.query import QueryHandler
-from chatbot.api.exceptions import InvalidDialogFlowID
-import chatbot.api.util as util
+from chatbot.api.v1.exceptions import InvalidDialogFlowID
+import chatbot.api.v1.util as util
 
 
 PROJECT_ID = os.getenv("PROJECT_ID")
@@ -22,7 +22,10 @@ entities = {}
 
 entities_loaded = False
 
-dialog_api = Blueprint('DialogFlow_API', __name__, template_folder='templates')
+dialog_api = Blueprint('DialogFlow APIv1',
+                       __name__,
+                       url_prefix='/v1/dialogflow',
+                       template_folder='templates')
 CORS(dialog_api)
 
 
@@ -41,7 +44,7 @@ def handle_invalid_usage(error):
     return response
 
 
-@dialog_api.route("/v1/dialogflow/response", methods=["POST"])
+@dialog_api.route("/response", methods=["POST"])
 def get_response():
     """ Returns the response to a given query. Capable of passing on raw query
     text, display name, query parameters, entities and intents from DialogFlow
@@ -103,7 +106,7 @@ def create_intent_object(intent_name, training_phrases, match_entity=True):
     return intent
 
 
-@dialog_api.route("/v1/dialogflow/intent", methods=["PUT"])
+@dialog_api.route("/intent", methods=["PUT"])
 def create_intent_post():
     json_input_data = json.loads(request.data)
     try:
@@ -158,7 +161,7 @@ def get_entities():
     entities_loaded = True
 
 
-@dialog_api.route("/v1/dialogflow/intents", methods=["PUT"])
+@dialog_api.route("/intents", methods=["PUT"])
 def batch_create_intents_post():
     json_input_data = json.loads(request.data)
     intents = json_input_data["data"]
@@ -205,7 +208,7 @@ def get_all_intents():
     return client.list_intents(parent)
 
 
-@dialog_api.route("/v1/dialogflow/entities", methods=["PUT"])
+@dialog_api.route("/entities", methods=["PUT"])
 def batch_create_entities_post():
     json_input_data = json.loads(request.data)
     entity_types = json_input_data["data"]
@@ -242,7 +245,7 @@ def batch_create_entities(entity_types):
     return ID_list
 
 
-@dialog_api.route("/v1/dialogflow/entities", methods=["DELETE"])
+@dialog_api.route("/entities", methods=["DELETE"])
 def batch_delete_entities_post():
     json_input_data = json.loads(request.data)
     entity_ids = json_input_data["data"]

@@ -5,7 +5,7 @@ import time
 from chatbot.nlp.query import _handle_not_found
 from chatbot.model.model_factory import ModelFactory
 from chatbot.api import server
-from chatbot.api import dialogflow
+from chatbot.api.v1 import dialogflow
 from chatbot.util.config_util import Config
 
 

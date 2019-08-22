@@ -5,10 +5,13 @@ from flask import request, Blueprint
 from chatbot.model.model_factory import ModelFactory
 from chatbot.nlp.keyword import lemmatize_content_keywords
 from chatbot.util.config_util import Config
-import chatbot.api.util as flask_util
+import chatbot.api.v1.util as flask_util
 
 
-web_api = Blueprint('Website API', __name__, template_folder='templates')
+web_api = Blueprint('Website APIv1',
+                    __name__,
+                    url_prefix='/v1/web',
+                    template_folder='templates')
 
 factory = ModelFactory.get_instance()
 factory.set_db()
@@ -19,7 +22,7 @@ conflict_col = Config.get_mongo_collection("conflicts")
 unknown_col = Config.get_mongo_collection("unknown")
 
 
-@web_api.route("/v1/web/conflict_ids", methods=["GET"])
+@web_api.route("/conflict_ids", methods=["GET"])
 def get_all_conflict_ids():
     """
     :return: a list of {"title" "...", "id": "..."}
@@ -38,7 +41,7 @@ def get_all_conflict_ids():
     return json.dumps(conflict_ids)
 
 
-@web_api.route("/v1/web/content/", methods=["GET"])
+@web_api.route("/content/", methods=["GET"])
 def get_content():
     """
     :return: the content of the prod document and manual document
@@ -59,7 +62,7 @@ def get_content():
 
 
 # TODO: This should use PUT and verify that the content exists
-@web_api.route("/v1/web/content/", methods=["POST"])
+@web_api.route("/content/", methods=["POST"])
 def update_content():
     """ Update the manual collection with new content. """
 
@@ -91,7 +94,7 @@ def update_content():
     return flask_util.create_success_response("Success")
 
 
-@web_api.route("/v1/web/docs/", methods=["GET"])
+@web_api.route("/docs/", methods=["GET"])
 def get_docs_from_url():
     """
     :return: Every document for a single url with id and title.
@@ -122,7 +125,7 @@ def delete_manual_document():
     return flask_util.create_success_response(success_msg)
 
 
-@web_api.route("/v1/web/unknown_query", methods=["DELETE"])
+@web_api.route("/unknown_query", methods=["DELETE"])
 def delete_unknown_query():
     """ Delete a query from the unknown_query collection.
     :return: A success json if it was successful.
@@ -136,7 +139,7 @@ def delete_unknown_query():
     return flask_util.create_success_response(success_msg)
 
 
-@web_api.route("/v1/web/unknown_queries", methods=["GET"])
+@web_api.route("/unknown_queries", methods=["GET"])
 def get_all_unknown_queries():
     """
     :return: a list of unknown queries.
