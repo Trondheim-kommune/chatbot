@@ -65,9 +65,6 @@ def app():
 def test_get_homepage(app):
     response = app.test_client().get('/')
     assert response.status_code == 200
-    response_json = json.loads(response.data.decode())
-    assert "OK" == response_json["status"]
-    assert "Success" == response_json["message"]
 
 
 def test_add_and_remove_entities(app):
