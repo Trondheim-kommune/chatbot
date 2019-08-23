@@ -1,6 +1,6 @@
 {
   "name": "chatbot_website",
-  "version": "1.1.5",
+  "version": "1.1.8",
   "private": true,
   "homepage": "https://127.0.0.1/",
   "dependencies": {
