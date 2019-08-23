@@ -44,20 +44,22 @@ keyword_model = api.model('Keyword', {
                     'confidence': fields.Float
 })
 
-content_model = api.model('Content', {
+inner_content_model = api.model('InnerContent', {
                     'title': fields.String,
                     'keywords': fields.List(fields.Nested(keyword_model)),
                     'texts': fields.List(fields.String)
+})
+
+content_model = api.model('Content', {
+                    'id': fields.String,
+                    'url': fields.String,
+                    'content': fields.Nested(inner_content_model)
 })
 
 content_collection_model = api.model('ContentCol', {
             'prod': fields.Nested(content_model),
             'manual': fields.Nested(content_model),
             'url': fields.String
-})
-
-content_data_model = api.model('ContentDataModel', {
-            'data': fields.Nested(content_model)
 })
 
 unknown_query_model = api.model('UnknownQuery', {
@@ -104,28 +106,16 @@ url_parser = reqparse.RequestParser()
 url_parser.add_argument('url', required=True)
 
 
-class Documents(Resource):
+class Contents(Resource):
     @api.marshal_with(document_model)
     @api.expect(url_parser)
+    @api.response(404, 'Document not found')
     def get(self):
         url = url_parser.parse_args()['url']
         docs = factory.get_collection(prod_col).find({'url': url})
-
-        return [models.Document(doc['id'], doc['content']['title'])
+        docs = [models.Document(doc['id'], doc['content']['title'])
                 for doc in docs]
-
-    @api.marshal_with(delete_model)
-    @api.response(200, 'Success', delete_model)
-    @api.response(404, 'Document not found')
-    def delete(self, document_id):
-        query = {'id': document_id}
-        result = factory.delete_document(query, manual_col)
-        factory.update_document(query, {'manually_changed': False})
-
-        if result.deleted_count > 0:
-            return result
-        else:
-            abort(404, 'Document not found')
+        return docs if docs else abort(404, 'Document not found')
 
 
 class Content(Resource):
@@ -138,26 +128,39 @@ class Content(Resource):
 
         response = {}
         if prod:
-            response['prod'] = prod['content']
+            response['prod'] = prod
         else:
             abort(404, 'Content not found')
 
-        response['manual'] = manual['content'] if manual else None
-        response['url'] = prod['url'] if prod else None
+        response['manual'] = manual if manual else {}
+        response['url'] = prod['url'] if prod else ''
 
         return response
 
-    # TODO: Write to use model factory function update_document
-    @api.expect(content_data_model)
-    @api.marshal_with(content_data_model)
+    @api.marshal_with(delete_model)
+    @api.response(200, 'Success', delete_model)
+    @api.response(404, 'Content not found')
+    def delete(self, content_id):
+        query = {'id': content_id}
+        result = factory.delete_document(query, manual_col)
+        factory.update_document(query, {'manually_changed': False}, manual_col)
+        factory.update_document(query, {'manually_changed': False}, prod_col)
+
+        if result.deleted_count > 0:
+            return result
+        else:
+            abort(404, 'Content not found')
+
+    @api.expect(content_model)
+    @api.marshal_with(content_model)
     @api.response(400, 'Content IDs does not match!')
     @api.response(404, 'Content not found')
     def put(self, content_id):
         # Grab the data from request payload
         input_data = api.payload
 
-        new_content = input_data['data']['content']
-        input_content_id = input_data['data']['id']
+        new_content = input_data['content']
+        input_content_id = input_data['id']
 
         if not input_content_id == content_id:
             abort(400, 'Content IDs does not match!')
@@ -181,17 +184,20 @@ class Content(Resource):
             old_content['content'] = new_content
             factory.get_database() \
                    .get_collection(manual_col) \
-                   .insert_one(new_content)
+                   .insert_one(old_content)
 
         # set manually_changed to true
         index = ({'id': content_id}, {'$set': {'manually_changed': True}})
-        factory.get_database().get_collection(prod_col).update(*index)
+        new_document = factory.get_database() \
+                              .get_collection(prod_col) \
+                              .update(*index)
 
         # delete this document from the conflict collection
         query = {"conflict_id": content_id}
         factory.get_database().get_collection(conflict_col).delete_one(query)
 
-        return new_content
+        if new_document['updatedExisting']:
+            return input_data
 
 
 class UnknownQueries(Resource):
@@ -232,20 +238,16 @@ api.add_resource(ConflictIDs,
                  '/conflict_ids/<conflict_id>/',
                  methods=['DELETE'])
 
-api.add_resource(Documents,
-                 '/documents/',
+api.add_resource(Contents,
+                 '/contents/',
                  methods=['GET'])
-api.add_resource(Documents,
-                 '/documents/<document_id>/',
-                 methods=['DELETE'])
-
 api.add_resource(Content,
                  '/content/<content_id>/',
-                 methods=['GET', 'PUT'])
+                 methods=['GET', 'PUT', 'DELETE'])
 
 api.add_resource(UnknownQueries,
                  '/unknown_queries/',
                  methods=['GET'])
 api.add_resource(UnknownQueries,
-                 '/unknown_queries/<unknown_query>',
+                 '/unknown_queries/<unknown_query>/',
                  methods=['DELETE'])

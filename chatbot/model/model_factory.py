@@ -96,8 +96,12 @@ class ModelFactory:
     def update_document(self, query, data, collection):
         """ Updates the document specified in query with the new data """
         col = self.get_collection(collection)
-        data = json_util.loads(data)
-        col.find_one_and_update({"$and": [query]}, {"$set": data})
+
+        # Converts the data correctly if not a dict (str)
+        if not isinstance(data, dict):
+            data = json_util.loads(data)
+
+        return col.find_one_and_update({"$and": [query]}, {"$set": data})
 
     def delete_document(self, query, collection):
         """ Deleted document using a query, from collection """

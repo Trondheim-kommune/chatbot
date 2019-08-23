@@ -198,8 +198,6 @@ def test_get_content(app):
         url = "/v1/web/content/?id=test_content_id"
         response = app.test_client().get(url)
         response_json = json.loads(response.data.decode())
-        print(response_json)
-
         assert response_json["prod"] == "some_test_content"
     finally:
         # Delete test content
