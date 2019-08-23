@@ -12,6 +12,7 @@ api = Namespace('v2', description='Chatbot APIv2')
 factory = ModelFactory.get_instance()
 factory.set_db()
 
+
 prod_col = Config.get_mongo_collection("prod")
 manual_col = Config.get_mongo_collection("manual")
 conflict_col = Config.get_mongo_collection("conflicts")
@@ -36,6 +37,31 @@ delete_model = api.model('Delete', {
 document_model = api.model('Document', {
     'id': fields.String(description='Content doc ID'),
     'title': fields.String(description='Content doc title')
+})
+
+keyword_model = api.model('Keyword', {
+                    'keyword': fields.String,
+                    'confidence': fields.Float
+})
+
+content_model = api.model('Content', {
+                    'title': fields.String,
+                    'keywords': fields.List(fields.Nested(keyword_model)),
+                    'texts': fields.List(fields.String)
+})
+
+content_collection_model = api.model('ContentCol', {
+            'prod': fields.Nested(content_model),
+            'manual': fields.Nested(content_model),
+            'url': fields.String
+})
+
+content_data_model = api.model('ContentDataModel', {
+            'data': fields.Nested(content_model)
+})
+
+unknown_query_model = api.model('UnknownQuery', {
+            'query_text': fields.String
 })
 
 
@@ -100,28 +126,6 @@ class Documents(Resource):
             return result
         else:
             abort(404, 'Document not found')
-
-
-keyword_model = api.model('Keyword', {
-                    'keyword': fields.String,
-                    'confidence': fields.Float
-})
-
-content_model = api.model('Content', {
-                    'title': fields.String,
-                    'keywords': fields.List(fields.Nested(keyword_model)),
-                    'texts': fields.List(fields.String)
-})
-
-content_collection_model = api.model('ContentCol', {
-            'prod': fields.Nested(content_model),
-            'manual': fields.Nested(content_model),
-            'url': fields.String
-})
-
-content_data_model = api.model('ContentDataModel', {
-            'data': fields.Nested(content_model)
-})
 
 
 class Content(Resource):
@@ -190,27 +194,58 @@ class Content(Resource):
         return new_content
 
 
+class UnknownQueries(Resource):
+    @api.marshal_with(unknown_query_model)
+    def get(self):
+        unknown_queries = factory.get_collection(unknown_col).find()
+        unknown_queries = [{'query_text': unknown_query['query_text']}
+                           for unknown_query in unknown_queries]
+        return unknown_queries
+
+    @api.marshal_with(delete_model)
+    @api.response(200, 'Success', delete_model)
+    @api.response(404, 'Document not found')
+    def delete(self, unknown_query):
+        result = factory.delete_document({'query_text': unknown_query},
+                                         unknown_col)
+        if result.deleted_count > 0:
+            return result
+        else:
+            abort(404, 'Unknown query not found')
+
+
 api.add_resource(HelloWorld,
                  '/',
                  methods=['GET'])
+
 api.add_resource(Response,
                  '/response/<string:query>/',
                  methods=['GET'])
 api.add_resource(FullResponse,
                  '/response/',
                  methods=['GET'])
+
 api.add_resource(ConflictIDs,
                  '/conflict_ids/',
                  methods=['GET'])
 api.add_resource(ConflictIDs,
                  '/conflict_ids/<conflict_id>/',
                  methods=['DELETE'])
+
 api.add_resource(Documents,
                  '/documents/',
                  methods=['GET'])
 api.add_resource(Documents,
                  '/documents/<document_id>/',
                  methods=['DELETE'])
+
 api.add_resource(Content,
                  '/content/<content_id>/',
                  methods=['GET', 'PUT'])
+
+api.add_resource(UnknownQueries,
+                 '/unknown_queries/',
+                 methods=['GET'])
+api.add_resource(UnknownQueries,
+                 '/unknown_queries/<unknown_query>',
+                 methods=['DELETE'])
