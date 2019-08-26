@@ -38,7 +38,7 @@ h1 {
 
   margin: 20px auto;
   width: 80%;
-  height: 900px;
+  height: 80vh;
   max-height: 900px;
   overflow: auto;
   border-style: solid;
@@ -48,13 +48,13 @@ h1 {
 .msg {
   height: auto;
   width: 100%;
-  max-height: 450px;
   margin-bottom: 10px;
 }
 
 .user {
   margin-left: auto;
   margin-right: 0;
+  float: right;
 }
 
 .user p {
@@ -92,4 +92,9 @@ p {
   display: flex;
   flex-direction: row;
   justify-content: center;
+}
+
+.disclaimer {
+  color: red;
+  margin: 5px auto;
 }

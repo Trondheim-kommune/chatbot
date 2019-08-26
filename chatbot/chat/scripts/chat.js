@@ -27,6 +27,10 @@ function getUserInput() {
  */
 function query() {
 	var input = getUserInput();
+
+	// Don't do anything if the field is empty
+	if (!input) { return; }
+
 	populateChatWithMessage(input, "user")
 
 	http.open("POST", host+"v1/dialogflow/response", true);
