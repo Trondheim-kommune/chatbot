@@ -9,3 +9,14 @@ export async function fetchData(url, method, body) {
   });
   return await response.json();
 }
+
+export async function fetchDataWithoutTypeHeader(url, method) {
+  const response = await fetch(url, {
+    method: method,
+	  headers: {
+		  Accept: 'application/json',
+		},
+		body: undefined && JSON.stringify(undefined),
+	});
+	return await response.json();
+}

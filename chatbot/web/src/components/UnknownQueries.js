@@ -6,12 +6,11 @@ const { Title } = Typography;
 
 export default class UnknownQueries extends React.Component {
   deleteAnswer = async i => {
-    const data = { data: { query_text: this.props.queries[i].query_text } };
+    const data = this.props.queries[i].query_text;
 
     await fetchData(
-      process.env.REACT_APP_SERVER_URL + 'v1/web/unknown_query',
-      'DELETE',
-      data,
+      process.env.REACT_APP_SERVER_URL + 'v2/unknown_queries/' + data + '/',
+      'DELETE'
     );
 
     this.props.changeView('main');

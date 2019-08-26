@@ -62,11 +62,11 @@ def insert_documents(data):
         if prod_doc and temp_doc:
             if not temp_doc["content"] == prod_doc["content"]:
                 title = temp_doc["content"]["title"]
-                conflicts.append({"conflict_id": idx,
+                conflicts.append({"id": idx,
                                   "title": title})
 
     print("Conflicts: {}".format(conflicts))
-    factory.get_collection(conflict_col).create_index([("conflict_id", 1)],
+    factory.get_collection(conflict_col).create_index([("id", 1)],
                                                       unique=True)
     for conflict in conflicts:
         try:
