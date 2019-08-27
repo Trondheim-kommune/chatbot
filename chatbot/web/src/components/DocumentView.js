@@ -76,10 +76,10 @@ class DocumentView extends React.Component {
     if (this.state.manual) {
       this.setState(prevState => ({
         manual: {
-		  content: {
+          content: {
             ...prevState.manual.content,
             texts: [...prevState.manual.content.texts, ''],
-		  }
+          }
         },
       }));
     }
@@ -90,13 +90,13 @@ class DocumentView extends React.Component {
     if (this.state.manual) {
       this.setState(prevState => ({
         manual: {
-		  content: {
-			...prevState.manual.content,
-			keywords: [
-			  ...prevState.manual.content.keywords,
-			  { keyword: '', confidence: 1 },
-		 	],
-		  }
+          content: {
+            ...prevState.manual.content,
+            keywords: [
+              ...prevState.manual.content.keywords,
+              { keyword: '', confidence: 1 },
+            ],
+          }
         },
       }));
     }
@@ -122,11 +122,11 @@ class DocumentView extends React.Component {
     this.setState(prevState => ({
       manual: {
         content: {
-            ...prevState.manual.content,
-            texts: [
-              ...prevState.manual.content.texts.slice(0, i),
-              ...prevState.manual.content.texts.slice(i + 1),
-            ],
+          ...prevState.manual.content,
+          texts: [
+            ...prevState.manual.content.texts.slice(0, i),
+            ...prevState.manual.content.texts.slice(i + 1),
+          ],
         }
       },
     }));

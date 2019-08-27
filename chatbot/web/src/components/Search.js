@@ -18,7 +18,6 @@ export default class SearchBar extends React.Component {
 
   handleSearch = async url => {
     // Title and ID based on URL.
-	console.log(url)
     const content = await fetchDataWithoutTypeHeader(
       process.env.REACT_APP_SERVER_URL + 'v2/contents/?url=' + url.toString(),
       'GET',

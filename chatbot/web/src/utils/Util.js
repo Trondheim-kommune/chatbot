@@ -15,8 +15,7 @@ export async function fetchDataWithoutTypeHeader(url, method) {
     method: method,
 	  headers: {
 		  Accept: 'application/json',
-		},
-		body: undefined && JSON.stringify(undefined),
+		}
 	});
 	return await response.json();
 }

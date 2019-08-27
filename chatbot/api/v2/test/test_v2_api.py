@@ -49,7 +49,6 @@ def test_get_conflict_ids(client):
         response = client.get('/v2/conflict_ids/')
         response_data = json.loads(response.data.decode())
 
-        print(response_data)
         for conflict in conflicts:
             assert conflict['id'] in [response['id']
                                       for response in response_data]
