@@ -15,7 +15,12 @@ def test_get_document():
     fact.get_database().drop_collection("test")
 
     try:
-        fact.post_document(data[0], "test")
+        test_col = fact.get_database().get_collection('test')
+
+        # Insert data
+        for d in data:
+            test_col.insert_one(d)
+
         fact.post_document(data[1], "test")
         fact.get_collection("test").create_index(
             [("keywords", pymongo.TEXT),
@@ -46,13 +51,13 @@ def test_get_document():
 
 
 def test_update_document():
-    data = '{"name": "testname", "manually_changed": false }'
+    data = {"name": "testname", "manually_changed": False}
     try:
-        fact.post_document(data, "test")
+        fact.get_database().get_collection('test').insert_one(data)
         fact.get_collection("test").create_index(
             [("name", pymongo.TEXT)], default_language="norwegian")
 
-        newdata = '{"name": "nottestname"}'
+        newdata = {"name": "nottestname"}
         fact.update_document({"name": "testname"}, newdata, "test")
         doc = fact.get_document("nottestname", prod_col="test")[0]
 
@@ -60,3 +65,21 @@ def test_update_document():
 
     finally:
         fact.get_database().drop_collection("test")
+
+
+def test_delete_document():
+    idx = '#321_test_delete_id'
+    doc = {'id': idx, 'data': 'some data to be deleted'}
+    try:
+        fact.get_database().get_collection('test').insert_one(doc)
+
+        query = {'id': idx}
+        fact.delete_document(query, 'test')
+
+        response_data = next(fact.get_database()
+                                 .get_collection('test')
+                                 .find(query), None)
+        assert response_data is None
+
+    finally:
+        fact.get_database().drop_collection('test')
