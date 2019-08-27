@@ -38,7 +38,7 @@ def test_response(client):
 
 def test_get_conflict_ids(client):
     # Setup two conflicts
-    conflicts = [{"conflict_id": "test_conflict_id_{}".format(i),
+    conflicts = [{"id": "test_conflict_id_{}".format(i),
                   "title": "test_conflict_title_{}".format(i)}
                  for i in range(2)]
 
@@ -50,25 +50,26 @@ def test_get_conflict_ids(client):
         response_data = json.loads(response.data.decode())
 
         for conflict in conflicts:
-            assert conflict['conflict_id'] in [response['conflict_id']
-                                               for response in response_data]
+            assert conflict['id'] in [response['id']
+                                      for response in response_data]
     finally:
         for conflict in conflicts:
-            factory.delete_document({'conflict_id': conflict['conflict_id']},
+            factory.delete_document({'id': conflict['id']},
                                     conflict_col)
 
 
 def test_delete_conflict_ids(client):
-    conflict = {'conflict_id': 'test conflict id',
+    conflict = {'id': 'test conflict id',
                 'title': 'test title'}
     factory.post_document(conflict, conflict_col)
 
     try:
-        idx = conflict['conflict_id']
+        idx = conflict['id']
         response = client.delete('/v2/conflict_ids/{}/'.format(idx))
+        print(response.data.decode())
         assert json.loads(response.data.decode())['deleted_count'] > 0
     finally:
-        factory.delete_document({'conflict_id': 'test conflict id'},
+        factory.delete_document({'id': 'test conflict id'},
                                 conflict_col)
 
 

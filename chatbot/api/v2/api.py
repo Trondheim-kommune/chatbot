@@ -25,7 +25,7 @@ direct_response_model = api.model('DirectResponse', {
 })
 
 conflict_model = api.model('Conflict', {
-    'conflict_id': fields.String(description='Document ID for conflict'),
+    'id': fields.String(description='Document ID for conflict'),
     'title': fields.String(description='Title of conflict content')
 })
 
@@ -87,14 +87,14 @@ class ConflictIDs(Resource):
     @api.marshal_with(conflict_model)
     def get(self):
         conflict_ids = factory.get_collection(conflict_col).find()
-        return [models.Conflict(conflict['conflict_id'], conflict['title'])
+        return [models.Conflict(conflict['id'], conflict['title'])
                 for conflict in conflict_ids]
 
     @api.marshal_with(delete_model)
     @api.response(200, 'Success', delete_model)
     @api.response(404, 'Conflict not found')
     def delete(self, conflict_id):
-        result = factory.delete_document({"conflict_id": conflict_id},
+        result = factory.delete_document({'id': conflict_id},
                                          conflict_col)
         if result.deleted_count > 0:
             return result
@@ -146,6 +146,9 @@ class Content(Resource):
         factory.update_document(query, {'manually_changed': False}, manual_col)
         factory.update_document(query, {'manually_changed': False}, prod_col)
 
+        # Delete conflict if there was one
+        factory.delete_document({'id': content_id}, conflict_col)
+
         if result.deleted_count > 0:
             return result
         else:
@@ -193,7 +196,7 @@ class Content(Resource):
                               .update(*index)
 
         # delete this document from the conflict collection
-        query = {"conflict_id": content_id}
+        query = {'id': content_id}
         factory.get_database().get_collection(conflict_col).delete_one(query)
 
         if new_document['updatedExisting']:

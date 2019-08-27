@@ -1,5 +1,5 @@
 import React from 'react';
-import { fetchData } from '../utils/Util';
+import { fetchDataWithoutTypeHeader } from '../utils/Util';
 import DocumentList from './DocumentList';
 import { Input } from 'antd';
 import css from './Search.module.css';
@@ -18,8 +18,8 @@ export default class SearchBar extends React.Component {
 
   handleSearch = async url => {
     // Title and ID based on URL.
-    const content = await fetchData(
-      process.env.REACT_APP_SERVER_URL + 'v1/web/docs/?url=' + url,
+    const content = await fetchDataWithoutTypeHeader(
+      process.env.REACT_APP_SERVER_URL + 'v2/contents/?url=' + url.toString(),
       'GET',
     );
 
