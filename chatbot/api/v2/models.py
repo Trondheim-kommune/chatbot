@@ -20,7 +20,7 @@ class Response(object):
 
 class Conflict(object):
     def __init__(self, conflict_id, title):
-        self.conflict_id = conflict_id
+        self.id = conflict_id
         self.title = title
 
 

@@ -25,19 +25,19 @@ class DocumentView extends React.Component {
   async componentDidMount() {
     // Fetch content.
     const content = await fetchData(
-      process.env.REACT_APP_SERVER_URL + 'v1/web/content/?id=' + this.props.id,
+      process.env.REACT_APP_SERVER_URL + 'v2/content/' + this.props.id + '/',
       'GET',
     );
 
     this.setState({
-      manual: content.manual || content.prod,
+      manual: content.manual.id ? content.manual : content.prod,
       automatic: content.prod,
       title: content.prod.title,
       url: content.url,
     });
   }
 
-  validateKeywords = () => this.state.manual.keywords.every(entry =>
+  validateKeywords = () => this.state.manual.content.keywords.every(entry =>
     !/\s/g.test(entry['keyword']));
 
 
@@ -57,11 +57,11 @@ class DocumentView extends React.Component {
     });
 
     // Save data and delete entry in manual collection if needed.
-    const data = { data: { id: this.props.id, content: this.state.manual } };
+    const data = { id: this.props.id, content: this.state.manual.content };
 
     await fetchData(
-      process.env.REACT_APP_SERVER_URL + 'v1/web/content/',
-      'POST',
+      process.env.REACT_APP_SERVER_URL + 'v2/content/' + this.props.id + '/',
+      'PUT',
       data,
     );
 
@@ -76,8 +76,10 @@ class DocumentView extends React.Component {
     if (this.state.manual) {
       this.setState(prevState => ({
         manual: {
-          ...prevState.manual,
-          texts: [...prevState.manual.texts, ''],
+          content: {
+            ...prevState.manual.content,
+            texts: [...prevState.manual.content.texts, ''],
+          }
         },
       }));
     }
@@ -88,11 +90,13 @@ class DocumentView extends React.Component {
     if (this.state.manual) {
       this.setState(prevState => ({
         manual: {
-          ...prevState.manual,
-          keywords: [
-            ...prevState.manual.keywords,
-            { keyword: '', confidence: 1 },
-          ],
+          content: {
+            ...prevState.manual.content,
+            keywords: [
+              ...prevState.manual.content.keywords,
+              { keyword: '', confidence: 1 },
+            ],
+          }
         },
       }));
     }
@@ -102,11 +106,13 @@ class DocumentView extends React.Component {
     e.preventDefault();
     this.setState(prevState => ({
       manual: {
-        ...prevState.manual,
-        keywords: [
-          ...prevState.manual.keywords.slice(0, i),
-          ...prevState.manual.keywords.slice(i + 1),
-        ],
+		content: {
+		  ...prevState.manual.content,
+		  keywords: [
+		    ...prevState.manual.content.keywords.slice(0, i),
+			...prevState.manual.content.keywords.slice(i + 1),
+		  ],
+		}
       },
     }));
   };
@@ -115,22 +121,22 @@ class DocumentView extends React.Component {
     e.preventDefault();
     this.setState(prevState => ({
       manual: {
-        ...prevState.manual,
-        texts: [
-          ...prevState.manual.texts.slice(0, i),
-          ...prevState.manual.texts.slice(i + 1),
-        ],
+        content: {
+          ...prevState.manual.content,
+          texts: [
+            ...prevState.manual.content.texts.slice(0, i),
+            ...prevState.manual.content.texts.slice(i + 1),
+          ],
+        }
       },
     }));
   };
 
   deleteDocument = (e, i) => {
     e.preventDefault();
-    const document = { data: { id: this.props.id } };
     fetchData(
-      process.env.REACT_APP_SERVER_URL + 'v1/web/doc',
-      'DELETE',
-      document
+      process.env.REACT_APP_SERVER_URL + 'v2/content/' + this.props.id + '/',
+      'DELETE'
     ).then(() => {
       this.props.changeView('main');
     });
@@ -140,7 +146,7 @@ class DocumentView extends React.Component {
     let textAreasManual;
     if (this.state.manual) {
       /* map through the texts field from manual */
-      textAreasManual = this.state.manual.texts.map((text, i) => (
+      textAreasManual = this.state.manual.content.texts.map((text, i) => (
         <div key={i} className="answers">
           <div className="answer">
             <TextArea
@@ -153,12 +159,14 @@ class DocumentView extends React.Component {
 
                 this.setState(prevState => ({
                   manual: {
-                    ...prevState.manual,
-                    texts: [
-                      ...prevState.manual.texts.slice(0, i),
-                      value,
-                      ...prevState.manual.texts.slice(i + 1),
-                    ],
+                    content: {
+                      ...prevState.manual.content,
+                      texts: [
+                        ...prevState.manual.content.texts.slice(0, i),
+                        value,
+                        ...prevState.manual.content.texts.slice(i + 1),
+                      ],
+                    }
                   },
                 }));
               }}
@@ -175,7 +183,7 @@ class DocumentView extends React.Component {
     let keywordsManual;
     if (this.state.manual) {
       /* Map through the keywords from manual */
-      keywordsManual = this.state.manual.keywords.map((keyword, i) => (
+      keywordsManual = this.state.manual.content.keywords.map((keyword, i) => (
         <div key={i} className={css.keywordListItem}>
           <Input
             type="text"
@@ -186,15 +194,17 @@ class DocumentView extends React.Component {
               const value = e.target.value;
               this.setState(prevState => ({
                 manual: {
-                  ...prevState.manual,
-                  keywords: [
-                    ...prevState.manual.keywords.slice(0, i),
-                    {
-                      keyword: value,
-                      confidence: prevState.manual.keywords[i].confidence,
-                    },
-                    ...prevState.manual.keywords.slice(i + 1),
-                  ],
+                  content: {
+                    ...prevState.manual.content,
+                    keywords: [
+                      ...prevState.manual.content.keywords.slice(0, i),
+                      {
+                         keyword: value,
+                         confidence: prevState.manual.content.keywords[i].confidence,
+                      },
+                      ...prevState.manual.content.keywords.slice(i + 1),
+                    ],
+                  }
                 },
               }));
             }}
@@ -212,15 +222,17 @@ class DocumentView extends React.Component {
               const value = parseFloat(e.target.value);
               this.setState(prevState => ({
                 manual: {
-                  ...prevState.manual,
-                  keywords: [
-                    ...prevState.manual.keywords.slice(0, i),
-                    {
-                      keyword: prevState.manual.keywords[i].keyword,
-                      confidence: value,
-                    },
-                    ...prevState.manual.keywords.slice(i + 1),
-                  ],
+                  content: {
+                    ...prevState.manual.content,
+                    keywords: [
+                      ...prevState.manual.content.keywords.slice(0, i),
+                      {
+                        keyword: prevState.manual.content.keywords[i].keyword,
+                        confidence: value,
+                      },
+                      ...prevState.manual.content.keywords.slice(i + 1),
+                    ],
+                  }
                 },
               }));
             }}
@@ -239,7 +251,7 @@ class DocumentView extends React.Component {
     let textAreasAutomatic;
     if (this.state.automatic) {
       /* Map through the texts field from prod */
-      textAreasAutomatic = this.state.automatic.texts.map((text, i) => (
+      textAreasAutomatic = this.state.automatic.content.texts.map((text, i) => (
         <TextArea readOnly key={i} rows="10" cols="50" value={text} className={css.answer} />
       ));
     }
@@ -247,7 +259,7 @@ class DocumentView extends React.Component {
     let keywordsAutomatic;
     if (this.state.automatic) {
       /* Map through the keywords field from prod */
-      keywordsAutomatic = this.state.automatic.keywords.map((keyword, i) => (
+      keywordsAutomatic = this.state.automatic.content.keywords.map((keyword, i) => (
         <div key={i} className={css.keywordListItem}>
           <Input className={css.keywordInput} readOnly type="text" value={keyword['keyword']} />
           <Input className={css.confidenceInput} readOnly type="text" value={keyword['confidence']} />
