@@ -20,12 +20,12 @@ services:
         image: mongo:latest
         container_name: "mongodb"
         environment:
-          - MONGO_DATA_DIR=/data/db
-          - MONGO_LOG_DIR=/dev/null
-          - MONGODB_USER=${DB_USER}
-          - MONGODB_PASS=${DB_PWD}
+            - MONGO_DATA_DIR=/data/db
+            - MONGO_LOG_DIR=/dev/null
+            - MONGODB_USER=${DB_USER}
+            - MONGODB_PASS=${DB_PWD}
         volumes:
-          - mongodb:/data/db
+            - mongodb:/data/db
         ports:
             - 27017:27017
         command: mongod --logpath=/dev/null
@@ -38,9 +38,9 @@ services:
         command: 
             - /scripts/entrypoint_db.sh
         environment:
-          - DB_USER=${DB_USER}
-          - DB_PWD=${DB_PWD}
-          - DB_NAME=prod_chatbot
+            - DB_USER=${DB_USER}
+            - DB_PWD=${DB_PWD}
+            - DB_NAME=prod_chatbot
         links:
             - mongodb:mongodb
         depends_on:
@@ -52,6 +52,8 @@ services:
             - 8000:80
         volumes:
             - .:/srv/chatbot-web
+        environment:
+            - SERVER_URL=${SERVER_URL}
         working_dir: /usr/src/app
 
 volumes:
