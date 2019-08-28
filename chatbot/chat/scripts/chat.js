@@ -33,18 +33,19 @@ function query() {
 
 	populateChatWithMessage(input, "user")
 
-	http.open("POST", host+"v1/dialogflow/response", true);
-	http.setRequestHeader("Content-Type", "text/plain");
+	http.open("GET", host+"v2/response/"+input+"/", true);
+  http.setRequestHeader("Content-Type", "text/plain");
 	http.onreadystatechange = function() {
 		if(this.readyState == 4 && this.status == 200) {
 			var json = JSON.parse(http.responseText);
-			var response = json.fulfillmentText;
+			var response = json.response;
 			response = response.replace(/\n/g, '<br>');
 			populateChatWithMessage(response, "bot");
 		}
 	}
-	var data = JSON.stringify({"queryResult": { "queryText": input }});
-	http.send(data);
+  http.send();
+	//var data = JSON.stringify({"queryResult": { "queryText": input }});
+	//http.send(data);
 }
 
 /*
