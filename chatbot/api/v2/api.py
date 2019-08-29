@@ -19,9 +19,10 @@ conflict_col = Config.get_mongo_collection("conflicts")
 unknown_col = Config.get_mongo_collection("unknown")
 
 
-direct_response_model = api.model('DirectResponse', {
+response_model = api.model('Response', {
     'user_input': fields.String(description='User chat input'),
-    'response': fields.String(description='Bot chat response')
+    'response': fields.String(description='Bot chat response'),
+    'style': fields.String
 })
 
 conflict_model = api.model('Conflict', {
@@ -40,30 +41,31 @@ document_model = api.model('Document', {
 })
 
 keyword_model = api.model('Keyword', {
-                    'keyword': fields.String,
-                    'confidence': fields.Float
+    'keyword': fields.String,
+    'confidence': fields.Float
 })
 
 inner_content_model = api.model('InnerContent', {
-                    'title': fields.String,
-                    'keywords': fields.List(fields.Nested(keyword_model)),
-                    'texts': fields.List(fields.String)
+    'title': fields.String,
+    'keywords': fields.List(fields.Nested(keyword_model)),
+    'text': fields.String,
+    'links': fields.List(fields.List(fields.String))
 })
 
 content_model = api.model('Content', {
-                    'id': fields.String,
-                    'url': fields.String,
-                    'content': fields.Nested(inner_content_model)
+    'id': fields.String,
+    'url': fields.String,
+    'content': fields.Nested(inner_content_model)
 })
 
 content_collection_model = api.model('ContentCol', {
-            'prod': fields.Nested(content_model),
-            'manual': fields.Nested(content_model),
-            'url': fields.String
+    'prod': fields.Nested(content_model),
+    'manual': fields.Nested(content_model),
+    'url': fields.String
 })
 
 unknown_query_model = api.model('UnknownQuery', {
-            'query_text': fields.String
+    'query_text': fields.String
 })
 
 
@@ -72,15 +74,17 @@ class HelloWorld(Resource):
         return {'hello': 'world'}
 
 
+style_parser = reqparse.RequestParser()
+style_parser.add_argument('style', required=False)
+
+
 class Response(Resource):
-    @api.marshal_with(direct_response_model)
+    @api.marshal_with(response_model)
+    @api.expect(style_parser)
     def get(self, query):
-        return models.DirectResponse(user_input=query)
-
-
-class FullResponse(Resource):
-    def get(self):
-        pass
+        args = style_parser.parse_args()
+        style = args['style'] if 'style' in args else 'plain'
+        return models.Response(query, style)
 
 
 class ConflictIDs(Resource):
@@ -223,34 +227,21 @@ class UnknownQueries(Resource):
             abort(404, 'Unknown query not found')
 
 
-api.add_resource(HelloWorld,
-                 '/',
-                 methods=['GET'])
+api.add_resource(HelloWorld, '/', methods=['GET'])
 
-api.add_resource(Response,
-                 '/response/<string:query>/',
-                 methods=['GET'])
-api.add_resource(FullResponse,
-                 '/response/',
-                 methods=['GET'])
+api.add_resource(Response, '/response/<string:query>/', methods=['GET'])
 
-api.add_resource(ConflictIDs,
-                 '/conflict_ids/',
-                 methods=['GET'])
+api.add_resource(ConflictIDs, '/conflict_ids/', methods=['GET'])
 api.add_resource(ConflictIDs,
                  '/conflict_ids/<conflict_id>/',
                  methods=['DELETE'])
 
-api.add_resource(Contents,
-                 '/contents/',
-                 methods=['GET'])
+api.add_resource(Contents, '/contents/', methods=['GET'])
 api.add_resource(Content,
                  '/content/<content_id>/',
                  methods=['GET', 'PUT', 'DELETE'])
 
-api.add_resource(UnknownQueries,
-                 '/unknown_queries/',
-                 methods=['GET'])
+api.add_resource(UnknownQueries, '/unknown_queries/', methods=['GET'])
 api.add_resource(UnknownQueries,
                  '/unknown_queries/<unknown_query>/',
                  methods=['DELETE'])

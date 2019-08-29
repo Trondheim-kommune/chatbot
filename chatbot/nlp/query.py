@@ -1,5 +1,4 @@
 import string
-import random
 import os
 import pymongo
 
@@ -45,18 +44,40 @@ def _handle_not_found(query_text):
 
 def _get_corpus_text(doc):
     ''' Converts a document from the model into a string which will be used in
-    a corpus.  All possible answers are used to generate the corpus, if
-    multiple answers exist.'''
-    content = ' '.join(doc['content']['texts'])
+    a corpus. '''
+    content = doc['content']['text']
     return doc['content']['title'] + ' ' + content
 
 
-def _get_answer_text(doc):
-    ''' Converts a document from the model into a readable string. '''
-    content = random.choice(doc['content']['texts'])
-    content = content + '\n' + URL_FROM_TEXT + doc['url']
+def _get_answer(doc):
+    ''' Converts a document from the model into a (text, [links])-answer tuple
+    '''
+    answer = [doc['content']['text'], doc['content']['links']
+              if 'links' in doc['content'] else []]
+    # Add the source-ur to the list of urls
+    answer[1].append([URL_FROM_TEXT, doc['url']])
 
-    return doc['content']['title'] + ':\n' + content
+    answer[0] = doc['content']['title'] + ':\n' + answer[0]
+    return answer
+
+
+_url_styles = {
+            'plain': '{} {}',
+            'html': "<a href='{1}' target='_blank'>{0}</a>"
+           }
+
+
+def _format_answer(answer, url_style):
+    ''' Format an answer (text, links) with a specific url_style. Supports plain
+    for '{} {}'-like 'text, link' format, and html for a full <a>-tag. Returns
+    a plain string '''
+    for link in answer[1]:
+        answer[0] = answer[0].replace(link[0],
+                                      _url_styles[url_style].format(*link))
+
+    # Appends source (URL_FROM_TEXT) to the end
+    answer[0] += '\n ' + _url_styles[url_style].format(*answer[1][-1])
+    return answer[0]
 
 
 def expand_query(query):
@@ -137,7 +158,7 @@ def expand_query(query):
     return ' '.join(result)
 
 
-def _perform_search(query_text):
+def _perform_search(query_text, url_style):
     ''' Takes a query string and finds the best matching document in the
     database. '''
 
@@ -183,11 +204,11 @@ def _perform_search(query_text):
                 break
 
             # Add this result to the list of answers.
-            answers.append(_get_answer_text(docs[scores.index(score)]))
+            answers.append(_get_answer(docs[scores.index(score)]))
 
         if len(answers) == 1:
             # Return the answer straight away if there is only 1 result/
-            return answers[0]
+            return _format_answer(answers[0], url_style)
 
         # Append answers until we reach the CHAR_LIMIT
         i, n_chars = 0, 0
@@ -198,12 +219,13 @@ def _perform_search(query_text):
         # If we only have 1 answer after threshold we don't want to add the
         # MULTI_ANSWERS option to the response
         if max(i, 1) == 1:
-            return answers[0]
+            return _format_answer(answers[0], url_style)
 
         # Join the results with a separator. Still setting a max number of
         # answers
-        return '\n\n---\n\n'.join([MULTIPLE_ANSWERS] + answers[0:min(max(i, 1),
-                                  MAX_ANSWERS)])
+        answers = answers[0:min(max(i, 1,), MAX_ANSWERS)]
+        answers = [_format_answer(ans, url_style) for ans in answers]
+        return '\n\n---\n\n'.join([MULTIPLE_ANSWERS] + answers)
     except KeyError:
         raise Exception('Document does not have content and texts.')
     except ValueError:
@@ -211,5 +233,5 @@ def _perform_search(query_text):
 
 
 class QueryHandler:
-    def get_response(self, query):
-        return _perform_search(query)
+    def get_response(self, query, url_style='plain'):
+        return _perform_search(query, url_style)

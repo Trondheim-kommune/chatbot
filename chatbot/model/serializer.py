@@ -10,10 +10,6 @@ from chatbot.util.config_util import Config
 
 class KeyWord:
     """ Keyword to fill keyword-list in model schema contents-list """
-
-    __word = None
-    __confidence = None
-
     def __init__(self, word, confidence):
         self.__word = word
         self.__confidence = confidence
@@ -24,14 +20,10 @@ class KeyWord:
 
 class Content:
     """ Content to fill contents-list in model schema """
-
-    __title = ""
-    __keywords = []
-    __texts = []
-
-    def __init__(self, title, texts, keywords=[]):
+    def __init__(self, title, text, links=[], keywords=[]):
         self.__title = title
-        self.__texts = texts
+        self.__text = text
+        self.__links = links
 
         if keywords:
             if not all(isinstance(keyword, KeyWord) for keyword in keywords):
@@ -43,7 +35,8 @@ class Content:
         return {
             "title": self.__title,
             "keywords": [keyword.get_keyword() for keyword in self.__keywords],
-            "texts": self.__texts,
+            "text": self.__text,
+            "links": self.__links
         }
 
     def __repr__(self):
@@ -130,7 +123,8 @@ class Serializer:
                                                    .format(title,
                                                            child["text"]))]
 
-                content = Content(title, [child["text"]], keywords)
+                content = Content(title, child["text"],
+                                  child["links"], keywords)
                 new_model = copy.deepcopy(model_template)
                 new_model["id"] = child["id"]
                 new_model["content"] = content.get_content()
