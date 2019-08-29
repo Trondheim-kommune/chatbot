@@ -71,20 +71,6 @@ class DocumentView extends React.Component {
     });
   };
 
-  createNewAnswer = e => {
-    e.preventDefault();
-    if (this.state.manual) {
-      this.setState(prevState => ({
-        manual: {
-          content: {
-            ...prevState.manual.content,
-            texts: [...prevState.manual.content.texts, ''],
-          }
-        },
-      }));
-    }
-  };
-
   createNewKeyword = e => {
     e.preventDefault();
     if (this.state.manual) {
@@ -110,24 +96,9 @@ class DocumentView extends React.Component {
 		  ...prevState.manual.content,
 		  keywords: [
 		    ...prevState.manual.content.keywords.slice(0, i),
-			...prevState.manual.content.keywords.slice(i + 1),
+        ...prevState.manual.content.keywords.slice(i + 1),
 		  ],
 		}
-      },
-    }));
-  };
-
-  deleteAnswer = (e, i) => {
-    e.preventDefault();
-    this.setState(prevState => ({
-      manual: {
-        content: {
-          ...prevState.manual.content,
-          texts: [
-            ...prevState.manual.content.texts.slice(0, i),
-            ...prevState.manual.content.texts.slice(i + 1),
-          ],
-        }
       },
     }));
   };
@@ -146,13 +117,13 @@ class DocumentView extends React.Component {
     let textAreasManual;
     if (this.state.manual) {
       /* map through the texts field from manual */
-      textAreasManual = this.state.manual.content.texts.map((text, i) => (
-        <div key={i} className="answers">
+      textAreasManual =
+        <div key="0" className="answers">
           <div className="answer">
             <TextArea
               rows="10"
               cols="50"
-              value={text}
+              defaultValue={this.state.manual.content.text}
               className={css.answer}
               onChange={e => {
                 const value = e.target.value;
@@ -161,23 +132,14 @@ class DocumentView extends React.Component {
                   manual: {
                     content: {
                       ...prevState.manual.content,
-                      texts: [
-                        ...prevState.manual.content.texts.slice(0, i),
-                        value,
-                        ...prevState.manual.content.texts.slice(i + 1),
-                      ],
+                      text:  value
                     }
                   },
                 }));
               }}
             />
           </div>
-
-          <Button type="danger" onClick={e => this.deleteAnswer(e, i)}>
-            Slett svar
-          </Button>
         </div>
-      ));
     }
 
     let keywordsManual;
@@ -251,9 +213,8 @@ class DocumentView extends React.Component {
     let textAreasAutomatic;
     if (this.state.automatic) {
       /* Map through the texts field from prod */
-      textAreasAutomatic = this.state.automatic.content.texts.map((text, i) => (
-        <TextArea readOnly key={i} rows="10" cols="50" value={text} className={css.answer} />
-      ));
+      textAreasAutomatic =
+        <TextArea readOnly key="0" rows="10" cols="50" value={this.state.automatic.content.text} className={css.answer} />
     }
 
     let keywordsAutomatic;
@@ -289,16 +250,6 @@ class DocumentView extends React.Component {
 
               <form>
                 {textAreasManual}
-
-                <div>
-                  <Button
-                    type="primary"
-                    className={classNames(css.addAnswer, 'newText')}
-                    onClick={e => this.createNewAnswer(e)}
-                  >
-                    Nytt svar
-                  </Button>
-                </div>
 
                 <Paragraph>
                   Man kan også oppdatere, legge til og slette nøkkelord og

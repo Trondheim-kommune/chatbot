@@ -123,7 +123,8 @@ class Serializer:
                                                    .format(title,
                                                            child["text"]))]
 
-                content = Content(title, child["text"], child["links"], keywords)
+                content = Content(title, child["text"],
+                                  child["links"], keywords)
                 new_model = copy.deepcopy(model_template)
                 new_model["id"] = child["id"]
                 new_model["content"] = content.get_content()

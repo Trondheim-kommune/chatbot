@@ -39,7 +39,6 @@ def test_scraper_snapshot():
     tree = spider.parse(fake_response_from_file("test.html"))
     tree_obj = next(tree)
 
-
     # Handle absolute path
     responses_dir = os.path.dirname(os.path.realpath(__file__))
     file_path = os.path.join(responses_dir, 'test_html.json')

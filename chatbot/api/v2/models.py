@@ -7,11 +7,12 @@ handler = QueryHandler()
 class Response(object):
     def __init__(self, user_input, style):
         self.user_input = user_input
-        if style: 
+        if style:
             self.response = handler.get_response(self.user_input, style)
-        else: 
+            self.style = style
+        else:
             self.response = handler.get_response(self.user_input)
-        self.style = style
+            self.style = 'plain'
 
 
 class Conflict(object):

@@ -1,5 +1,4 @@
 import string
-import random
 import os
 import pymongo
 
@@ -51,9 +50,10 @@ def _get_corpus_text(doc):
 
 
 def _get_answer(doc):
-    ''' Converts a document from the model into a (text, [links])-answer tuple '''
-    answer = [doc['content']['text'], 
-               doc['content']['links'] if 'links' in doc['content'] else []]
+    ''' Converts a document from the model into a (text, [links])-answer tuple
+    '''
+    answer = [doc['content']['text'], doc['content']['links']
+              if 'links' in doc['content'] else []]
     # Add the source-ur to the list of urls
     answer[1].append([URL_FROM_TEXT, doc['url']])
 
@@ -72,8 +72,9 @@ def _format_answer(answer, url_style):
     for '{} {}'-like 'text, link' format, and html for a full <a>-tag. Returns
     a plain string '''
     for link in answer[1]:
-        answer[0] = answer[0].replace(link[0], _url_styles[url_style].format(*link))
-    
+        answer[0] = answer[0].replace(link[0],
+                                      _url_styles[url_style].format(*link))
+
     # Appends source (URL_FROM_TEXT) to the end
     answer[0] += '\n ' + _url_styles[url_style].format(*answer[1][-1])
     return answer[0]
@@ -232,5 +233,5 @@ def _perform_search(query_text, url_style):
 
 
 class QueryHandler:
-    def get_response(self, query, url_style='html'):
+    def get_response(self, query, url_style='plain'):
         return _perform_search(query, url_style)
