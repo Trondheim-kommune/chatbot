@@ -94,7 +94,7 @@
     "query_system": {
         "not_found": "Jeg fant ikke informasjonen du spurte etter.\nTa kontakt med Boligadministrasjonen dersom du har behov for assistanse.\nTelefon: 72 54 02 88",
         "multiple_answers": "Jeg har flere mulige svar til deg.",
-        "url_from_text": "Hentet fra: ",
+        "url_from_text": "Kilde",
         "custom_synset_file": "chatbot/nlp/statics/synset.json",
         "character_limit": 400,
         "max_answers": 4

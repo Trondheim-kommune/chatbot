@@ -17,12 +17,12 @@ def test_serialize_data():
     assert test_data[0]["url"] == serialized_data[0]["url"]
     assert test_data[0]["id"] == serialized_data[0]["id"]
     assert (
-            test_data[0]["content"]["texts"]
-            == serialized_data[0]["content"]["texts"]
+            test_data[0]["content"]["text"]
+            == serialized_data[0]["content"]["text"]
     )
     assert (
-            test_data[1]["content"]["texts"]
-            == serialized_data[1]["content"]["texts"]
+            test_data[1]["content"]["text"]
+            == serialized_data[1]["content"]["text"]
     )
     assert (
             test_data[0]["header_meta_keywords"][0]
@@ -43,7 +43,7 @@ def test_instance_of_KeyWord():
         Content(
             "Åpningstider",
             "Svømmehallen er åpen alle dager 09:00-20:00",
-            [["svømme", 0.82], ["åpningstid", 0.87]],
+            keywords=[["svømme", 0.82], ["åpningstid", 0.87]],
         )
 
     # Test that no TypeError is raised when creating a Content object with

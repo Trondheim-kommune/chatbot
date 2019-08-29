@@ -39,20 +39,28 @@ def test_scraper_snapshot():
     tree = spider.parse(fake_response_from_file("test.html"))
     tree_obj = next(tree)
 
+
     # Handle absolute path
     responses_dir = os.path.dirname(os.path.realpath(__file__))
     file_path = os.path.join(responses_dir, 'test_html.json')
-
-    # Create the JSON test file if non existing
-    if not os.path.isfile(file_path):
-        with open(file_path, "w") as f:
-            f.write(json.dumps(tree_obj))
 
     # Retrieve snapshot
     with open(file_path, "r") as data:
         html_tree_snapshot = data.readlines()[0]
 
-    # Sort and compare snapshots
-    assert sorted(
-        json.loads(str(html_tree_snapshot)).items()
-    ) == sorted(tree_obj.items())
+    correct = json.loads(str(html_tree_snapshot))
+    result = tree_obj
+
+    assert correct["url"] == result["url"]
+
+    assert correct["tree"]["id"] == result["tree"]["id"]
+
+    # Get a very specific content that contains links
+    a = correct["tree"]["children"][1]["children"][3]["children"][0]["links"]
+    b = result["tree"]["children"][1]["children"][3]["children"][0]["links"]
+    assert a == b
+
+    # Get a very specific content that contains a text
+    a = correct["tree"]["children"][1]["children"][0]["text"]
+    b = result["tree"]["children"][1]["children"][0]["text"]
+    assert a == b
