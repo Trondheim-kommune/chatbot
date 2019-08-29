@@ -78,7 +78,8 @@ def test_get_content(client):
                'content': {
                    'title': 'test title',
                    'keywords': [],
-                   'texts': []
+                   'text': '',
+                   'links': []
                },
                'url': 'test_url'}
     factory.post_document(content, prod_col)
@@ -103,7 +104,8 @@ def test_update_content(client):
                         "confidence": 0.2010
                     }
                 ],
-                "texts": ["some test text"]
+                "text": "some test text",
+                "links": []
             }
     }
     factory.post_document(content.copy(), prod_col)
@@ -140,7 +142,8 @@ def test_get_document(client):
                         "confidence": 0.2010
                     }
                 ],
-                "texts": ["some test text"]
+                "text": "some test text",
+                "links": []
             }
     }
     factory.post_document(document.copy(), prod_col)
@@ -166,7 +169,7 @@ def test_delete_content(client):
                         "confidence": 0.2010
                     }
                 ],
-                "texts": ["some test text"]
+                "text": "some test text"
             }
     }
     factory.post_document(document.copy(), prod_col)

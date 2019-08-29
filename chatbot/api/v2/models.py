@@ -4,18 +4,15 @@ from chatbot.nlp.query import QueryHandler
 handler = QueryHandler()
 
 
-class DirectResponse(object):
-    def __init__(self, user_input=''):
-        self.user_input = user_input
-        self.response = handler.get_response(self.user_input)
-
-
 class Response(object):
-    def __init__(self, user_input='', response_format='plain'):
+    def __init__(self, user_input, style):
         self.user_input = user_input
-        self.response_format = response_format
-        self.response = handler.get_response(self.user_input,
-                                             self.response_format)
+        if style:
+            self.response = handler.get_response(self.user_input, style)
+            self.style = style
+        else:
+            self.response = handler.get_response(self.user_input)
+            self.style = 'plain'
 
 
 class Conflict(object):

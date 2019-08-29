@@ -33,7 +33,7 @@ function query() {
 
 	populateChatWithMessage(input, "user")
 
-	http.open("GET", host+"v2/response/"+input+"/", true);
+	http.open("GET", host+"v2/response/"+input+"/?style=html", true);
   http.setRequestHeader("Content-Type", "text/plain");
 	http.onreadystatechange = function() {
 		if(this.readyState == 4 && this.status == 200) {

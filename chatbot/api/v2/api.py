@@ -19,9 +19,10 @@ conflict_col = Config.get_mongo_collection("conflicts")
 unknown_col = Config.get_mongo_collection("unknown")
 
 
-direct_response_model = api.model('DirectResponse', {
+response_model = api.model('Response', {
     'user_input': fields.String(description='User chat input'),
-    'response': fields.String(description='Bot chat response')
+    'response': fields.String(description='Bot chat response'),
+    'style': fields.String
 })
 
 conflict_model = api.model('Conflict', {
@@ -47,7 +48,8 @@ keyword_model = api.model('Keyword', {
 inner_content_model = api.model('InnerContent', {
     'title': fields.String,
     'keywords': fields.List(fields.Nested(keyword_model)),
-    'texts': fields.List(fields.String)
+    'text': fields.String,
+    'links': fields.List(fields.List(fields.String))
 })
 
 content_model = api.model('Content', {
@@ -72,15 +74,17 @@ class HelloWorld(Resource):
         return {'hello': 'world'}
 
 
+style_parser = reqparse.RequestParser()
+style_parser.add_argument('style', required=False)
+
+
 class Response(Resource):
-    @api.marshal_with(direct_response_model)
+    @api.marshal_with(response_model)
+    @api.expect(style_parser)
     def get(self, query):
-        return models.DirectResponse(user_input=query)
-
-
-class FullResponse(Resource):
-    def get(self):
-        pass
+        args = style_parser.parse_args()
+        style = args['style'] if 'style' in args else 'plain'
+        return models.Response(query, style)
 
 
 class ConflictIDs(Resource):
@@ -226,8 +230,6 @@ class UnknownQueries(Resource):
 api.add_resource(HelloWorld, '/', methods=['GET'])
 
 api.add_resource(Response, '/response/<string:query>/', methods=['GET'])
-
-api.add_resource(FullResponse, '/response/', methods=['GET'])
 
 api.add_resource(ConflictIDs, '/conflict_ids/', methods=['GET'])
 api.add_resource(ConflictIDs,

@@ -17,7 +17,7 @@ def evaluate_test(test):
 
     for question in questions:
         # The answer our system gave.
-        our_answer = _perform_search(question)
+        our_answer = _perform_search(question, 'plain')
         # The score for this specific question.
         score_question = 0
         score_url = 0

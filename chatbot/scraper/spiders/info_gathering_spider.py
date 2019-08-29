@@ -22,12 +22,13 @@ class TreeElement(NodeMixin):
     # A counter used to give an unique ID to all nodes.
     counter = 0
 
-    def __init__(self, tag, page_id, text=None, parent=None):
+    def __init__(self, tag, page_id, text=None, parent=None, links=[]):
         ''' Tree node which stores information about an HTML tag. '''
 
         self.tag = tag
         self.text = text
         self.parent = parent
+        self.links = []
 
         # We hash the URL of all pages and add a counter for the element
         # after it. This is used to diff new and stored HTML pages.
@@ -311,12 +312,11 @@ class InfoGatheringSpider(scrapy.Spider):
                     # Add the element text to parent instead of creating a
                     # new element
                     if elem_text in self.normalize(parent.text):
-                        parent.text += '\n' + url
+                        current_parent.links.append([elem_text, url])
                         continue
 
-                    # Add the URL and elem_text into the end of the parent's
-                    # text
-                    parent.text += '\n' + elem_text + ' ' + url
+                    current_parent.links.append([url, url])
+
             elif elem_tag in self.ignored_child_tags \
                     and current_parent.tag \
                     in self.ignored_child_tags[elem_tag]:
