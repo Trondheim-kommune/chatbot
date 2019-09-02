@@ -40,4 +40,4 @@ RUN ["pip", "install", "."]
 RUN ["python3", "setup.py", "develop"]
 
 # Start server
-CMD ["./scripts/start_server_docker.sh"]
+CMD ["./scripts/start_chatbot_docker.sh"]
