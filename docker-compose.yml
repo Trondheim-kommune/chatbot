@@ -47,13 +47,14 @@ services:
             - mongodb
 
     web:
-        build: chatbot/web
+        build:
+            context: chatbot/web
+            args: 
+                - "REACT_APP_SERVER_URL=http://${SERVER_URL}/"
         ports:
             - 8000:80
         volumes:
             - .:/srv/chatbot-web
-        environment:
-            - REACT_APP_SERVER_URL=${SERVER_URL}
         working_dir: /usr/src/app
 
 volumes:
