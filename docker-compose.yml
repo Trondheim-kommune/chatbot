@@ -53,7 +53,7 @@ services:
         volumes:
             - .:/srv/chatbot-web
         environment:
-            - SERVER_URL=${SERVER_URL}
+            - REACT_APP_SERVER_URL=${SERVER_URL}
         working_dir: /usr/src/app
 
 volumes:

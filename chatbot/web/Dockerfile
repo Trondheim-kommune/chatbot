@@ -2,15 +2,12 @@ FROM node:9 as build-deps
 
 WORKDIR /temp
 
-
 ADD package*.json  ./
 RUN npm install
 
-ENV REACT_APP_SERVER_URL="http://${SERVER_URL}/"
-
 ADD . ./
 
-RUN npm run build
+CMD ["./scripts/start_website_docker.sh"]
 
 # Stage 2 - the production environment
 FROM nginx:1.12-alpine
