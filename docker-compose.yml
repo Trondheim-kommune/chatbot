@@ -10,12 +10,15 @@ services:
             - DB_PWD=${DB_PWD}
             - SERVER_URL=mongodb
             - DOCKER=TRUE
+            - LOG=TRUE
         ports:
-            - 8080:8080
+            - 8080:80
         links:
             - mongodb
         depends_on:
             - mongodb
+        volumes:
+            - ./logs:/usr/src/app/logs
     mongodb:
         image: mongo:latest
         container_name: "mongodb"

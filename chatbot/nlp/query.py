@@ -1,6 +1,7 @@
 import string
 import os
 import pymongo
+import logging
 
 from sklearn.metrics.pairwise import cosine_similarity
 
@@ -12,6 +13,11 @@ from chatbot.model.model_factory import ModelFactory
 from chatbot.nlp.keyword import get_tfidf_model, get_stopwords, lemmatize, nb
 from chatbot.nlp.synset import SynsetWrapper
 from chatbot.util.config_util import Config
+from chatbot.util.logger_util import set_logger
+
+
+if str(os.getenv("LOG")) == "TRUE":
+    set_logger()
 
 
 NOT_FOUND = Config.get_value(['query_system', 'not_found'])
@@ -162,11 +168,12 @@ def _perform_search(query_text, url_style):
     ''' Takes a query string and finds the best matching document in the
     database. '''
 
+    logging.info('Pre expansion: {}'.format(query_text))
+
     # Perform simple query expansion on the original query.
     query = expand_query(query_text)
 
-    if str(os.getenv('LOG')) == 'TRUE':
-        print('Post expansion: ', query)
+    logging.info('Post expansion: {}'.format(query))
 
     # Retrieve a set of documents using MongoDB. We then attempt to filter
     # these further.
@@ -234,4 +241,6 @@ def _perform_search(query_text, url_style):
 
 class QueryHandler:
     def get_response(self, query, url_style='plain'):
-        return _perform_search(query, url_style)
+        response = _perform_search(query, url_style)
+        logging.info('Response: {}'.format(response))
+        return response

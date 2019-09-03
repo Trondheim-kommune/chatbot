@@ -276,6 +276,3 @@ def batch_delete_entities(entity_ids):
         entity_ids_fixed_path.append(parent + "/entityTypes/" + entity_id)
 
     return client.batch_delete_entity_types(parent, entity_ids_fixed_path)
-
-
-get_entities()

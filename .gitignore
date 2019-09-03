@@ -26,3 +26,5 @@ venv/
 # Docker volumes
 data/
 
+# Python log files
+logs/
