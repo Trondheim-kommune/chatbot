@@ -24,6 +24,9 @@ COPY . .
 # Add crontab file in the cron directory
 ADD scripts/crontab /etc/cron.d/crontab
 
+# Setup log file
+RUN mkdir -p /usr/src/app/logs && touch /usr/src/app/logs/chatbot.log
+
 # Give execution rights on the cron job
 RUN chmod 0644 /etc/cron.d/crontab
 
