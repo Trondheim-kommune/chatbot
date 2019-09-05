@@ -33,7 +33,7 @@ def test_response(client):
         assert response.status_code == 200
         assert json.loads(response.data.decode())['user_input'] == query
     finally:
-        factory.delete_document({'unknown_query': query}, conflict_col)
+        factory.delete_document({'query_text': query}, conflict_col)
 
 
 def test_get_conflict_ids(client):
