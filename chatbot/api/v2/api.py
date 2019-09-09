@@ -74,17 +74,19 @@ class HelloWorld(Resource):
         return {'hello': 'world'}
 
 
-style_parser = reqparse.RequestParser()
-style_parser.add_argument('style', required=False)
+response_parser = reqparse.RequestParser()
+response_parser.add_argument('style', required=False)
+response_parser.add_argument('source', required=False)
 
 
 class Response(Resource):
     @api.marshal_with(response_model)
-    @api.expect(style_parser)
+    @api.expect(response_parser)
     def get(self, query):
-        args = style_parser.parse_args()
+        args = response_parser.parse_args()
         style = args['style'] if 'style' in args else 'plain'
-        return models.Response(query, style)
+        source = args['source'] if 'source' in args else 'dev'
+        return models.Response(query, style, source)
 
 
 class ConflictIDs(Resource):

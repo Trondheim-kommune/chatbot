@@ -5,14 +5,11 @@ handler = QueryHandler()
 
 
 class Response(object):
-    def __init__(self, user_input, style):
+    def __init__(self, user_input, style, source):
         self.user_input = user_input
-        if style:
-            self.response = handler.get_response(self.user_input, style)
-            self.style = style
-        else:
-            self.response = handler.get_response(self.user_input)
-            self.style = 'plain'
+        self.response = handler.get_response(self.user_input, style, source)
+        self.style = style
+        self.source = source
 
 
 class Conflict(object):
