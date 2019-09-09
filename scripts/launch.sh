@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 if ! [ -f "chatbot/scraper/scraped.json" ]; then
 	scrapy crawl info_gathering -o chatbot/scraper/scraped.json
