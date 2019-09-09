@@ -238,7 +238,8 @@ def _perform_search(query_text, url_style):
 
 
 class QueryHandler:
-    def get_response(self, query, url_style='plain'):
+    def get_response(self, query, url_style='plain', source='dev'):
+        logging.info('Source: {}'.format(source))
         response = _perform_search(query, url_style)
         logging.info('Response: {}'.format(response))
         return response
