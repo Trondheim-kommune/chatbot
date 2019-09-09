@@ -60,10 +60,10 @@ def _get_answer(doc):
     '''
     answer = [doc['content']['text'], doc['content']['links']
               if 'links' in doc['content'] else []]
-    # Add the source-ur to the list of urls
-    answer[1].append([URL_FROM_TEXT, doc['url']])
+    # Add the source-url to the list of urls, using the title as link text
+    answer[1].append([doc['content']['title'], doc['url']])
 
-    answer[0] = doc['content']['title'] + ':\n' + answer[0]
+    answer[0] = answer[0] + '\n' + doc['content']['title']
     return answer
 
 
@@ -81,8 +81,6 @@ def _format_answer(answer, url_style):
         answer[0] = answer[0].replace(link[0],
                                       _url_styles[url_style].format(*link))
 
-    # Appends source (URL_FROM_TEXT) to the end
-    answer[0] += '\n ' + _url_styles[url_style].format(*answer[1][-1])
     return answer[0]
 
 
