@@ -5,4 +5,4 @@
 # `0 0 * * *  bash <path_to_this_script>`
 cd /usr/src/app
 rm chatbot/scraper/scraped.json
-bash launch.sh
+bash scripts/launch.sh

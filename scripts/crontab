@@ -1,1 +1,1 @@
-* * 1 * * ./usr/src/app/scripts/refresh_data.sh >> /var/log/cron.log
+0 1 * * * bash /usr/src/app/scripts/refresh_data.sh >> /var/log/cron.log
