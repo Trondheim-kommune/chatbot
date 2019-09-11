@@ -21,14 +21,17 @@ RUN python3 -m pip install -r requirements.txt --no-cache-dir
 # Copy all code
 COPY . .
 
-# Add crontab file in the cron directory
-ADD scripts/crontab /etc/cron.d/crontab
-
 # Setup log file
 RUN mkdir -p /usr/src/app/logs && touch /usr/src/app/logs/chatbot.log
 
+# Copy cron-job script to the cron.d dir
+COPY scripts/crontab /etc/cron.d/chatbot
+
 # Give execution rights on the cron job
-RUN chmod 0644 /etc/cron.d/crontab
+RUN chmod 0644 /etc/cron.d/chatbot
+
+# Apply cron job
+RUN crontab /etc/cron.d/chatbot
 
 # Create the log file to be able to run tail
 RUN touch /var/log/cron.log
@@ -44,5 +47,7 @@ RUN ["pip", "install", "."]
 
 # Install pakcage
 RUN ["python3", "setup.py", "develop"]
+
+CMD ["cron"]
 
 CMD ["./scripts/start_chatbot_docker.sh"]
