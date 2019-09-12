@@ -26,6 +26,9 @@ CHAR_LIMIT = Config.get_value(['query_system', 'character_limit'])
 MAX_ANSWERS = Config.get_value(['query_system', 'max_answers'])
 URL_FROM_TEXT = Config.get_value(['query_system', 'url_from_text'])
 
+ANSWER_THRESHOLD = Config.get_value(['query_system', 'answer_threshold'])
+SIMILARITY_THRESHOLD = Config.get_value(['query_system', 'similarity_threshold'])
+
 
 factory = ModelFactory.get_instance()
 factory.set_db()
@@ -197,7 +200,7 @@ def _perform_search(query_text, url_style):
 
         # This could be calculated using the mean of all scores and the
         # standard deviation.
-        if sorted_scores[0] < 0.05:
+        if sorted_scores[0] < ANSWER_THRESHOLD:
             return _handle_not_found(query_text)
 
         # Allow returning multiple answers if they rank very similarly.
@@ -205,14 +208,14 @@ def _perform_search(query_text, url_style):
 
         for score in sorted_scores:
             # Tolerance for similarity between scores.
-            if sorted_scores[0] - score > 0.1:
+            if sorted_scores[0] - score > SIMILARITY_THRESHOLD:
                 break
 
             # Add this result to the list of answers.
             answers.append(_get_answer(docs[scores.index(score)]))
 
         if len(answers) == 1:
-            # Return the answer straight away if there is only 1 result/
+            # Return the answer straight away if there is only 1 result
             return _format_answer(answers[0], url_style)
 
         # Append answers until we reach the CHAR_LIMIT
