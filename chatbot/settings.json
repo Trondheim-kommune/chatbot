@@ -32,7 +32,8 @@
         "url": {
             "root_url": "https://www.trondheim.kommune.no/tema/sosiale-tjenester",
             "allowed_paths": [
-                "https://www.trondheim.kommune.no/tema/sosiale-tjenester/bolig-med-tjenester/"
+                "https://www.trondheim.kommune.no/tema/sosiale-tjenester/bolig-med-tjenester/kommunal-bolig",
+				"https://www.trondheim.kommune.no/tema/sosiale-tjenester/bolig-med-tjenester/for-deg-som-bor-i-kommunal-utleiebolig"
             ]
         },
         "blacklist": {
