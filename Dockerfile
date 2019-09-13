@@ -42,6 +42,9 @@ COPY chatbot/api/nginx.conf /etc/nginx
 # Give NGINX access to the uwsgi web socket
 RUN chmod 777 -R /tmp && chmod o+t -R /tmp
 
+# Set correct timezone for logging
+RUN ln -snf /usr/share/zoneinfo/Europe/Oslo /etc/localtime && echo Europe/Oslo > /etc/timezone
+
 # Install extra package
 RUN ["pip", "install", "."]
 

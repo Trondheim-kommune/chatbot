@@ -23,5 +23,7 @@
 	[["snø", "NOUN"], ["måke", "NOUN"], ["snømåking", "VERB"]],
 	[["strøm", "NOUN"], ["strømregning", "NOUN"], ["oppvarming", "NOUN"]],
 	[["husordensregler", "NOUN"], ["regler", "NOUN"]],
-	[["velferd", "NOUN"], ["velferskontor", "NOUN"]]
+	[["velferd", "NOUN"], ["velferskontor", "NOUN"]],
+	[["brann", "NOUN"], ["brenner", "VERB"], ["brannslokkingsapparat", "NOUN"], ["røykvarsler", "NOUN"], ["brannsikkerhet", "NOUN"], ["brannvern", "NOUN"]],
+	[["røyk", "NOUN"], ["røykvarsler", "NOUN"], ["røykvarsleren", "NOUN"]]
 ]
