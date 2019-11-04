@@ -27,7 +27,8 @@ MAX_ANSWERS = Config.get_value(['query_system', 'max_answers'])
 URL_FROM_TEXT = Config.get_value(['query_system', 'url_from_text'])
 
 ANSWER_THRESHOLD = Config.get_value(['query_system', 'answer_threshold'])
-SIMILARITY_THRESHOLD = Config.get_value(['query_system', 'similarity_threshold'])
+SIMILARITY_THRESHOLD = Config.get_value(['query_system',
+                                         'similarity_threshold'])
 
 
 factory = ModelFactory.get_instance()
