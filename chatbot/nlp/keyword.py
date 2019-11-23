@@ -44,7 +44,7 @@ def _extract_top(feature_names, sorted_items, n=10):
     return [(feature_names[i], score) for i, score in sorted_items[:n]]
 
 
-def _has_digits(token):
+def has_digits(token):
     ''' Returns true if the given string contains any digits. '''
     return any(char.isdigit() for char in token)
 
@@ -58,7 +58,7 @@ def tokenize(doc):
     tokens = [token for token in tokens if token not in string.punctuation]
 
     # Remove tokens which contain any number.
-    tokens = [token for token in tokens if not _has_digits(token)]
+    tokens = [token for token in tokens if not has_digits(token)]
 
     # Remove tokens without text.
     tokens = [token for token in tokens if bool(token.strip())]
