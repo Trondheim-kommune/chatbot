@@ -1,8 +1,11 @@
 import json
 import os
 
+from bs4 import BeautifulSoup
+
 from chatbot.nlp.keyword import (get_keywords, get_tfidf_model,
                                  stop_words, tokenize)
+from chatbot.model.serializer import KeyWord
 
 
 class Evaluator():
@@ -54,27 +57,28 @@ class Evaluator():
         ''' Return a list of words that are known and used frequently in
         Norwegian '''
         with open('chatbot/nlp/statics/no_50k.json') as file_:
-            return [word for word, _ in json.load(file_)]
+            return [word for word in json.load(file_)]
+
+    def _get_num_rare_words(self, doc):
+        ''' Return a 'normalised' number of rare words in the document '''
+        # Need a list of frequent words to check how many 'rare' words each
+        # text document has
+        freq_words = self._get_frequent_words()
+        unknown_words = 0
+
+        tokens = tokenize(doc)
+        for token in tokens:
+            if token not in freq_words:
+                unknown_words += 1
+
+        # "normalized" number of unknown words based on non-stopword tokens
+        return unknown_words / len(tokens)
 
     def _calculate_global_metrics(self, corpus):
         ''' Calculate metrics based on the global corpus '''
 
-        # Need a list of frequent words to check how many 'rare' words each
-        # text document has
-        freq_words = self._get_frequent_words()
-
-        num_rare_words = []
-        for doc in corpus:
-            tokens = tokenize(doc)
-            unknown_words = 0
-            for token in tokens:
-                if token not in freq_words:
-                    unknown_words += 1
-
-            # "normalized" number of unknown words based on non-stopword tokens
-            num_rare_words.append(unknown_words / len(tokens))
-
-        n_stop_words = [sum([d.count(s) for s in stop_words] for d in corpus)]
+        num_rare_words = [self._get_num_rare_words(doc) for doc in corpus]
+        n_stop_words = [sum(d.count(s) for s in stop_words for d in corpus)]
         lens = [len(d) for d in corpus]
 
         # Averages to use in evaluation
@@ -121,11 +125,13 @@ class Evaluator():
                 path = self._create_path(path_len, uri)
 
                 html_file = path + '/' + uri[-1] + '.html'
-                if not os.path.exists(html_file):
-                    # We don't actually want to make a new file here, instead
-                    # we must copy a pre-defined html-template that we can then
-                    # add DOM-elements to, for each content
-                    os.mknod(html_file)
+                # We read from the template file and save it as a bs4
+                # object. This object will be extended to include the
+                # contents of the page. Once the main while-loop is done, we
+                # write the soup-object to the file html_file
+                with open('text_evaluator/statics/template.html', 'r') as inf:
+                    txt = inf.read()
+                    soup = BeautifulSoup(txt)
 
                 # Tread child_data as a queue for iterative traversal
                 child_data = list(data['tree'].get('children', []))
@@ -134,19 +140,79 @@ class Evaluator():
                 if len(child_data) > 0 and child_data[0]['tag'] == 'meta':
                     child_data.pop(0)
 
-                title = child_data['text']
                 while child_data:
                     node = child_data.pop(0)
-                    if 'text' in node:
-                        title = '{} - {}'.format(title, node['text']) \
-                                if title else node['text']
 
                     if 'children' in node:
                         child_data += node['children']
+
+                        if 'text' in node:
+                            title = node['text']
+
                     else:
                         # Serialize and build .html file in var:path
-                        continue
+                        text = node['text']
 
+                        keywords = [KeyWord(*kw)
+                                    for kw in get_keywords(self._vectorizer,
+                                                           self._feature_names,
+                                                           "{} {}"
+                                                           .format(title,
+                                                                   text))]
+
+                        # Evaluation metrix
+                        num_rare_words = self._get_num_rare_words(text)
+                        num_stop_words = sum([text.count(s) for s in stop_words])
+                        length = len(text)
+                        max_kw_conf = max([kw.get_keyword()['confidence'] 
+                                           for kw in keywords])
+                        
+                        page_container = soup.find(id='page-container')
+                        text_content = '''
+                        <div class='content-container'>
+                            <div class='row'>
+                                <div class='text-area'>
+                                    <h3 class='title'>{}</h3>
+                                    <p>{}</p>
+                                </div>
+                        '''.format(title, text.replace('\n', '<br>'))
+                        keyword_content = '''
+                        <div class='keywords'>
+                            <h3>Keywords</h3>
+                            <ul> 
+                        '''
+                        for kw in keywords:
+                            keyword_content += '''
+                            <li>{}
+                                <progress value='{}' max='{}'></progress>
+                            </li>
+                            '''.format(kw.get_keyword()['keyword'],
+                                       kw.get_keyword()['confidence'],
+                                       max_kw_conf)
+                        # Close ul, keywords and row divs
+                        keyword_content += '</ul></div></div>' 
+                        metrics = '''
+                        <div class='row'>
+                            <div class='metrics'>
+                                <h3> Evaluation </h3>
+                            </div>
+                        </div>
+                        '''
+                        # Close content-container div
+                        metrics += '</div>'
+                        content = text_content + keyword_content + metrics
+                        content = BeautifulSoup(content)
+                        
+                        # Insert the whole content-container div at the end of
+                        # page-container div
+                        page_container.append(content.div)
+                        
+                # Write the whole new soup-object to the html_file now that we
+                # have looped over all the contents and made the html-structure
+                # for them
+                with open(html_file, 'w') as outf:
+                    outf.write(str(soup))
+                        
 
 eval_ = Evaluator('chatbot/scraper/scraped.json')
 eval_.serialize_data()
