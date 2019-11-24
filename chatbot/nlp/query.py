@@ -77,7 +77,7 @@ _url_styles = {
            }
 
 
-def _format_answer(answer, url_style):
+def format_answer(answer, url_style):
     ''' Format an answer (text, links) with a specific url_style. Supports plain
     for '{} {}'-like 'text, link' format, and html for a full <a>-tag. Returns
     a plain string '''
@@ -217,7 +217,7 @@ def _perform_search(query_text, url_style):
 
         if len(answers) == 1:
             # Return the answer straight away if there is only 1 result
-            return _format_answer(answers[0], url_style)
+            return format_answer(answers[0], url_style)
 
         # Append answers until we reach the CHAR_LIMIT
         i, n_chars = 0, 0
@@ -228,12 +228,12 @@ def _perform_search(query_text, url_style):
         # If we only have 1 answer after threshold we don't want to add the
         # MULTI_ANSWERS option to the response
         if max(i, 1) == 1:
-            return _format_answer(answers[0], url_style)
+            return format_answer(answers[0], url_style)
 
         # Join the results with a separator. Still setting a max number of
         # answers
         answers = answers[0:min(max(i, 1,), MAX_ANSWERS)]
-        answers = [_format_answer(ans, url_style) for ans in answers]
+        answers = [format_answer(ans, url_style) for ans in answers]
         return '\n\n---\n\n'.join([MULTIPLE_ANSWERS] + answers)
     except KeyError:
         raise Exception('Document does not have content and texts.')

@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 from chatbot.nlp.keyword import (get_keywords, get_tfidf_model,
                                  stop_words, tokenize)
 from chatbot.model.serializer import KeyWord
+from chatbot.nlp.query import format_answer
 
 
 class Evaluator():
@@ -76,15 +77,23 @@ class Evaluator():
 
     def _calculate_global_metrics(self, corpus):
         ''' Calculate metrics based on the global corpus '''
-
         num_rare_words = [self._get_num_rare_words(doc) for doc in corpus]
-        n_stop_words = [sum(d.count(s) for s in stop_words for d in corpus)]
+        n_stop_words = [sum(d.count(s) for s in stop_words)/len(d)
+                        for d in corpus]
         lens = [len(d) for d in corpus]
 
         # Averages to use in evaluation
         self._avg_length = sum(lens) / len(lens)
-        self._avg_n_stop_words = sum(n_stop_words) / len(n_stop_words)
-        self._avg_rare_words = sum(num_rare_words) / len(num_rare_words)
+        self._max_length = max(lens)
+        self._min_length = min(lens)
+
+        self._avg_s_words = sum(n_stop_words) / len(n_stop_words)
+        self._max_s_words = max(n_stop_words)
+        self._min_s_words = min(n_stop_words)
+
+        self._avg_r_words = sum(num_rare_words) / len(num_rare_words)
+        self._max_r_words = max(num_rare_words)
+        self._min_r_words = min(num_rare_words)
 
     def _create_path(self, path_length, uri):
         ''' Build file path to the path_length-th element in uri '''
@@ -96,6 +105,12 @@ class Evaluator():
             path += '/{}'.format(uri[i])
 
         return path
+
+    def _calc_meter_values(self, min_, max_, avg_, x):
+        low = (avg_-min_)/2
+        high = (avg_+max_)/2
+
+        return (max_, min_, x, high, low, avg_)
 
     def serialize_data(self):
         title = None
@@ -131,7 +146,15 @@ class Evaluator():
                 # write the soup-object to the file html_file
                 with open('text_evaluator/statics/template.html', 'r') as inf:
                     txt = inf.read()
-                    soup = BeautifulSoup(txt)
+                    soup = BeautifulSoup(txt, 'lxml')
+
+                # Since the html files will be placed at unknown depths,
+                # providng a relative path back to the template stylesheet is
+                # not feasible. Instead, we read the contents of the style
+                # document and insert it in a <style>-tag in the html document.
+                with open('text_evaluator/statics/style.css', 'r') as style_f:
+                    style = style_f.read()
+                soup.style.insert(1, style)
 
                 # Tread child_data as a queue for iterative traversal
                 child_data = list(data['tree'].get('children', []))
@@ -144,7 +167,7 @@ class Evaluator():
                     node = child_data.pop(0)
 
                     if 'children' in node:
-                        child_data += node['children']
+                        child_data = node['children'] + child_data
 
                         if 'text' in node:
                             title = node['text']
@@ -152,6 +175,10 @@ class Evaluator():
                     else:
                         # Serialize and build .html file in var:path
                         text = node['text']
+                        length = len(text)
+                        links = node['links']
+                        # Get proper link-formatting
+                        text = format_answer([text, links], 'html')
 
                         keywords = [KeyWord(*kw)
                                     for kw in get_keywords(self._vectorizer,
@@ -162,11 +189,11 @@ class Evaluator():
 
                         # Evaluation metrix
                         num_rare_words = self._get_num_rare_words(text)
-                        num_stop_words = sum([text.count(s) for s in stop_words])
-                        length = len(text)
-                        max_kw_conf = max([kw.get_keyword()['confidence'] 
+                        num_stop_words = sum([text.count(s)
+                                              for s in stop_words]) / len(text)
+                        max_kw_conf = max([kw.get_keyword()['confidence']
                                            for kw in keywords])
-                        
+
                         page_container = soup.find(id='page-container')
                         text_content = '''
                         <div class='content-container'>
@@ -179,40 +206,74 @@ class Evaluator():
                         keyword_content = '''
                         <div class='keywords'>
                             <h3>Keywords</h3>
-                            <ul> 
+                            <ul>
                         '''
                         for kw in keywords:
                             keyword_content += '''
-                            <li>{}
+                            <li><p>{}</p>
                                 <progress value='{}' max='{}'></progress>
                             </li>
                             '''.format(kw.get_keyword()['keyword'],
                                        kw.get_keyword()['confidence'],
                                        max_kw_conf)
                         # Close ul, keywords and row divs
-                        keyword_content += '</ul></div></div>' 
+                        keyword_content += '</ul></div></div>'
                         metrics = '''
                         <div class='row'>
                             <div class='metrics'>
                                 <h3> Evaluation </h3>
+                            </div class='metrics'>
+                        </div>
+                        <div class='row'>
+                            <div class='metrics'>
+                                <div class='column'>
+                                    <p> Length of text (50% optimal)</p>
+                                    <meter max="{}", min="{}",
+                                           value="{}", high="{}",
+                                           low="{}", optimum="{}"></meter>
+                                </div>
+                                <div class='column'>
+                                    <p> Number of stop words (50% optimal)</p>
+                                    <meter max="{}", min="{}",
+                                           value="{}", high="{}",
+                                           low="{}", optimum="{}"></meter>
+                                </div>
+                                <div class='column'>
+                                    <p> Number of rare words (low optimal)</p>
+                                    <meter max="{}", min="{}",
+                                           value="{}", high="{}",
+                                           low="{}", optimum="{}"></meter>
+                                </div>
                             </div>
                         </div>
-                        '''
+                        '''.format(*self._calc_meter_values(self._min_length,
+                                                            self._max_length,
+                                                            self._avg_length,
+                                                            length),
+                                   *self._calc_meter_values(self._min_s_words,
+                                                            self._max_s_words,
+                                                            self._avg_s_words,
+                                                            num_stop_words),
+                                   *self._calc_meter_values(self._min_r_words,
+                                                            self._max_r_words,
+                                                            self._avg_r_words,
+                                                            num_rare_words)
+                                   )
                         # Close content-container div
                         metrics += '</div>'
                         content = text_content + keyword_content + metrics
-                        content = BeautifulSoup(content)
-                        
+                        content = BeautifulSoup(content, 'lxml')
+
                         # Insert the whole content-container div at the end of
                         # page-container div
                         page_container.append(content.div)
-                        
+
                 # Write the whole new soup-object to the html_file now that we
                 # have looped over all the contents and made the html-structure
                 # for them
                 with open(html_file, 'w') as outf:
                     outf.write(str(soup))
-                        
+
 
 eval_ = Evaluator('chatbot/scraper/scraped.json')
 eval_.serialize_data()
