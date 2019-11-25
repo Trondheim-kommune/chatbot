@@ -222,7 +222,7 @@ def _perform_search(query_text, url_style):
         # Append answers until we reach the CHAR_LIMIT
         i, n_chars = 0, 0
         while n_chars < CHAR_LIMIT and i < len(answers):
-            n_chars += len(answers[i])
+            n_chars += len(answers[i][0])
             i += 1
 
         # If we only have 1 answer after threshold we don't want to add the
