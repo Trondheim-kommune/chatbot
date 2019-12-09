@@ -1,5 +1,5 @@
 const http = new XMLHttpRequest();
-const host = "http://localhost:8080/"
+const host = "http://localhost:8090/"
 
 document.getElementById("user-input-submit").addEventListener("click", function(evt) {
 	event.preventDefault();
