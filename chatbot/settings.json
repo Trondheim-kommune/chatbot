@@ -32,9 +32,9 @@
         "url": {
             "root_url": "https://trondelagfylke.no",
             "allowed_paths": [
-		"https://www.trondelagfylke.no/vare-tjenester",
-		"https://www.trondelagfylke.no/politikk",
-		"https://www.trondelagfylke.no/om-oss"
+				"https://www.trondelagfylke.no/vare-tjenester",
+				"https://www.trondelagfylke.no/politikk",
+				"https://www.trondelagfylke.no/om-oss"
             ]
         },
         "blacklist": {
@@ -55,7 +55,8 @@
             "texts": [
                 "Sist oppdatert:",
                 "Se kart",
-                "_______________"
+                "_______________",
+				"UserExtensions.GetUsername()="
             ],
             "garbage_start_urls": [
                 "#",
