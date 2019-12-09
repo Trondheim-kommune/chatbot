@@ -2,7 +2,7 @@ version: '3'
 services:
     chatbot:
         build: .
-        container_name: "chatbot-full"
+        container_name: "chatbot-trdfylk"
         environment:
             - PROJECT_ID=${PROJECT_ID}
             - GOOGLE_APPLICATION_CREDENTIALS=/usr/src/app/backupagent.json
@@ -12,7 +12,7 @@ services:
             - DOCKER=TRUE
             - LOG=TRUE
         ports:
-            - 8090:80
+            - 8020:80
         links:
             - mongodb
         depends_on:
@@ -21,7 +21,7 @@ services:
             - ./logs:/usr/src/app/logs
     mongodb:
         image: mongo:latest
-        container_name: "mongodb-full"
+        container_name: "mongodb-trdfylk"
         environment:
             - MONGO_DATA_DIR=/data/db
             - MONGO_LOG_DIR=/dev/null
@@ -30,12 +30,12 @@ services:
         volumes:
             - mongodb:/data/db
         ports:
-            - 27018:27017
+            - 27019:27017
         command: mongod --logpath=/dev/null
 
     mongoClientInitializer:
         image: mongo:latest
-        container_name: mongoClientInitializer-full
+        container_name: mongoClientInitializer-trdfylk
         volumes:
             - ./scripts:/scripts
         command: 
@@ -55,7 +55,7 @@ services:
             args: 
                 - "REACT_APP_SERVER_URL=http://${SERVER_URL}/"
         ports:
-            - 8100:80
+            - 8200:80
         volumes:
             - .:/srv/chatbot-web
         working_dir: /usr/src/app

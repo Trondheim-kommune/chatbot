@@ -3,7 +3,7 @@
         "username": "vegardev",
         "password": "vegardev",
         "url": "127.0.0.1",
-        "port": 27018,
+        "port": 27019,
         "prod_db": "prod_chatbot",
         "dev_db": "dev_chatbot",
 		"collections": {
@@ -30,11 +30,11 @@
             "p": 20
         },
         "url": {
-            "root_url": "https://www.trondheim.kommune.no/",
+            "root_url": "https://trondelagfylke.no",
             "allowed_paths": [
-		"https://www.trondheim.kommune.no/tema",
-		"https://www.trondheim.kommune.no/aktuelt",
-		"https://www.trondheim.kommune.no/org"
+		"https://www.trondelagfylke.no/vare-tjenester",
+		"https://www.trondelagfylke.no/politikk",
+		"https://www.trondelagfylke.no/om-oss"
             ]
         },
         "blacklist": {
@@ -48,11 +48,9 @@
                 "#ssp_fantdu"
             ],
             "scrape": [
-                "https://www.trondheim.kommune.no/?$"
+                "https://www.trondelagfylke.no/?$"
             ],
             "visit": [
-                "https://www.trondheim.kommune.no/aktuelt",
-                "https://www.trondheim.kommune.no/tema/bygg-kart-og-eiendom"
             ],
             "texts": [
                 "Sist oppdatert:",
