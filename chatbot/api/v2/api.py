@@ -1,6 +1,7 @@
 import chatbot.api.v2.models as models
 
 from flask_restplus import Namespace, Resource, fields, abort, reqparse
+from flask import request
 
 from chatbot.model.model_factory import ModelFactory
 from chatbot.util.config_util import Config
@@ -22,7 +23,15 @@ unknown_col = Config.get_mongo_collection("unknown")
 response_model = api.model('Response', {
     'user_input': fields.String(description='User chat input'),
     'response': fields.String(description='Bot chat response'),
-    'style': fields.String
+    'style': fields.String,
+    'session': fields.Integer(description='Chat session ID'),
+})
+
+response_input_model = api.model('Response', {
+    'user_input': fields.String(description='Use chat input', required=True),
+    'style': fields.String,
+    'session': fields.Integer(description='Chat session ID', required=True),
+    'source': fields.String
 })
 
 conflict_model = api.model('Conflict', {
@@ -87,6 +96,29 @@ class Response(Resource):
         style = args['style'] if 'style' in args else 'plain'
         source = args['source'] if 'source' in args else 'dev'
         return models.Response(query, style, source)
+
+
+class ResponseJSON(Resource):
+    @api.marshal_with(response_model)
+    @api.expect(response_input_model)
+    @api.response(417, 'No session provided.')
+    @api.response(417, 'No user_input provided.')
+    @api.response(400, 'Invalid session ID.')
+    def get(self):
+        args = request.json
+        if not args:
+            abort(400, 'No input provided.')
+        if not 'session' in args:
+            abort(417, 'No session ID provided.')
+        if not 'user_input' in args:
+            abort(417, 'No user_input provided.')
+        # TODO: Verify valid session ID
+
+        style = args['style'] if 'style' in args else 'plain'
+        source = args['source'] if 'source' in args else 'dev'
+        query = args['user_input']
+        session = args['session']
+        return models.Response(query, style, source, session)
 
 
 class ConflictIDs(Resource):
@@ -231,6 +263,7 @@ class UnknownQueries(Resource):
 
 api.add_resource(HelloWorld, '/', methods=['GET'])
 
+api.add_resource(ResponseJSON, '/response/', methods=['GET'])
 api.add_resource(Response, '/response/<string:query>/', methods=['GET'])
 
 api.add_resource(ConflictIDs, '/conflict_ids/', methods=['GET'])
