@@ -1,3 +1,5 @@
+import random
+
 import chatbot.api.v2.models as models
 
 from flask_restplus import Namespace, Resource, fields, abort, reqparse
@@ -75,6 +77,10 @@ content_collection_model = api.model('ContentCol', {
 
 unknown_query_model = api.model('UnknownQuery', {
     'query_text': fields.String
+})
+
+session_model = api.model('Session', {
+    'session': fields.Integer
 })
 
 
@@ -261,6 +267,22 @@ class UnknownQueries(Resource):
             abort(404, 'Unknown query not found')
 
 
+class Session(Resource):
+    @api.marshal_with(session_model)
+    def get(self):
+        return {"session": random.randint(1000, 9999)}
+
+    @api.marshal_with(session_model)
+    @api.response(400, 'Session already closed or timed out')
+    def delete(self, session):
+        # TODO: Verify if session is valid
+        try:
+            session = int(session)
+            return {"session": session}
+        except:
+            abort(400, 'Session ID not an integer.')
+
+
 api.add_resource(HelloWorld, '/', methods=['GET'])
 
 api.add_resource(ResponseJSON, '/response/', methods=['GET'])
@@ -280,3 +302,7 @@ api.add_resource(UnknownQueries, '/unknown_queries/', methods=['GET'])
 api.add_resource(UnknownQueries,
                  '/unknown_queries/<unknown_query>/',
                  methods=['DELETE'])
+
+api.add_resource(Session, '/session/', methods=['GET'])
+api.add_resource(Session, '/session/<session>/', methods=['DELETE'])
+
