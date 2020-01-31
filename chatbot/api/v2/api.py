@@ -26,10 +26,10 @@ response_model = api.model('Response', {
     'user_input': fields.String(description='User chat input'),
     'response': fields.String(description='Bot chat response'),
     'style': fields.String,
-    'session': fields.Integer(description='Chat session ID'),
+    'session': fields.Integer(description='Chat session ID')
 })
 
-response_input_model = api.model('Response', {
+response_input_model = api.model('ResponseInput', {
     'user_input': fields.String(description='Use chat input', required=True),
     'style': fields.String,
     'session': fields.Integer(description='Chat session ID', required=True),
