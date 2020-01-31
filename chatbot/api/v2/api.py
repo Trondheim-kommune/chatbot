@@ -1,12 +1,15 @@
+import random
+
 import chatbot.api.v2.models as models
 
 from flask_restplus import Namespace, Resource, fields, abort, reqparse
+from flask import request
 
 from chatbot.model.model_factory import ModelFactory
 from chatbot.util.config_util import Config
 
 
-api = Namespace('v2', description='Chatbot APIv2')
+api = Namespace('v2', description='Chatbot APIv2.1')
 
 
 factory = ModelFactory.get_instance()
@@ -22,7 +25,15 @@ unknown_col = Config.get_mongo_collection("unknown")
 response_model = api.model('Response', {
     'user_input': fields.String(description='User chat input'),
     'response': fields.String(description='Bot chat response'),
-    'style': fields.String
+    'style': fields.String,
+    'session': fields.Integer(description='Chat session ID'),
+})
+
+response_input_model = api.model('Response', {
+    'user_input': fields.String(description='Use chat input', required=True),
+    'style': fields.String,
+    'session': fields.Integer(description='Chat session ID', required=True),
+    'source': fields.String
 })
 
 conflict_model = api.model('Conflict', {
@@ -68,6 +79,10 @@ unknown_query_model = api.model('UnknownQuery', {
     'query_text': fields.String
 })
 
+session_model = api.model('Session', {
+    'session': fields.Integer
+})
+
 
 class HelloWorld(Resource):
     def get(self):
@@ -87,6 +102,29 @@ class Response(Resource):
         style = args['style'] if 'style' in args else 'plain'
         source = args['source'] if 'source' in args else 'dev'
         return models.Response(query, style, source)
+
+
+class ResponseJSON(Resource):
+    @api.marshal_with(response_model)
+    @api.expect(response_input_model)
+    @api.response(417, 'No session provided.')
+    @api.response(417, 'No user_input provided.')
+    @api.response(400, 'Invalid session ID.')
+    def get(self):
+        args = request.json
+        if not args:
+            abort(400, 'No input provided.')
+        if not 'session' in args:
+            abort(417, 'No session ID provided.')
+        if not 'user_input' in args:
+            abort(417, 'No user_input provided.')
+        # TODO: Verify valid session ID
+
+        style = args['style'] if 'style' in args else 'plain'
+        source = args['source'] if 'source' in args else 'dev'
+        query = args['user_input']
+        session = args['session']
+        return models.Response(query, style, source, session)
 
 
 class ConflictIDs(Resource):
@@ -229,8 +267,25 @@ class UnknownQueries(Resource):
             abort(404, 'Unknown query not found')
 
 
+class Session(Resource):
+    @api.marshal_with(session_model)
+    def get(self):
+        return {"session": random.randint(1000, 9999)}
+
+    @api.marshal_with(session_model)
+    @api.response(400, 'Session already closed or timed out')
+    def delete(self, session):
+        # TODO: Verify if session is valid
+        try:
+            session = int(session)
+            return {"session": session}
+        except:
+            abort(400, 'Session ID not an integer.')
+
+
 api.add_resource(HelloWorld, '/', methods=['GET'])
 
+api.add_resource(ResponseJSON, '/response/', methods=['GET'])
 api.add_resource(Response, '/response/<string:query>/', methods=['GET'])
 
 api.add_resource(ConflictIDs, '/conflict_ids/', methods=['GET'])
@@ -247,3 +302,7 @@ api.add_resource(UnknownQueries, '/unknown_queries/', methods=['GET'])
 api.add_resource(UnknownQueries,
                  '/unknown_queries/<unknown_query>/',
                  methods=['DELETE'])
+
+api.add_resource(Session, '/session/', methods=['GET'])
+api.add_resource(Session, '/session/<session>/', methods=['DELETE'])
+

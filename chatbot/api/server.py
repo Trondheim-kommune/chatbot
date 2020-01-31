@@ -14,7 +14,7 @@ app = Flask(__name__)
 app.register_blueprint(v1_dialog_api)
 app.register_blueprint(v1_web_api)
 
-api = Api(app, version='2.0')
+api = Api(app, version='2.1')
 api.add_namespace(v2_api)
 
 CORS(app)
