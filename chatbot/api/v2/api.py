@@ -9,7 +9,7 @@ from chatbot.model.model_factory import ModelFactory
 from chatbot.util.config_util import Config
 
 
-api = Namespace('v2', description='Chatbot APIv2')
+api = Namespace('v2', description='Chatbot APIv2.1')
 
 
 factory = ModelFactory.get_instance()
