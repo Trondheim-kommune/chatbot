@@ -110,7 +110,7 @@ class ResponseJSON(Resource):
     @api.response(417, 'No session provided.')
     @api.response(417, 'No user_input provided.')
     @api.response(400, 'Invalid session ID.')
-    def get(self):
+    def post(self):
         args = request.json
         if not args:
             abort(400, 'No input provided.')
@@ -285,7 +285,7 @@ class Session(Resource):
 
 api.add_resource(HelloWorld, '/', methods=['GET'])
 
-api.add_resource(ResponseJSON, '/response/', methods=['GET'])
+api.add_resource(ResponseJSON, '/response/', methods=['POST'])
 api.add_resource(Response, '/response/<string:query>/', methods=['GET'])
 
 api.add_resource(ConflictIDs, '/conflict_ids/', methods=['GET'])
