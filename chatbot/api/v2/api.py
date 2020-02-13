@@ -22,6 +22,23 @@ conflict_col = Config.get_mongo_collection("conflicts")
 unknown_col = Config.get_mongo_collection("unknown")
 
 
+link_model = api.model('Link', {
+    'title': fields.String(),
+    'link': fields.String()
+})
+
+answer_model = api.model('Answer', {
+    'answer_id': fields.String(description='Answer ID used for feedback'),
+    'answer': fields.String(description='Textual answer'),
+    'links': fields.List(fields.Nested(link_model))
+})
+
+response_raw_model = api.model('ResponseRaw', {
+    'user_input': fields.String(description='User chat input'),
+    'response': fields.List(fields.Nested(answer_model), description='Bot chat response'),
+    'session': fields.Integer(description='Chat session ID'),
+})
+
 response_model = api.model('Response', {
     'user_input': fields.String(description='User chat input'),
     'response': fields.String(description='Bot chat response'),
@@ -31,7 +48,6 @@ response_model = api.model('Response', {
 
 response_input_model = api.model('ResponseInput', {
     'user_input': fields.String(description='Use chat input', required=True),
-    'style': fields.String,
     'session': fields.Integer(description='Chat session ID', required=True),
     'source': fields.String
 })
@@ -105,7 +121,7 @@ class Response(Resource):
 
 
 class ResponseJSON(Resource):
-    @api.marshal_with(response_model)
+    @api.marshal_with(response_raw_model)
     @api.expect(response_input_model)
     @api.response(417, 'No session provided.')
     @api.response(417, 'No user_input provided.')
@@ -120,11 +136,10 @@ class ResponseJSON(Resource):
             abort(417, 'No user_input provided.')
         # TODO: Verify valid session ID
 
-        style = args['style'] if 'style' in args else 'plain'
         source = args['source'] if 'source' in args else 'dev'
         query = args['user_input']
         session = args['session']
-        return models.Response(query, style, source, session)
+        return models.ResponseRaw(query, source, session)
 
 
 class ConflictIDs(Resource):

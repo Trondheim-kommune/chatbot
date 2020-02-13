@@ -1,3 +1,5 @@
+import random 
+
 from chatbot.nlp.query import QueryHandler
 
 
@@ -11,6 +13,25 @@ class Response(object):
         self.style = style
         self.source = source
         self.session = session
+
+
+class ResponseRaw(object):
+    def __init__(self, user_input, source, session):
+        self.user_input = user_input
+        responses = handler.get_response(self.user_input, source=source, raw=True)
+        self.response = [] 
+        for r in responses:
+            answer = {}
+            answer['answer'] = r[0]
+            answer['links'] = []
+            if len(r) > 1:
+                for link in r[1]:
+                    answer['links'].append({'title': link[0], 'link': link[1]})
+            answer['answer_id'] = random.randint(1000, 9999)
+            self.response.append(answer)
+        self.source = source
+        self.session = session
+
 
 class Conflict(object):
     def __init__(self, conflict_id, title):

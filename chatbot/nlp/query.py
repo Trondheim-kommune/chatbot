@@ -166,7 +166,7 @@ def expand_query(query):
     return ' '.join(result)
 
 
-def _perform_search(query_text, url_style):
+def _perform_search(query_text, url_style, raw):
     ''' Takes a query string and finds the best matching document in the
     database. '''
 
@@ -183,7 +183,8 @@ def _perform_search(query_text, url_style):
 
     # Prevent generating an empty corpus if no documents were found.
     if not docs:
-        return _handle_not_found(query_text)
+        if raw:
+            return [[_handle_not_found(query_text)]]
 
     # Create a corpus on the results from the MongoDB query.
     corpus = [_get_corpus_text(doc) for doc in docs]
@@ -202,6 +203,7 @@ def _perform_search(query_text, url_style):
         # This could be calculated using the mean of all scores and the
         # standard deviation.
         if sorted_scores[0] < ANSWER_THRESHOLD:
+            if raw: return [[_handle_not_found(query_text)]]
             return _handle_not_found(query_text)
 
         # Allow returning multiple answers if they rank very similarly.
@@ -217,6 +219,7 @@ def _perform_search(query_text, url_style):
 
         if len(answers) == 1:
             # Return the answer straight away if there is only 1 result
+            if raw: return [answers[0]]
             return _format_answer(answers[0], url_style)
 
         # Append answers until we reach the CHAR_LIMIT
@@ -228,22 +231,31 @@ def _perform_search(query_text, url_style):
         # If we only have 1 answer after threshold we don't want to add the
         # MULTI_ANSWERS option to the response
         if max(i, 1) == 1:
+            if raw: 
+                return [answers[0]]
             return _format_answer(answers[0], url_style)
 
         # Join the results with a separator. Still setting a max number of
         # answers
         answers = answers[0:min(max(i, 1,), MAX_ANSWERS)]
+        # Return (text, links) where links is (title, link) in the case of
+        # needing 'raw' answers. 
+        if raw: 
+            return [[MULTIPLE_ANSWERS]] + answers
         answers = [_format_answer(ans, url_style) for ans in answers]
         return '\n\n---\n\n'.join([MULTIPLE_ANSWERS] + answers)
-    except KeyError:
+    except KeyError as e:
         raise Exception('Document does not have content and texts.')
     except ValueError:
-        return _handle_not_found(query_text)
+        if raw: 
+            return [[_handle_not_found(query_text)]]
+        else: 
+            return _handle_not_found(query_text)
 
 
 class QueryHandler:
-    def get_response(self, query, url_style='plain', source='dev'):
+    def get_response(self, query, url_style='plain', source='dev', raw=False):
         logging.info('Source: {}'.format(source))
-        response = _perform_search(query, url_style)
+        response = _perform_search(query, url_style, raw)
         logging.info('Response: {}'.format(response))
         return response
