@@ -28,7 +28,7 @@ link_model = api.model('Link', {
 })
 
 answer_model = api.model('Answer', {
-    'answer_id': fields.String(description='Answer ID used for feedback'),
+    'answer_id': fields.Integer(description='Answer ID used for feedback'),
     'answer': fields.String(description='Textual answer'),
     'links': fields.List(fields.Nested(link_model))
 })
@@ -99,6 +99,14 @@ session_model = api.model('Session', {
     'session': fields.Integer
 })
 
+feedback_model = api.model('Feedback', {
+    'session': fields.Integer('Session ID of feedback session'),
+    'user_input': fields.String('User input that generated feedback answer'),
+    'answer_id': fields.Integer('ID of feedback answer'),
+    'answer': fields.String('Feedback answer'),
+    'feedback': fields.Integer('Feedback: {-1, 1}')
+})
+
 
 class HelloWorld(Resource):
     def get(self):
@@ -123,17 +131,15 @@ class Response(Resource):
 class ResponseJSON(Resource):
     @api.marshal_with(response_raw_model)
     @api.expect(response_input_model)
-    @api.response(417, 'No session provided.')
-    @api.response(417, 'No user_input provided.')
-    @api.response(400, 'Invalid session ID.')
+    @api.response(400, 'No <field> provided./Invalid ID.')
     def post(self):
         args = request.json
         if not args:
             abort(400, 'No input provided.')
         if not 'session' in args:
-            abort(417, 'No session ID provided.')
+            abort(400, 'No session ID provided.')
         if not 'user_input' in args:
-            abort(417, 'No user_input provided.')
+            abort(400, 'No user_input provided.')
         # TODO: Verify valid session ID
 
         source = args['source'] if 'source' in args else 'dev'
@@ -298,6 +304,41 @@ class Session(Resource):
             abort(400, 'Session ID not an integer.')
 
 
+class Feedback(Resource):
+    @api.marshal_with(feedback_model)
+    @api.expect(feedback_model)
+    @api.response(400, 'No <field> provided/Invalid feedback value.')
+    def post(self):
+        args = request.json
+        if not args:
+            abort(400, 'No input provided.')
+        
+        for feedback_arg in feedback_model:
+            if feedback_arg not in args:
+                abort(400, 'No {} provided.'.format(feedback_arg))
+
+        # Validate integer values
+        for integer_arg in ('session', 'answer_id', 'feedback'):
+            try:
+               value = int(args[integer_arg])
+            except:
+                abort(400, '{} is not and integer.'.format(integer_arg))
+
+        feedback = args['feedback']
+        # Validate valid values for feedback
+        if not (feedback == 1 or feedback == -1):
+            abort(400, 'Invalid feedback value. Accepts {-1, 1} only.')
+
+        session = args['session']
+        user_input = args['user_input']
+        answer = args['answer']
+        answer_id = args['answer_id']
+
+        # TODO: Implement feedback
+        return models.Feedback(feedback, session, user_input, 
+                               answer, answer_id)
+
+
 api.add_resource(HelloWorld, '/', methods=['GET'])
 
 api.add_resource(ResponseJSON, '/response/', methods=['POST'])
@@ -321,3 +362,4 @@ api.add_resource(UnknownQueries,
 api.add_resource(Session, '/session/', methods=['GET'])
 api.add_resource(Session, '/session/<session>/', methods=['DELETE'])
 
+api.add_resource(Feedback, '/feedback/', methods=['POST'])

@@ -43,3 +43,12 @@ class Document(object):
     def __init__(self, id, title):
         self.id = id
         self.title = title
+
+
+class Feedback(object):
+    def __init__(self, feedback, session, user_input, answer, answer_id):
+        self.feedback = feedback
+        self.session = session
+        self.user_input = user_input
+        self.answer = answer
+        self.answer_id = answer_id

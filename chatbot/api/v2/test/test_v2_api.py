@@ -30,6 +30,7 @@ def test_response(client):
     query = 'some test response'
     try:
         response = client.get('/v2/response/{}/'.format(query))
+        print(response.data)
         assert response.status_code == 200
         assert json.loads(response.data.decode())['user_input'] == query
     finally:
@@ -208,3 +209,30 @@ def test_delete_unknown_query(client):
         assert response_data['deleted_count'] > 0
     finally:
         factory.delete_document(query, unknown_col)
+
+
+def test_feedback_invalid_feedback(client):
+    data = {'session': 0,
+            'user_input': 'text',
+            'answer_id': 0,
+            'answer': 'text',
+            'feedback': 0}
+
+    response = client.post('/v2/feedback/', data=data)
+    assert response.status_code == 400
+
+
+def test_feedback_valid_feedback(client):
+    data = {'session': 0,
+            'user_input': 'text',
+            'answer_id': 0,
+            'answer': 'text',
+            'feedback': 1}
+
+    response = client.post('/v2/feedback/', json=data)
+    print(response.data)
+    assert response.status_code == 200
+
+    data['feedback'] = -1
+    response = client.post('/v2/feedback/', json=data)
+    assert response.status_code == 200
