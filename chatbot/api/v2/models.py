@@ -1,4 +1,4 @@
-import random 
+import random
 
 from chatbot.nlp.query import QueryHandler
 
@@ -13,8 +13,8 @@ class Response(object):
             self.response = handler.get_response(self.user_input,
                                                  source=source)
         else:
-            self.response = handler.get_response(self.user_input, 
-                                                 style, 
+            self.response = handler.get_response(self.user_input,
+                                                 style,
                                                  source)
         self.style = style
         self.source = source
@@ -24,8 +24,10 @@ class Response(object):
 class ResponseRaw(object):
     def __init__(self, user_input, source, session):
         self.user_input = user_input
-        responses = handler.get_response(self.user_input, source=source, raw=True)
-        self.response = [] 
+        responses = handler.get_response(self.user_input,
+                                         source=source,
+                                         raw=True)
+        self.response = []
         for r in responses:
             answer = {}
             answer['answer'] = r[0]

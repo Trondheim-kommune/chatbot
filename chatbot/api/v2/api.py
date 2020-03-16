@@ -35,7 +35,8 @@ answer_model = api.model('Answer', {
 
 response_raw_model = api.model('ResponseRaw', {
     'user_input': fields.String(description='User chat input'),
-    'response': fields.List(fields.Nested(answer_model), description='Bot chat response'),
+    'response': fields.List(fields.Nested(answer_model),
+                            description='Bot chat response'),
     'session': fields.Integer(description='Chat session ID'),
 })
 
@@ -136,9 +137,9 @@ class ResponseJSON(Resource):
         args = request.json
         if not args:
             abort(400, 'No input provided.')
-        if not 'session' in args:
+        if 'session' not in args:
             abort(400, 'No session ID provided.')
-        if not 'user_input' in args:
+        if 'user_input' not in args:
             abort(400, 'No user_input provided.')
         # TODO: Verify valid session ID
 
@@ -300,7 +301,7 @@ class Session(Resource):
         try:
             session = int(session)
             return {"session": session}
-        except:
+        except ValueError:
             abort(400, 'Session ID not an integer.')
 
 
@@ -312,7 +313,7 @@ class Feedback(Resource):
         args = request.json
         if not args:
             abort(400, 'No input provided.')
-        
+
         for feedback_arg in feedback_model:
             if feedback_arg not in args:
                 abort(400, 'No {} provided.'.format(feedback_arg))
@@ -320,22 +321,22 @@ class Feedback(Resource):
         # Validate integer values
         for integer_arg in ('session', 'answer_id', 'feedback'):
             try:
-               value = int(args[integer_arg])
-            except:
+                int(args[integer_arg])
+            except ValueError:
                 abort(400, '{} is not and integer.'.format(integer_arg))
 
-        feedback = args['feedback']
+        feedback = int(args['feedback'])
         # Validate valid values for feedback
         if not (feedback == 1 or feedback == -1):
             abort(400, 'Invalid feedback value. Accepts {-1, 1} only.')
 
-        session = args['session']
+        session = int(args['session'])
         user_input = args['user_input']
         answer = args['answer']
-        answer_id = args['answer_id']
+        answer_id = int(args['answer_id'])
 
         # TODO: Implement feedback
-        return models.Feedback(feedback, session, user_input, 
+        return models.Feedback(feedback, session, user_input,
                                answer, answer_id)
 
 

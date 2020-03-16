@@ -203,7 +203,8 @@ def _perform_search(query_text, url_style, raw):
         # This could be calculated using the mean of all scores and the
         # standard deviation.
         if sorted_scores[0] < ANSWER_THRESHOLD:
-            if raw: return [[_handle_not_found(query_text)]]
+            if raw:
+                return [[_handle_not_found(query_text)]]
             return _handle_not_found(query_text)
 
         # Allow returning multiple answers if they rank very similarly.
@@ -219,7 +220,8 @@ def _perform_search(query_text, url_style, raw):
 
         if len(answers) == 1:
             # Return the answer straight away if there is only 1 result
-            if raw: return [answers[0]]
+            if raw:
+                return [answers[0]]
             return _format_answer(answers[0], url_style)
 
         # Append answers until we reach the CHAR_LIMIT
@@ -231,7 +233,7 @@ def _perform_search(query_text, url_style, raw):
         # If we only have 1 answer after threshold we don't want to add the
         # MULTI_ANSWERS option to the response
         if max(i, 1) == 1:
-            if raw: 
+            if raw:
                 return [answers[0]]
             return _format_answer(answers[0], url_style)
 
@@ -239,17 +241,17 @@ def _perform_search(query_text, url_style, raw):
         # answers
         answers = answers[0:min(max(i, 1,), MAX_ANSWERS)]
         # Return (text, links) where links is (title, link) in the case of
-        # needing 'raw' answers. 
-        if raw: 
+        # needing 'raw' answers.
+        if raw:
             return [[MULTIPLE_ANSWERS]] + answers
         answers = [_format_answer(ans, url_style) for ans in answers]
         return '\n\n---\n\n'.join([MULTIPLE_ANSWERS] + answers)
-    except KeyError as e:
+    except KeyError:
         raise Exception('Document does not have content and texts.')
     except ValueError:
-        if raw: 
+        if raw:
             return [[_handle_not_found(query_text)]]
-        else: 
+        else:
             return _handle_not_found(query_text)
 
 
