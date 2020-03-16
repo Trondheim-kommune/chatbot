@@ -1,6 +1,10 @@
 import random
 
 from chatbot.nlp.query import QueryHandler
+from chatbot.util.config_util import Config
+
+NOT_FOUND = Config.get_value(['query_system', 'not_found'])
+MULTIPLE_ANSWERS = Config.get_value(['query_system', 'multiple_answers'])
 
 
 handler = QueryHandler()
@@ -37,6 +41,13 @@ class ResponseRaw(object):
                     answer['links'].append({'title': link[0], 'link': link[1]})
             answer['answer_id'] = random.randint(1000, 9999)
             self.response.append(answer)
+
+        # Static ID for default answers
+        if (self.response[0]['answer'] == MULTIPLE_ANSWERS or
+            self.response[0]['answer'] == NOT_FOUND):
+            self.response[0]['answer_id'] = -1
+
+
         self.source = source
         self.session = session
 
