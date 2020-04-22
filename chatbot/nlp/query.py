@@ -78,14 +78,18 @@ _url_styles = {
            }
 
 
-def _format_answer(answer, url_style):
+def _format_answer(answer, url_style, raw=True):
     ''' Format an answer (text, links) with a specific url_style. Supports plain
     for '{} {}'-like 'text, link' format, and html for a full <a>-tag. Returns
     a plain string '''
-    for link in answer[1]:
+    for link in answer[1][:-1]:
         answer[0] = answer[0].replace(link[0],
                                       _url_styles[url_style].format(*link))
 
+    if raw:
+        # Remove source-link title from answer text
+        answer[0] = answer[0].replace(answer[1][-1][0], '')
+    
     return answer[0]
 
 
@@ -219,11 +223,12 @@ def _perform_search(query_text, url_style, raw):
             # Add this result to the list of answers.
             answers.append(_get_answer(docs[scores.index(score)]))
 
+
         if len(answers) == 1:
             # Return the answer straight away if there is only 1 result
             if raw:
-                return [_format_answer(answers[0], url_style)]
-            return _format_answer(answers[0], url_style)
+                return [(_format_answer(answers[0], url_style), answers[0][1])]
+            return _format_answer(answers[0], url_style, raw=False)
 
         # Append answers until we reach the CHAR_LIMIT
         i, n_chars = 0, 0
@@ -235,17 +240,18 @@ def _perform_search(query_text, url_style, raw):
         # MULTI_ANSWERS option to the response
         if max(i, 1) == 1:
             if raw:
-                return [_format_answer(answers[0], url_style)]
-            return _format_answer(answers[0], url_style)
+                return [(_format_answer(answers[0], url_style), ansers[0][1])]
+            return _format_answer(answers[0], url_style, raw=False)
 
         # Join the results with a separator. Still setting a max number of
         # answers
         answers = answers[0:min(max(i, 1,), MAX_ANSWERS)]
         # Return (text, links) where links is (title, link) in the case of
         # needing 'raw' answers.
-        answers = [_format_answer(ans, url_style) for ans in answers]
         if raw:
+            answers = [(_format_answer(a, url_style), a[1]) for a in answers]
             return [[MULTIPLE_ANSWERS]] + answers
+        answers = [_format_answer(ans, url_style, raw=False) for ans in answers]
         return '\n\n---\n\n'.join([MULTIPLE_ANSWERS] + answers)
     except KeyError:
         raise Exception('Document does not have content and texts.')

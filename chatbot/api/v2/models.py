@@ -38,14 +38,15 @@ class ResponseRaw(object):
             answer['answer'] = r[0]
             answer['links'] = []
 
-            # Remove last element (source link)
-            answer_source = r[1].pop(-1)
-            answer['answer_source']['title'] = answer_source[0]
-            answer['answer_source']['link'] = answer_source[1]
-
             if len(r) > 1:
+                # Remove last element (source link)
+                answer_source = r[1].pop(-1)
+                answer['answer_source'] = {}
+                answer['answer_source']['title'] = answer_source[0]
+                answer['answer_source']['link'] = answer_source[1]
                 for link in r[1]:
                     answer['links'].append({'title': link[0], 'link': link[1]})
+
             answer['answer_id'] = random.randint(1000, 9999)
             self.response.append(answer)
 
