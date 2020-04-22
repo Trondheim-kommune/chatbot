@@ -26,16 +26,23 @@ class Response(object):
 
 
 class ResponseRaw(object):
-    def __init__(self, user_input, source, session):
+    def __init__(self, user_input, source, session, style):
         self.user_input = user_input
         responses = handler.get_response(self.user_input,
                                          source=source,
+                                         url_style=style,
                                          raw=True)
         self.response = []
         for r in responses:
             answer = {}
             answer['answer'] = r[0]
             answer['links'] = []
+
+            # Remove last element (source link)
+            answer_source = r[1].pop(-1)
+            answer['answer_source']['title'] = answer_source[0]
+            answer['answer_source']['link'] = answer_source[1]
+
             if len(r) > 1:
                 for link in r[1]:
                     answer['links'].append({'title': link[0], 'link': link[1]})

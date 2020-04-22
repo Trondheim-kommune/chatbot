@@ -50,7 +50,8 @@ response_model = api.model('Response', {
 response_input_model = api.model('ResponseInput', {
     'user_input': fields.String(description='Use chat input', required=True),
     'session': fields.Integer(description='Chat session ID', required=True),
-    'source': fields.String
+    'source': fields.String,
+    'style': fields.String
 })
 
 conflict_model = api.model('Conflict', {
@@ -143,10 +144,11 @@ class ResponseJSON(Resource):
             abort(400, 'No user_input provided.')
         # TODO: Verify valid session ID
 
+        style = 'plain' if 'style' not in args else args['style']
         source = args['source'] if 'source' in args else 'dev'
         query = args['user_input']
         session = args['session']
-        return models.ResponseRaw(query, source, session)
+        return models.ResponseRaw(query, source, session, style)
 
 
 class ConflictIDs(Resource):

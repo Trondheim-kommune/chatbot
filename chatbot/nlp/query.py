@@ -73,7 +73,8 @@ def _get_answer(doc):
 
 _url_styles = {
             'plain': '{} {}',
-            'html': "<a href='{1}' target='_blank'>{0}</a>"
+            'html': "<a href='{1}' target='_blank'>{0}</a>",
+            'md': "[{0}]({1})"
            }
 
 
@@ -221,7 +222,7 @@ def _perform_search(query_text, url_style, raw):
         if len(answers) == 1:
             # Return the answer straight away if there is only 1 result
             if raw:
-                return [answers[0]]
+                return [_format_answer(answers[0], url_style)]
             return _format_answer(answers[0], url_style)
 
         # Append answers until we reach the CHAR_LIMIT
@@ -234,7 +235,7 @@ def _perform_search(query_text, url_style, raw):
         # MULTI_ANSWERS option to the response
         if max(i, 1) == 1:
             if raw:
-                return [answers[0]]
+                return [_format_answer(answers[0], url_style)]
             return _format_answer(answers[0], url_style)
 
         # Join the results with a separator. Still setting a max number of
@@ -242,9 +243,9 @@ def _perform_search(query_text, url_style, raw):
         answers = answers[0:min(max(i, 1,), MAX_ANSWERS)]
         # Return (text, links) where links is (title, link) in the case of
         # needing 'raw' answers.
+        answers = [_format_answer(ans, url_style) for ans in answers]
         if raw:
             return [[MULTIPLE_ANSWERS]] + answers
-        answers = [_format_answer(ans, url_style) for ans in answers]
         return '\n\n---\n\n'.join([MULTIPLE_ANSWERS] + answers)
     except KeyError:
         raise Exception('Document does not have content and texts.')
