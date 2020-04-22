@@ -33,9 +33,16 @@ answer_model = api.model('Answer', {
     'links': fields.List(fields.Nested(link_model))
 })
 
+raw_answer_model = api.model('RawAnswer', {
+    'answer_id': fields.Integer(description='Answer ID used for feedback'),
+    'answer': fields.String(description='Textual answer'),
+    'links': fields.List(fields.Nested(link_model)),
+    'answer_source': fields.Nested(link_model)
+})
+
 response_raw_model = api.model('ResponseRaw', {
     'user_input': fields.String(description='User chat input'),
-    'response': fields.List(fields.Nested(answer_model),
+    'response': fields.List(fields.Nested(raw_answer_model),
                             description='Bot chat response'),
     'session': fields.Integer(description='Chat session ID'),
 })
