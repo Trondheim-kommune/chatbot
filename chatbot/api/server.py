@@ -18,3 +18,6 @@ api = Api(app, version='2.1')
 api.add_namespace(v2_api)
 
 CORS(app)
+
+if __name__ == '__main__':
+    app.run(ssl_context='adhoc')
