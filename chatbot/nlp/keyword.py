@@ -3,8 +3,6 @@ import string
 import re
 
 import spacy
-from spacy.lemmatizer import Lemmatizer
-from spacy.lang.nb import LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 
@@ -12,9 +10,8 @@ import nltk
 
 
 # Load a Norwegian language model for Spacy.
-nb = spacy.load('nb_dep_ud_sm')
-
-lemmatize = Lemmatizer(LEMMA_INDEX, LEMMA_EXC, LEMMA_RULES)
+nb = spacy.load('nb_core_news_sm')
+lemmatize = nb.Defaults.create_lemmatizer()
 
 nltk.download('wordnet', quiet=True)
 nltk.download('omw', quiet=True)
