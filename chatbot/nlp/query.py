@@ -240,7 +240,7 @@ def _perform_search(query_text, url_style, raw):
         # MULTI_ANSWERS option to the response
         if max(i, 1) == 1:
             if raw:
-                return [(_format_answer(answers[0], url_style), ansers[0][1])]
+                return [(_format_answer(answers[0], url_style), answers[0][1])]
             return _format_answer(answers[0], url_style, raw=False)
 
         # Join the results with a separator. Still setting a max number of
